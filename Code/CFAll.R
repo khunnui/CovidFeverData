@@ -2,6 +2,7 @@
 # Description: Driver program for Covid-19 Fever data processing	  	         #
 # Author:      hpy1                                                            #
 # Created:     January 27, 2022                                                #
+# Modified:    March 8, 2022                                                   #
 #------------------------------------------------------------------------------#
 library(tidyverse)
 library(lubridate)
@@ -30,7 +31,7 @@ dbConn <- dbConnector(server, database, uid, pwd)
 tblSection1 <- dbGetQuery(dbConn,'select * from "tblSection1"')
 tblSection2 <- dbGetQuery(dbConn,'select * from "tblSection2"')
 tblSection3 <- dbGetQuery(dbConn,'select * from "tblSection3"')
-#tblSection4 <- dbGetQuery(dbConn,'select * from "tblSection4"')
+tblSection4 <- dbGetQuery(dbConn,'select * from "tblSection4"')
 #tblSection4_1 <- dbGetQuery(dbConn,'select * from "tblSection4_1"')
 #tblSection5 <- dbGetQuery(dbConn,'select * from "tblSection5"')
 #tblSection5_1 <- dbGetQuery(dbConn,'select * from "tblSection5_1"')
@@ -44,7 +45,7 @@ LabPCRResult <- dbGetQuery(dbConn,'select * from "LabPCRResult"')
 source(paste0(code_folder, "/tblSection1.R"))
 source(paste0(code_folder, "/tblSection2.R"))
 source(paste0(code_folder, "/tblSection3.R"))
-# source(paste0(code_folder, "/tblSection4.R"))
+source(paste0(code_folder, "/tblSection4.R"))
 # source(paste0(code_folder, "/tblSection4_1.R"))
 # source(paste0(code_folder, "/tblSection5.R"))
 # source(paste0(code_folder, "/tblSection5_1.R"))
@@ -60,7 +61,7 @@ save(
     "tblSection1",
     "tblSection2",
     "tblSection3",
-    # "tblSection4",
+    "tblSection4",
     # "tblSection4_1",
     # "tblSection5",
     # "tblSection5_1",
