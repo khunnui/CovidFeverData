@@ -54,4 +54,5 @@ tblSection1 <- tblSection1 %>%
                   Blood),
                 function(f) {ifelse(f == 2, 0, f)}), 
          # Create CF_enrol based on a having a CFID
-         CF_Enrol = ifelse(!is.na(CFID), 1, 0))
+         CF_Enrol = ifelse(!is.na(CFID), 1, 0),
+         OLDCF = ifelse(!is.na(PreCFID), 1, 0)
