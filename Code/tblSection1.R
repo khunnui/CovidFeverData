@@ -55,8 +55,8 @@ tblSection1 <- tblSection1 %>%
                 function(f) {ifelse(f == 2, 0, f)}), 
          # Create CF_enrol based on a having a CFID
          CF_Enrol = factor(ifelse(!is.na(CFID), 1, 0),
-                           levels = c(0,1),
-                           labels = c('No','Yes')),
+                           levels = c(1,0),
+                           labels = c('Yes','No')),
          OLDCF = factor(ifelse(!is.na(PreCFID), 1, 0),
-                        levels = c(0,1),
-                        labels = c('No','Yes')))
+                        levels = c(1,0),
+                        labels = c('Yes','No')))
