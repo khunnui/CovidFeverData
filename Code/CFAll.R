@@ -58,7 +58,7 @@ source(paste0(code_folder, "/LabPCRResult.R"))
 # Screening page
 df_scr <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
-  group_by(scrdate) %>% 
+  group_by(Province, S1HospitalID, scrdate) %>% 
   tally()
 df_scrage0 <- tblSection1 %>%
   summarize(
@@ -93,34 +93,34 @@ df_scrage2 <- tblSection1 %>%
     max = max(S1Age_Year, na.rm = TRUE)
   )
 df_scrgender <- tblSection1 %>%
-  group_by(S1Gender) %>% 
+  group_by(Province, S1HospitalID, S1Gender) %>% 
   tally()
 df_screnrol <- tblSection1 %>%
-  group_by(OLDCF, CF_Enrol) %>% 
+  group_by(Province, S1HospitalID, OLDCF, CF_Enrol) %>% 
   tally()
 
 # Enrollment page
 df_eli <- tblSection1 %>%
   filter(S1Eligible == 1) %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>% 
-  group_by(scrdate) %>% 
+  group_by(Province, S1HospitalID, scrdate) %>% 
   tally()
 df_enr <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   left_join(LabPCRResult, by = "CFID") %>%
   mutate(enrdate = floor_date(S1EnrollDate, "month")) %>% 
-  group_by(enrdate, FinalResult) %>% 
+  group_by(Province, S1HospitalID, enrdate, FinalResult) %>% 
   tally()
 df_enrage <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
-  group_by(agegroup) %>% 
+  group_by(Province, S1HospitalID, agegroup) %>% 
   tally()
 df_enrgender <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
-  group_by(S1Gender) %>% 
+  group_by(Province, S1HospitalID, S1Gender) %>% 
   tally()
 df_enrocc <- tblSection3 %>%
-  group_by(S34Occupation) %>% 
+  group_by(Province, S1HospitalID, S34Occupation) %>% 
   tally()
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
