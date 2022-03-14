@@ -99,7 +99,31 @@ df_screnrol <- tblSection1 %>%
   group_by(OLDCF, CF_Enrol) %>% 
   tally()
 
-## Save all data frames in one data file (CFMast.RData) for later use ----------
+# Enrollment page
+df_eli <- tblSection1 %>%
+  filter(S1Eligible == 1) %>% # Eligible only
+  mutate(scrdate = floor_date(S1ScreenDate, "month")) %>% 
+  group_by(scrdate) %>% 
+  tally()
+df_enr <- tblSection1 %>%
+  filter(!is.na(S1EnrollDate)) %>%
+  left_join(LabPCRResult, by = "CFID") %>%
+  mutate(enrdate = floor_date(S1EnrollDate, "month")) %>% 
+  group_by(enrdate, FinalResult) %>% 
+  tally()
+df_enrage <- tblSection1 %>%
+  filter(!is.na(S1EnrollDate)) %>%
+  group_by(agegroup) %>% 
+  tally()
+df_enrgender <- tblSection1 %>%
+  filter(!is.na(S1EnrollDate)) %>%
+  group_by(S1Gender) %>% 
+  tally()
+df_enrocc <- tblSection3 %>%
+  group_by(S34Occupation) %>% 
+  tally()
+
+## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
   list = c(
     "df_scr",
@@ -109,5 +133,5 @@ save(
     "df_scrgender",
     "df_screnrol"
   ),
-  file = paste0(data_folder, "/CFDashboard.Rdata")
+  file = paste0(data_folder, "/CFDashboard.RData")
 )
