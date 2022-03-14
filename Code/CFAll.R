@@ -59,7 +59,8 @@ source(paste0(code_folder, "/LabPCRResult.R"))
 df_scr <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
   group_by(Province, S1HospitalID, scrdate) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_scrage0 <- tblSection1 %>%
   summarize(
     n = n(),
@@ -80,7 +81,8 @@ df_scrage1 <- tblSection1 %>%
     mean = round(mean(S1Age_Year, na.rm = TRUE), 1),
     q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
     max = max(S1Age_Year, na.rm = TRUE)
-  )
+  ) %>% 
+  ungroup()
 df_scrage2 <- tblSection1 %>%
   group_by(S1HospitalID) %>% 
   summarize(
@@ -91,37 +93,45 @@ df_scrage2 <- tblSection1 %>%
     mean = round(mean(S1Age_Year, na.rm = TRUE), 1),
     q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
     max = max(S1Age_Year, na.rm = TRUE)
-  )
+  ) %>% 
+  ungroup()
 df_scrgender <- tblSection1 %>%
   group_by(Province, S1HospitalID, S1Gender) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_screnrol <- tblSection1 %>%
   group_by(Province, S1HospitalID, OLDCF, CF_Enrol) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 
 # Enrollment page
 df_eli <- tblSection1 %>%
   filter(S1Eligible == 1) %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>% 
   group_by(Province, S1HospitalID, scrdate) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_enr <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   left_join(LabPCRResult, by = "CFID") %>%
   mutate(enrdate = floor_date(S1EnrollDate, "month")) %>% 
   group_by(Province, S1HospitalID, enrdate, FinalResult) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_enrage <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   group_by(Province, S1HospitalID, agegroup) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_enrgender <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   group_by(Province, S1HospitalID, S1Gender) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 df_enrocc <- tblSection3 %>%
   group_by(Province, S1HospitalID, S34Occupation) %>% 
-  tally()
+  tally() %>% 
+  ungroup()
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
