@@ -5,6 +5,9 @@
 tblSection3 <- tblSection3 %>%
   select(-starts_with("_")) %>%
   mutate(Province = ifelse(substr(CFID,1,2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
+         S1HospitalID = factor(substr(CFID,1,2),
+                               levels = c(9,11,16,21,22,23),
+                               labels = c("Nakorn Phanom","Sri Songkhram","That Phanom","Mae Sot","Umphang","Tha Song Yang")),
          across(matches("Date") & !matches("DateRange"), as.Date),
          S34Occupation = factor(S34Occupation,
                                 levels = c(1:30,99),

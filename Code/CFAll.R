@@ -141,7 +141,12 @@ save(
     "df_scrage1",
     "df_scrage2",
     "df_scrgender",
-    "df_screnrol"
+    "df_screnrol",
+    "df_eli",
+    "df_enr",
+    "df_enrage",
+    "df_enrgender",
+    "df_enrocc"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
