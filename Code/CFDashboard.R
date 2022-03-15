@@ -79,7 +79,7 @@ df_enrgender <- tblSection1 %>%
   tally() %>% 
   ungroup()
 df_enrocc <- tblSection3 %>%
-  #mutate(S34Occupation = replace(S34Occupation, S34Occupation == "Other farmer", "Farmer")) %>%
+  mutate(S34Occupation = replace(S34Occupation, S34Occupation == "Other farmer", "Farmer")) %>%
   group_by(Province, S1HospitalID, S34Occupation) %>% 
   tally() %>% 
   ungroup()
