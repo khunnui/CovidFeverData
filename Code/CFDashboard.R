@@ -84,7 +84,8 @@ df_enrocc <- tblSection3 %>%
   tally() %>% 
   ungroup()
 df_vac <-tblSection3 %>%
-  group_by(Province, S1HospitalID, S33CovidVaccine) %>%
+  left_join(LabPCRResult, by = "CFID") %>%
+  group_by(Province, S1HospitalID, S33CovidVaccine,FinalResult) %>%
   tally() %>% 
   ungroup()
   
@@ -104,7 +105,8 @@ save(
     "df_pos3wk",
     "df_enrage",
     "df_enrgender",
-    "df_enrocc"
+    "df_enrocc",
+    "df_vac"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
