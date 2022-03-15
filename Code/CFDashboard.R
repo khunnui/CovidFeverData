@@ -83,6 +83,12 @@ df_enrocc <- tblSection3 %>%
   group_by(Province, S1HospitalID, S34Occupation) %>% 
   tally() %>% 
   ungroup()
+df_vac <-tblSection3 %>%
+  group_by(Province, S1HospitalID, S33CovidVaccine) %>%
+  tally() %>% 
+  ungroup()
+  
+
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
