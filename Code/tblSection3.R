@@ -56,13 +56,13 @@ tblSection3 <- tblSection3 %>%
                 function(f) {
                   factor(
                     f,
-                    levels = c(1, 2, 3, 4, 5),
+                    levels = c(5:1),
                     labels = c(
-                      'Strongly agree',
-                      'Agree',
-                      'Neither agree/disagree',
+                      'Strongly disagree',
                       'Disagree',
-                      'Strongly disagree'
+                      'Neither agree/disagree',
+                      'Agree',
+                      'Strongly agree',
                     )
                   )
                 }),
@@ -70,13 +70,13 @@ tblSection3 <- tblSection3 %>%
                 function(f) {
                   factor(
                     f,
-                    levels = c(1, 2, 3, 4, 5),
+                    levels = c(5:1),
                     labels = c(
-                      'Always',
-                      'Most of the time', 
-                      'Occasionally', 
+                      'Never',
                       'Rarely', 
-                      'Never'
+                      'Occasionally', 
+                      'Most of the time', 
+                      'Always'
                     )
                   )
                 })
