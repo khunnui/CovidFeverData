@@ -95,9 +95,9 @@ df_kap <-tblSection3 %>%
   pivot_longer(
     cols = S3604SickSpread:S3622,
     names_to = "kap",
-    values_to = "y"
+    values_to = "scale"
   ) %>% 
-  group_by(Province, S1HospitalID, kap, y) %>% 
+  group_by(Province, S1HospitalID, kap, scale) %>% 
   tally()
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
