@@ -89,7 +89,16 @@ df_vac <-tblSection3 %>%
   tally() %>% 
   ungroup()
   
-
+df_kap <-tblSection3 %>%
+  select(Province, S1HospitalID, 
+         S3604SickSpread, S3610MaskIn, S3613MaskOut, S3615CareLate:S3622) %>% 
+  pivot_longer(
+    cols = S3604SickSpread:S3622,
+    names_to = "kap",
+    values_to = "y"
+  ) %>% 
+  group_by(Province, S1HospitalID, kap, y) %>% 
+  tally()
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
@@ -106,7 +115,8 @@ save(
     "df_enrage",
     "df_enrgender",
     "df_enrocc",
-    "df_vac"
+    "df_vac",
+    "df_kap"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
