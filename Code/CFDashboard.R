@@ -89,17 +89,33 @@ df_vac <-tblSection3 %>%
   tally() %>% 
   ungroup()
   
-df_kap <-tblSection3 %>%
+df_kap1 <-tblSection3 %>%
   select(Province, S1HospitalID, 
-         S3604SickSpread, S3610MaskIn, S3613MaskOut, S3615CareLate:S3622) %>% 
+         S3604SickSpread, S3615CareLate:S3620) %>% 
   pivot_longer(
-    cols = S3604SickSpread:S3622,
+    cols = S3604SickSpread:S3620,
     names_to = "kap",
     values_to = "scale"
   ) %>%
   filter(!is.na(scale)) %>% 
   group_by(Province, S1HospitalID, kap, scale) %>% 
-  tally()
+  tally() %>% 
+  ungroup() %>% 
+  arrange(scale)
+
+df_kap2 <-tblSection3 %>%
+  select(Province, S1HospitalID, 
+         S3610MaskIn, S3613MaskOut, S3621:S3622) %>% 
+  pivot_longer(
+    cols = S3610MaskIn:S3622,
+    names_to = "kap",
+    values_to = "scale"
+  ) %>%
+  filter(!is.na(scale)) %>% 
+  group_by(Province, S1HospitalID, kap, scale) %>% 
+  tally() %>% 
+  ungroup() %>% 
+  arrange(scale)
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
@@ -117,7 +133,8 @@ save(
     "df_enrgender",
     "df_enrocc",
     "df_vac",
-    "df_kap"
+    "df_kap1",
+    "df_kap2"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )

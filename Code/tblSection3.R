@@ -56,7 +56,7 @@ tblSection3 <- tblSection3 %>%
                 function(f) {
                   factor(
                     f,
-                    levels = c(1:5),
+                    levels = c(1, 2, 3, 4, 5),
                     labels = c(
                       'Strongly agree',
                       'Agree',
@@ -70,7 +70,7 @@ tblSection3 <- tblSection3 %>%
                 function(f) {
                   factor(
                     f,
-                    levels = c(1:5),
+                    levels = c(1, 2, 3, 4, 5),
                     labels = c(
                       'Always',
                       'Most of the time', 
