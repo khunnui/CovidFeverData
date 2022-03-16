@@ -96,7 +96,8 @@ df_kap <-tblSection3 %>%
     cols = S3604SickSpread:S3622,
     names_to = "kap",
     values_to = "scale"
-  ) %>% 
+  ) %>%
+  filter(!is.na(scale)) %>% 
   group_by(Province, S1HospitalID, kap, scale) %>% 
   tally()
 
