@@ -62,7 +62,7 @@ tblSection3 <- tblSection3 %>%
                       'Disagree',
                       'Neither agree/disagree',
                       'Agree',
-                      'Strongly agree',
+                      'Strongly agree'
                     )
                   )
                 }),

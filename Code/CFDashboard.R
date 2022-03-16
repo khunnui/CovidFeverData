@@ -101,7 +101,7 @@ df_kap1 <-tblSection3 %>%
   group_by(Province, S1HospitalID, kap, scale) %>% 
   tally() %>% 
   ungroup() %>% 
-  arrange(desc(scale))
+  arrange(scale)
 
 df_kap2 <-tblSection3 %>%
   select(Province, S1HospitalID, 
@@ -115,7 +115,7 @@ df_kap2 <-tblSection3 %>%
   group_by(Province, S1HospitalID, kap, scale) %>% 
   tally() %>% 
   ungroup() %>% 
-  arrange(desc(scale))
+  arrange(scale)
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
