@@ -86,7 +86,8 @@ df_enrocc <- tblSection3 %>%
 
 # Diagnosis page
 df_dx <- tblSection2 %>%
-  select(CFID, Province, S1HospitalID,
+  left_join(LabPCRResult, by = "CFID") %>%
+  select(CFID, Province, S1HospitalID, FinalResult,
          S2DxFever:S2DxOther, S2DxMeningitis) %>%
   rename_with(~ str_replace(., "S2Dx", ""), starts_with("S2Dx")) %>%
   rename(
@@ -106,7 +107,7 @@ df_dx <- tblSection2 %>%
   pivot_longer(cols = Fever:Meningitis,
                names_to = "Diagnosis",
                values_to = "y") %>%
-  group_by(Province, S1HospitalID, Diagnosis) %>%
+  group_by(Province, S1HospitalID, FinalResult, Diagnosis) %>%
   tally(wt = y)
 
 # Vaccination page
