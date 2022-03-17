@@ -108,8 +108,7 @@ df_dx <- tblSection2 %>%
                names_to = "Diagnosis",
                values_to = "y") %>%
   group_by(Province, S1HospitalID, FinalResult, Diagnosis) %>%
-  tally(wt = y) %>% 
-  ungroup()
+  tally(wt = y) 
 
 # Underlying Page
 df_un <- tblSection3 %>%
