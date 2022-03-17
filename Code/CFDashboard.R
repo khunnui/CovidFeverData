@@ -110,6 +110,37 @@ df_dx <- tblSection2 %>%
   group_by(Province, S1HospitalID, FinalResult, Diagnosis) %>%
   tally(wt = y)
 
+# Underlying Page
+df_un <- tblSection3 %>%
+  select(CFID, Province,S1HospitalID, S35Diabetes,
+    S35Obesity:S35Cancer,
+    S35HIV:S35OthChronic,
+    S35HisSmoke:S35Pregnancy
+  ) %>%
+  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  rename_with( ~ str_replace(., "S35", ""), starts_with("S35")) %>%
+  rename(
+    "Heart Diseases" = HeartDisease,
+    "Immunodeficiency" = Immunodef,
+    "History of TB" = HisTB,
+    "Active TB" = ActiveTB,
+    "Chrolesterol" = Chroles,
+    "Cerebrovascular Diseases" = Cerebro,
+    "Other Chronic Diseases" = OthChronic,
+    "History of smoking" = HisSmoke,
+    "Current smoking" = CurSmoke,
+    "History of alcohol consumption" = HistAlcohol,
+    "Current of alcohol consumption" = CurAlcohol
+  ) %>%
+  pivot_longer(
+    cols = Diabetes:Pregnancy,
+    names_to = "Underlying",
+    values_to = "y"
+  ) %>%
+  group_by(Underlying, S1HospitalID, Province, FinalResult) %>%
+  tally(wt = y)
+#
+
 # Vaccination page
 df_vac <-tblSection3 %>%
   left_join(LabPCRResult, by = "CFID") %>%
@@ -157,7 +188,8 @@ save(
     "df_dx",
     "df_vac",
     "df_kap1",
-    "df_kap2"
+    "df_kap2",
+    "df_un"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
