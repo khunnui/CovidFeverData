@@ -83,40 +83,60 @@ df_enrocc <- tblSection3 %>%
   group_by(Province, S1HospitalID, S34Occupation) %>% 
   tally() %>% 
   ungroup()
+
+# Diagnosis page
+df_dx <- tblSection2 %>%
+  select(CFID, Province, S1HospitalID,
+         S2DxFever:S2DxOther, S2DxMeningitis) %>%
+  rename_with(~ str_replace(., "S2Dx", ""), starts_with("S2Dx")) %>%
+  rename(
+    "Common Cold" = ComCold,
+    "Bacterial Infection" = BacInfect,
+    "Heart Diseases" = HeartDis,
+    "Abdominal Pain" = AbPain,
+    "Cerebrovascular Accident" = CerebAcci,
+    "Chikungunya" = Chikun,
+    "Gastrointestinal Tract Infection" = GastroInfect,
+    "Renal Diseases" = Renal,
+    "Viral Infection" = ViralInfect,
+    "Alteration of Conscious" = AlterConscious,
+    "Electrolyte Imbalance" = ElecImbalance,
+    "Scrub Typhus" = ScrubTyphus
+  ) %>%
+  pivot_longer(cols = Fever:Meningitis,
+               names_to = "Diagnosis",
+               values_to = "y") %>%
+  group_by(Province, S1HospitalID, Diagnosis) %>%
+  tally(wt = y)
+
+# Vaccination page
 df_vac <-tblSection3 %>%
   left_join(LabPCRResult, by = "CFID") %>%
   group_by(Province, S1HospitalID, S33CovidVaccine,FinalResult) %>%
   tally() %>% 
   ungroup()
   
-df_kap1 <-tblSection3 %>%
-  select(Province, S1HospitalID, 
-         S3604SickSpread, S3615CareLate:S3620) %>% 
-  pivot_longer(
-    cols = S3604SickSpread:S3620,
-    names_to = "kap",
-    values_to = "scale"
-  ) %>%
-  #mutate(scale = fct_rev(scale)) %>% 
-  filter(!is.na(scale)) %>% 
-  group_by(Province, S1HospitalID, kap, scale) %>% 
-  tally() %>% 
-  ungroup() %>% 
-  arrange(scale)
+# KAP page
+df_kap1 <- tblSection3 %>%
+  select(Province, S1HospitalID,
+         S3604SickSpread, S3615CareLate:S3620) %>%
+  pivot_longer(cols = S3604SickSpread:S3620,
+               names_to = "kap",
+               values_to = "scale") %>%
+  #mutate(scale = fct_rev(scale)) %>%
+  filter(!is.na(scale)) %>%
+  group_by(Province, S1HospitalID, kap, scale) %>%
+  tally()
 
-df_kap2 <-tblSection3 %>%
-  select(Province, S1HospitalID, 
-         S3610MaskIn, S3613MaskOut, S3621:S3622) %>% 
-  pivot_longer(
-    cols = S3610MaskIn:S3622,
-    names_to = "kap",
-    values_to = "scale"
-  ) %>%
-  filter(!is.na(scale)) %>% 
-  group_by(Province, S1HospitalID, kap, scale) %>% 
-  tally() %>% 
-  ungroup() %>% 
-  arrange(scale)
+df_kap2 <- tblSection3 %>%
+  select(Province, S1HospitalID,
+         S3610MaskIn, S3613MaskOut, S3621:S3622) %>%
+  pivot_longer(cols = S3610MaskIn:S3622,
+               names_to = "kap",
+               values_to = "scale") %>%
+  filter(!is.na(scale)) %>%
+  group_by(Province, S1HospitalID, kap, scale) %>%
+  tally()
 
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
