@@ -64,27 +64,19 @@ tblSection3 <- tblSection3 %>%
                       'Disagree',
                       'Strongly disagree'
                     )
-                    # levels = c(5:1),
-                    # labels = c(
-                    #   'Strongly disagree',
-                    #   'Disagree',
-                    #   'Neither agree/disagree',
-                    #   'Agree',
-                    #   'Strongly agree'
-                    # )
                   )
                 }),
          across(c(S3610MaskIn, S3613MaskOut, S3621:S3622),
                 function(f) {
                   factor(
                     f,
-                    levels = c(5:1),
+                    levels = c(1:5),
                     labels = c(
-                      'Never',
-                      'Rarely', 
-                      'Occasionally', 
+                      'Always',
                       'Most of the time', 
-                      'Always'
+                      'Occasionally', 
+                      'Rarely', 
+                      'Never'
                     )
                   )
                 })
