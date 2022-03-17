@@ -108,7 +108,8 @@ df_dx <- tblSection2 %>%
                names_to = "Diagnosis",
                values_to = "y") %>%
   group_by(Province, S1HospitalID, FinalResult, Diagnosis) %>%
-  tally(wt = y)
+  tally(wt = y) %>% 
+  ungroup()
 
 # Underlying Page
 df_un <- tblSection3 %>%
@@ -186,10 +187,10 @@ save(
     "df_enrgender",
     "df_enrocc",
     "df_dx",
+    "df_un",
     "df_vac",
     "df_kap1",
-    "df_kap2",
-    "df_un"
+    "df_kap2"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
