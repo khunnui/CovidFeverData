@@ -153,6 +153,7 @@ save(
     "df_enrage",
     "df_enrgender",
     "df_enrocc",
+    "df_dx",
     "df_vac",
     "df_kap1",
     "df_kap2"
