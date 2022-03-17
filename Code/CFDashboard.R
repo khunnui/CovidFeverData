@@ -97,7 +97,7 @@ df_kap1 <-tblSection3 %>%
     names_to = "kap",
     values_to = "scale"
   ) %>%
-  mutate(scale = fct_rev(scale)) %>% 
+  #mutate(scale = fct_rev(scale)) %>% 
   filter(!is.na(scale)) %>% 
   group_by(Province, S1HospitalID, kap, scale) %>% 
   tally() %>% 
