@@ -139,7 +139,40 @@ df_un <- tblSection3 %>%
   ) %>%
   group_by(Underlying, S1HospitalID, Province, FinalResult) %>%
   tally(wt = y)
-#
+
+#Risk Factor page
+
+df_rf <- tblSection3 %>%
+  select(
+    CFID,
+    Province,S1HospitalID,
+    S33SuspectedCOVID19:S33VisitHos,
+    S33VistiCrowded:S33TravelThai,
+    S33TravelInter
+  ) %>%
+  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  mutate(
+    "Contact COVID-19 cases" = ifelse(S33SuspectedCOVID19 == 1, 1, 0),
+    "Contact febrile patients" = ifelse(S33FebrileHousehold == 1 |
+                                          S33FebrileCoWorker == 1 |
+                                          S33FebrileNeighbor == 1, 1, 0),
+    "Contact persons with respiratory symptoms" = ifelse(S33RPS == 1, 1, 0),
+    "Contact pneumonia patients" = ifelse(S33Pneumonia == 1, 1, 0),
+    "Contact healthcare workers" = ifelse(S33HealthCarePer == 1 |
+                                            S33VisitHos == 1, 1, 0),
+    "Visit crowded places" = ifelse(S33VistiCrowded == 1 |
+                                      S33PartPeople == 1, 1, 0),
+    "History of travel" = ifelse(S33TravelThai == 1 |
+                                   S33TravelInter, 1, 0)
+  ) %>%
+  select(-c(S33SuspectedCOVID19:S33VisitHos, S33VistiCrowded:S33TravelThai, S33TravelInter)) %>%
+  pivot_longer(
+    cols = "Contact COVID-19 cases":"History of travel",
+    names_to = "Risk",
+    values_to = "y"
+  ) %>%
+  group_by(Risk, Province, S1HospitalID,FinalResult) %>%
+  tally(wt = y)
 
 # Vaccination page
 df_vac <-tblSection3 %>%
@@ -187,6 +220,7 @@ save(
     "df_enrocc",
     "df_dx",
     "df_un",
+    "df_rf",
     "df_vac",
     "df_kap1",
     "df_kap2"
