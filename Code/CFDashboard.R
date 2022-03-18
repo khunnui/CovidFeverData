@@ -1,5 +1,10 @@
 # Screening page
-df_scr <- tblSection1 %>%
+df_scrw <- tblSection1 %>%
+  mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
+  group_by(Province, S1HospitalID, scrdate) %>% 
+  tally() %>% 
+  ungroup()
+df_scrm <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
   group_by(Province, S1HospitalID, scrdate) %>% 
   tally() %>% 
@@ -258,7 +263,8 @@ df_kap2 <- tblSection3 %>%
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
   list = c(
-    "df_scr",
+    "df_scrw",
+    "df_scrm",
     "df_scrage0",
     "df_scrage1",
     "df_scrage2",
