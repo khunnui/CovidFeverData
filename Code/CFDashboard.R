@@ -278,6 +278,7 @@ save(
     "df_enrocc",
     "df_dx",
     "df_un",
+    "df_rf",
     "df_sign",
     "df_vac",
     "df_kap1",
