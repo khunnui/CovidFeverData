@@ -174,6 +174,58 @@ df_rf <- tblSection3 %>%
   group_by(Risk, Province, S1HospitalID,FinalResult) %>%
   tally(wt = y)
 
+# Clinical Sign
+df_sign <- tblSection3 %>%
+  select(
+    CFID,
+    Province,
+    S1HospitalID,
+    S32Headache
+    ,S32NeckStiff
+    ,S32Tiredness
+    ,S32Malaise
+    ,S32Chills
+    ,S32EyePain
+    ,S32RedEyes
+    ,S32YellowEyes
+    ,S32NoseBleeding
+    ,S32Hyposmia
+    ,S32Dysgeusia
+    ,S32MusclePain
+    ,S32JointPain
+    ,S32RedJoints
+    ,S32BonePain
+    ,S32BackPain
+    ,S32ChestPain
+    ,S32NoAppetite
+    ,S32Nausea
+    ,S32Vomiting
+    ,S32BloodVomit
+    ,S32AbdominalPain
+    ,S32Diarrhea
+    ,S32BloodStool
+    ,S32BloodUrine
+    ,S32Dysuria
+    ,S32PaleSkin
+    ,S32Rash
+    ,S32Bruise
+    ,S32Seizures
+    ,S32Other
+  ) %>%
+  left_join(tblSection2 %>% select(CFID, S2Temp), by = "CFID") %>%
+  mutate(S2Temp = ifelse(S2Temp >= 38, 1, 0)) %>%
+  rename_with( ~ str_replace(., "S32", ""), starts_with("S32"))%>%
+  rename(
+    "Temperature >=38.0 C" = S2Temp) %>% 
+  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  pivot_longer(
+    cols = Headache:"Temperature >=38.0 C",
+    names_to = "Signs",
+    values_to = "y"
+  ) %>%
+  group_by(Signs, Province, S1HospitalID, FinalResult) %>%
+  tally(wt = y)
+
 # Vaccination page
 df_vac <-tblSection3 %>%
   left_join(LabPCRResult, by = "CFID") %>%
@@ -220,7 +272,7 @@ save(
     "df_enrocc",
     "df_dx",
     "df_un",
-    "df_rf",
+    "df_sign",
     "df_vac",
     "df_kap1",
     "df_kap2"
