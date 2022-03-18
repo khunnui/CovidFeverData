@@ -1,3 +1,5 @@
+ddate <- max(tblSection1$S1ScreenDate, na.rm = TRUE)
+
 # Screening page
 df_scrw <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
@@ -263,6 +265,7 @@ df_kap2 <- tblSection3 %>%
 ## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
 save(
   list = c(
+    "ddate",
     "df_scrw",
     "df_scrm",
     "df_scrage0",
