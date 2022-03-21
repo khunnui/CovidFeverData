@@ -148,7 +148,6 @@ df_un <- tblSection3 %>%
   tally(wt = y)
 
 #Risk Factor page
-
 df_rf <- tblSection3 %>%
   select(
     CFID,
@@ -248,6 +247,30 @@ df_sign <- tblSection3 %>%
   ) %>%
   group_by(Signs, Province, S1HospitalID, FinalResult) %>%
   tally(wt = y)
+
+# Clinical Sign Boxes
+#Hospitalized
+df_hos <- tblSection5 %>% 
+  select(CFID, Province, S1HospitalID)%>%
+  group_by(Province, S1HospitalID ) %>%
+  tally() %>% 
+  ungroup()
+
+#Intubation
+df_intub <- tblSection5 %>%
+  select(CFID, Province, S1HospitalID,S5Intub)%>%
+  filter(S5Intub == 2) %>% 
+  group_by(Province, S1HospitalID ) %>%
+  tally() %>%
+  ungroup()
+
+#Death
+df_death <- tblSection5 %>% 
+  select(CFID, Province, S1HospitalID, S5DishargeType)%>%
+  filter(S5DishargeType == 4) %>% 
+  group_by(Province, S1HospitalID ) %>%
+  tally() %>% 
+  ungroup()
 
 # Vaccination page
 df_vac <-tblSection3 %>%
