@@ -25,11 +25,10 @@ LabPCRResult_l <- LabPCRResult %>%
       levels = c(1, 4, 7),
       labels = c("NP+OP swab", "Nasal swab", "Saliva")
     ),
-    FinalResult = factor(
+    FinalResult_fac = factor(
       FinalResult,
       levels = c(1, 2, 3),
-      labels = c("Positive", "Inconclusive", "Negative"),
-      ordered = TRUE
+      labels = c("Positive", "Inconclusive", "Negative")
     )
   )
 
@@ -48,9 +47,16 @@ LabPCRResult_w <- LabPCRResult_l %>%
   ) %>%
   # Final PCR result based on all specimen types
   mutate(
-    FinalResult = pmin(`FinalResult_NP+OP swab`,
-                       `FinalResult_Nasal swab`,
-                       `FinalResult_Saliva`, na.rm = TRUE),
+    FinalResult = factor(
+      pmin(
+        `FinalResult_NP+OP swab`,
+        `FinalResult_Nasal swab`,
+        `FinalResult_Saliva`,
+        na.rm = TRUE
+      ),
+      levels = c(1, 2, 3),
+      labels = c("Positive", "Inconclusive", "Negative")
+    ),
     TestDate = pmin(
       `TestDate_P_NP+OP swab`,
       `TestDate_P_Nasal swab`,
@@ -64,4 +70,9 @@ LabPCRResult_w <- LabPCRResult_l %>%
       na.rm = TRUE
     )
   ) %>%
-  select(-c(`FinalResult_NP+OP swab`:`FinalResult_Saliva`, `TestDate_P_NP+OP swab`:`TestDate_I2_Saliva`))
+  select(
+    -c(
+      `FinalResult_NP+OP swab`:`FinalResult_Saliva`,
+      `TestDate_P_NP+OP swab`:`TestDate_I2_Saliva`
+    )
+  )
