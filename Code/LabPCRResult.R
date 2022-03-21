@@ -13,7 +13,10 @@
 LabPCRResult_l <- LabPCRResult %>%
   # Create CFID from first 9 characters of SpecimenID
   mutate(CFID = substr(SpecimenID, 1, 9),
-         across(matches("Date"), as.Date))
+         across(matches("Date"), as.Date),
+         SpecType = factor(SpecType,
+                           levels = c(1, 4, 7),
+                           labels = c("NP+OP swab","Nasal swab","Saliva")))
 
 LabPCRResult_w <- LabPCRResult_l %>%
   # Select only 4 columns (ID, type, result, and test dates)
