@@ -63,13 +63,13 @@ df_eli <- tblSection1 %>%
   ungroup()
 df_enr <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
-  left_join(LabPCRResult, by = "CFID") %>%
+  left_join(LabPCRResult_w, by = "CFID") %>%
   mutate(enrdate = floor_date(S1EnrollDate, "month")) %>% 
   group_by(Province, S1HospitalID, enrdate, FinalResult) %>% 
   tally() %>%
   ungroup()
 df_pos3wk <- tblSection1 %>%
-  left_join(LabPCRResult, by = "CFID") %>%
+  left_join(LabPCRResult_w, by = "CFID") %>%
   filter(!is.na(S1EnrollDate), 
          TestDate > Sys.Date() - 22) %>%
   group_by(Province, S1HospitalID, FinalResult) %>% 
@@ -93,7 +93,7 @@ df_enrocc <- tblSection3 %>%
 
 # Diagnosis page
 df_dx <- tblSection2 %>%
-  left_join(LabPCRResult, by = "CFID") %>%
+  left_join(LabPCRResult_w, by = "CFID") %>%
   select(CFID, Province, S1HospitalID, FinalResult,
          S2DxFever:S2DxOther, S2DxMeningitis) %>%
   rename_with(~ str_replace(., "S2Dx", ""), starts_with("S2Dx")) %>%
@@ -124,7 +124,7 @@ df_un <- tblSection3 %>%
     S35HIV:S35OthChronic,
     S35HisSmoke:S35Pregnancy
   ) %>%
-  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  left_join(LabPCRResult_w %>% select(CFID, FinalResult), by = "CFID") %>%
   rename_with( ~ str_replace(., "S35", ""), starts_with("S35")) %>%
   rename(
     "Heart Diseases" = HeartDisease,
@@ -148,7 +148,6 @@ df_un <- tblSection3 %>%
   tally(wt = y)
 
 #Risk Factor page
-
 df_rf <- tblSection3 %>%
   select(
     CFID,
@@ -157,7 +156,7 @@ df_rf <- tblSection3 %>%
     S33VistiCrowded:S33TravelThai,
     S33TravelInter
   ) %>%
-  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  left_join(LabPCRResult_w %>% select(CFID, FinalResult), by = "CFID") %>%
   mutate(
     "Contact COVID-19 cases" = ifelse(S33SuspectedCOVID19 == 1, 1, 0),
     "Contact febrile patients" = ifelse(S33FebrileHousehold == 1 |
@@ -223,26 +222,27 @@ df_sign <- tblSection3 %>%
   mutate(S2Temp = ifelse(S2Temp >= 38, 1, 0)) %>%
   rename_with( ~ str_replace(., "S32", ""), starts_with("S32"))%>%
   rename(
-    "Temperature >=38.0 C" = S2Temp,
-    "Stiff Neck" = NeckStiff,
+    "Temperature >= 38.0 C" = S2Temp,
+    "Stiff neck" = NeckStiff,
     "Eye pain" = EyePain,
     "Red eyes" = RedEyes,
     "Yellow eyes" = YellowEyes,
     "Muscle pain" = MusclePain,
     "Joint pain" =JointPain,
     "Red joints" = RedJoints,
-    "Nose Bleeding" = NoseBleeding,
+    "Nose bleeding" = NoseBleeding,
     "Bone pain" = BonePain,
     "Back pain" = BackPain,
     "Chest pain" = ChestPain,
-    "No Appetite" = NoAppetite,
+    "Pale skin" = PaleSkin,
+    "No appetite" = NoAppetite,
     "Blood vomitting" = BloodVomit,
     "Abdominal pain" =AbdominalPain,
     "Blood stool"= BloodStool,
     "Blood urine" = BloodUrine) %>% 
-  left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
+  left_join(LabPCRResult_w %>% select(CFID, FinalResult), by = "CFID") %>%
   pivot_longer(
-    cols = Headache:"Temperature >=38.0 C",
+    cols = Headache:"Temperature >= 38.0 C",
     names_to = "Signs",
     values_to = "y"
   ) %>%
@@ -251,7 +251,7 @@ df_sign <- tblSection3 %>%
 
 # Vaccination page
 df_vac <-tblSection3 %>%
-  left_join(LabPCRResult, by = "CFID") %>%
+  left_join(LabPCRResult_w, by = "CFID") %>%
   group_by(Province, S1HospitalID, S33CovidVaccine,FinalResult) %>%
   tally() %>% 
   ungroup()
@@ -268,6 +268,11 @@ df_atk <-
   )) %>% 
   group_by(Province, S1HospitalID, FinalResult) %>%
     tally() 
+
+# Lab
+df_lab <- LabPCRResult_l %>% 
+  group_by(SpecType, FinalResult) %>% 
+  tally()
 
 # KAP page
 df_kap1 <- tblSection3 %>%
@@ -314,6 +319,7 @@ save(
     "df_sign",
     "df_vac",
     "df_atk",
+    "df_lab",
     "df_kap1",
     "df_kap2"
   ),
