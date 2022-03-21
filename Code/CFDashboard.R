@@ -313,6 +313,7 @@ save(
     "df_rf",
     "df_sign",
     "df_vac",
+    "df_atk",
     "df_kap1",
     "df_kap2"
   ),
