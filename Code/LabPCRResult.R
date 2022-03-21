@@ -32,8 +32,8 @@ LabPCRResult_w <- LabPCRResult_l %>%
   mutate(
     FinalResult = factor(
       pmin(FinalResult_1, FinalResult_4, FinalResult_7, na.rm = TRUE),
-      levels = c(1, 2, 3),
-      labels = c("Positive", "Inconclusive", "Negative")
+      levels = c(3, 2, 1),
+      labels = c("Negative", "Inconclusive", "Positive")
     ),
     TestDate = pmin(
       TestDate_P_1,
