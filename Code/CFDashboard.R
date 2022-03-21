@@ -223,7 +223,23 @@ df_sign <- tblSection3 %>%
   mutate(S2Temp = ifelse(S2Temp >= 38, 1, 0)) %>%
   rename_with( ~ str_replace(., "S32", ""), starts_with("S32"))%>%
   rename(
-    "Temperature >=38.0 C" = S2Temp) %>% 
+    "Temperature >=38.0 C" = S2Temp,
+    "Stiff Neck" = NeckStiff,
+    "Eye pain" = EyePain,
+    "Red eyes" = RedEyes,
+    "Yellow eyes" = YellowEyes,
+    "Muscle pain" = MusclePain,
+    "Joint pain" =JointPain,
+    "Red joints" = RedJoints,
+    "Nose Bleeding" = NoseBleeding,
+    "Bone pain" = BonePain,
+    "Back pain" = BackPain,
+    "Chest pain" = ChestPain,
+    "No Appetite" = NoAppetite,
+    "Blood vomitting" = BloodVomit,
+    "Abdominal pain" =AbdominalPain,
+    "Blood stool"= BloodStool,
+    "Blood urine" = BloodUrine) %>% 
   left_join(LabPCRResult %>% select(CFID, FinalResult), by = "CFID") %>%
   pivot_longer(
     cols = Headache:"Temperature >=38.0 C",
@@ -240,6 +256,19 @@ df_vac <-tblSection3 %>%
   tally() %>% 
   ungroup()
   
+# Atk page
+df_atk <-
+  filter(tblSection3, S33ATK == 1 ) %>%
+  select(CFID,    Province,  S1HospitalID,S33ATK, S33ATKResult1, S33ATKResult2)%>%
+  mutate(FinalResult = case_when(S33ATKResult1 == 1~'Positive',
+                                 S33ATKResult2 == 1~'Positive',
+                                 S33ATKResult1 == 2~'Negative',
+                                 S33ATKResult1 == 3~'Unknown',
+                                 is.na(S33ATKResult1)~'Missing'
+  )) %>% 
+  group_by(Province, S1HospitalID, FinalResult) %>%
+    tally() 
+
 # KAP page
 df_kap1 <- tblSection3 %>%
   select(Province, S1HospitalID,
