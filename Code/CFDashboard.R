@@ -298,10 +298,11 @@ df_sign <- tblSection3 %>%
 #   group_by(Province, S1HospitalID ) %>%
 #   tally() %>% 
 #   ungroup()
+
 df_signBox <-tblSection5 %>%
-    select(CFID, Province, S1HospitalID, S5CovidPos,S5IsAdmit, S5Intub,S5DishargeType)%>%
+    select(CFID, Province, S1HospitalID, S5CovidPos,S5Intub,S5DishargeType)%>%
     filter(S5CovidPos == 1) %>% 
-    group_by(Province, S1HospitalID,S5IsAdmit, S5Intub,S5DishargeType ) %>%
+    group_by(Province, S1HospitalID, S5Intub,S5DishargeType ) %>%
     tally() %>%
     ungroup()
 
