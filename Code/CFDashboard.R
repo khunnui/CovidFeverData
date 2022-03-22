@@ -251,27 +251,32 @@ df_sign <- tblSection3 %>%
 
 # Clinical Sign Boxes
 #Hospitalized
-df_hos <- tblSection5 %>% 
-  select(CFID, Province, S1HospitalID)%>%
-  group_by(Province, S1HospitalID ) %>%
-  tally() %>% 
-  ungroup()
-
-#Intubation
-df_intub <- tblSection5 %>%
-  select(CFID, Province, S1HospitalID,S5Intub)%>%
-  filter(S5Intub == 2) %>% 
-  group_by(Province, S1HospitalID ) %>%
-  tally() %>%
-  ungroup()
-
-#Death
-df_death <- tblSection5 %>% 
-  select(CFID, Province, S1HospitalID, S5DishargeType)%>%
-  filter(S5DishargeType == 4) %>% 
-  group_by(Province, S1HospitalID ) %>%
-  tally() %>% 
-  ungroup()
+# df_hos <- tblSection5 %>% 
+#   select(CFID, Province, S1HospitalID)%>%
+#   group_by(Province, S1HospitalID ) %>%
+#   tally() %>% 
+#   ungroup()
+# 
+# #Intubation
+# df_intub <- tblSection5 %>%
+#   select(CFID, Province, S1HospitalID,S5Intub)%>%
+#   filter(S5Intub == 2) %>% 
+#   group_by(Province, S1HospitalID ) %>%
+#   tally() %>%
+#   ungroup()
+# 
+# #Death
+# df_death <- tblSection5 %>% 
+#   select(CFID, Province, S1HospitalID, S5DishargeType)%>%
+#   filter(S5DishargeType == 4) %>% 
+#   group_by(Province, S1HospitalID ) %>%
+#   tally() %>% 
+#   ungroup()
+df_signBox <-tblSection5 %>%
+    select(CFID, Province, S1HospitalID,S5Intub,S5DishargeType)%>%
+    group_by(Province, S1HospitalID,S5Intub,S5DishargeType ) %>%
+    tally() %>%
+    ungroup()
 
 # Vaccination page
 df_vac <-tblSection3 %>%
@@ -341,6 +346,9 @@ save(
     "df_un",
     "df_rf",
     "df_sign",
+    "df_hos",
+    "df_intub",
+    "df_death",
     "df_vac",
     "df_atk",
     "df_lab",
