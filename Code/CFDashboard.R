@@ -351,8 +351,8 @@ df_atk <-
 #-------------------------------------------------------------------------------
 
 df_lab <- LabPCRResult_l %>% 
-  group_by(SpecType, FinalResult) %>% 
-  tally()
+  group_by(Province, S1HospitalID, SpecType, FinalResult) %>%
+  tally() 
 
 #-------------------------------------------------------------------------------
 # KAP page
@@ -405,9 +405,6 @@ save(
     "df_un",
     "df_rf",
     "df_sign",
-    # "df_hos",
-    # "df_intub",
-    # "df_death",
     "df_signBox",
     "df_vac",
     "df_atk",
