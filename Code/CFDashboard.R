@@ -67,14 +67,29 @@ df_screnrol <- tblSection1 %>%
 # Enrollment page
 #-------------------------------------------------------------------------------
 
-df_eli <- tblSection1 %>%
+df_eliw <- tblSection1 %>%
+  filter(S1Eligible == 1) %>% # Eligible only
+  mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
+  group_by(Province, S1HospitalID, scrdate) %>% 
+  tally() %>% 
+  ungroup()
+
+df_elim <- tblSection1 %>%
   filter(S1Eligible == 1) %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>% 
   group_by(Province, S1HospitalID, scrdate) %>% 
   tally() %>% 
   ungroup()
 
-df_enr <- tblSection1 %>%
+df_enrw <- tblSection1 %>%
+  filter(!is.na(S1EnrollDate)) %>%
+  left_join(LabPCRResult_w, by = "CFID") %>%
+  mutate(enrdate = floor_date(S1EnrollDate, "week", week_start = 1)) %>%
+  group_by(Province, S1HospitalID, enrdate, FinalResult) %>% 
+  tally() %>%
+  ungroup()
+
+df_enrm <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   left_join(LabPCRResult_w, by = "CFID") %>%
   mutate(enrdate = floor_date(S1EnrollDate, "month")) %>% 
@@ -378,8 +393,10 @@ save(
     "df_scrage2",
     "df_scrgender",
     "df_screnrol",
-    "df_eli",
-    "df_enr",
+    "df_eliw",
+    "df_elim",
+    "df_enrw",
+    "df_enrm",
     "df_pos3wk",
     "df_enrage",
     "df_enrgender",
