@@ -350,9 +350,10 @@ df_atk <-
 # SARS-Cov2 detection page
 #-------------------------------------------------------------------------------
 
-df_lab <- LabPCRResult_l %>% 
-  group_by(Province, S1HospitalID, SpecType, FinalResult) %>%
-  tally() 
+df_lab <- LabPCRResult_l %>%
+  group_by(Province, S1HospitalID, SpecType, FinalResult_fac) %>%
+  tally() %>% 
+  rename(FinalResult = FinalResult_fac)
 
 #-------------------------------------------------------------------------------
 # KAP page
