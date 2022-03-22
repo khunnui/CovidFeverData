@@ -1,16 +1,21 @@
 ddate <- max(tblSection1$S1ScreenDate, na.rm = TRUE)
 
+#-------------------------------------------------------------------------------
 # Screening page
+#-------------------------------------------------------------------------------
+
 df_scrw <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
   group_by(Province, S1HospitalID, scrdate) %>% 
   tally() %>% 
   ungroup()
+
 df_scrm <- tblSection1 %>%
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
   group_by(Province, S1HospitalID, scrdate) %>% 
   tally() %>% 
   ungroup()
+
 df_scrage0 <- tblSection1 %>%
   summarize(
     n = n(),
@@ -21,6 +26,7 @@ df_scrage0 <- tblSection1 %>%
     q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
     max = max(S1Age_Year, na.rm = TRUE)
   )
+
 df_scrage1 <- tblSection1 %>%
   group_by(Province) %>% 
   summarize(
@@ -33,6 +39,7 @@ df_scrage1 <- tblSection1 %>%
     max = max(S1Age_Year, na.rm = TRUE)
   ) %>% 
   ungroup()
+
 df_scrage2 <- tblSection1 %>%
   group_by(S1HospitalID) %>% 
   summarize(
@@ -45,22 +52,28 @@ df_scrage2 <- tblSection1 %>%
     max = max(S1Age_Year, na.rm = TRUE)
   ) %>% 
   ungroup()
+
 df_scrgender <- tblSection1 %>%
   group_by(Province, S1HospitalID, S1Gender) %>% 
   tally() %>% 
   ungroup()
+
 df_screnrol <- tblSection1 %>%
   group_by(Province, S1HospitalID, OLDCF, CF_Enrol) %>% 
   tally() %>% 
   ungroup()
 
+#-------------------------------------------------------------------------------
 # Enrollment page
+#-------------------------------------------------------------------------------
+
 df_eli <- tblSection1 %>%
   filter(S1Eligible == 1) %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>% 
   group_by(Province, S1HospitalID, scrdate) %>% 
   tally() %>% 
   ungroup()
+
 df_enr <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   left_join(LabPCRResult_w, by = "CFID") %>%
@@ -68,6 +81,7 @@ df_enr <- tblSection1 %>%
   group_by(Province, S1HospitalID, enrdate, FinalResult) %>% 
   tally() %>%
   ungroup()
+
 df_pos3wk <- tblSection1 %>%
   left_join(LabPCRResult_w, by = "CFID") %>%
   filter(!is.na(S1EnrollDate), 
@@ -75,23 +89,29 @@ df_pos3wk <- tblSection1 %>%
   group_by(Province, S1HospitalID, FinalResult) %>% 
   tally() %>% 
   ungroup()
+
 df_enrage <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   group_by(Province, S1HospitalID, agegroup) %>% 
   tally() %>% 
   ungroup()
+
 df_enrgender <- tblSection1 %>%
   filter(!is.na(S1EnrollDate)) %>%
   group_by(Province, S1HospitalID, S1Gender) %>% 
   tally() %>% 
   ungroup()
+
 df_enrocc <- tblSection3 %>%
   mutate(S34Occupation = replace(S34Occupation, S34Occupation == "Other farmer", "Farmer")) %>%
   group_by(Province, S1HospitalID, S34Occupation) %>% 
   tally() %>% 
   ungroup()
 
+#-------------------------------------------------------------------------------
 # Diagnosis page
+#-------------------------------------------------------------------------------
+
 df_dx <- tblSection2 %>%
   left_join(LabPCRResult_w, by = "CFID") %>%
   select(CFID, Province, S1HospitalID, FinalResult,
@@ -117,7 +137,9 @@ df_dx <- tblSection2 %>%
   group_by(Province, S1HospitalID, FinalResult, Diagnosis) %>%
   tally(wt = y) 
 
+#-------------------------------------------------------------------------------
 # Underlying Page
+#-------------------------------------------------------------------------------
 df_un <- tblSection3 %>%
   select(CFID, Province,S1HospitalID, S35Diabetes,
     S35Obesity:S35Cancer,
@@ -147,7 +169,10 @@ df_un <- tblSection3 %>%
   group_by(Underlying, S1HospitalID, Province, FinalResult) %>%
   tally(wt = y)
 
+#-------------------------------------------------------------------------------
 #Risk Factor page
+#-------------------------------------------------------------------------------
+
 df_rf <- tblSection3 %>%
   select(
     CFID,
@@ -180,7 +205,9 @@ df_rf <- tblSection3 %>%
   group_by(Risk, Province, S1HospitalID,FinalResult) %>%
   tally(wt = y)
 
+#-------------------------------------------------------------------------------
 # Clinical Sign
+#-------------------------------------------------------------------------------
 df_sign <- tblSection3 %>%
   select(
     CFID,
@@ -249,7 +276,6 @@ df_sign <- tblSection3 %>%
   group_by(Signs, Province, S1HospitalID, FinalResult) %>%
   tally(wt = y)
 
-# Clinical Sign Boxes
 #Hospitalized
 # df_hos <- tblSection5 %>% 
 #   select(CFID, Province, S1HospitalID)%>%
@@ -278,14 +304,19 @@ df_signBox <-tblSection5 %>%
     tally() %>%
     ungroup()
 
+#-------------------------------------------------------------------------------
 # Vaccination page
+#-------------------------------------------------------------------------------
+
 df_vac <-tblSection3 %>%
   left_join(LabPCRResult_w, by = "CFID") %>%
   group_by(Province, S1HospitalID, S33CovidVaccine,FinalResult) %>%
   tally() %>% 
   ungroup()
   
+#-------------------------------------------------------------------------------
 # Atk page
+#-------------------------------------------------------------------------------
 df_atk <-
   filter(tblSection3, S33ATK == 1 ) %>%
   select(CFID,    Province,  S1HospitalID,S33ATK, S33ATKResult1, S33ATKResult2)%>%
@@ -298,12 +329,18 @@ df_atk <-
   group_by(Province, S1HospitalID, FinalResult) %>%
     tally() 
 
-# Lab
+#-------------------------------------------------------------------------------
+# SARS-Cov2 detection page
+#-------------------------------------------------------------------------------
+
 df_lab <- LabPCRResult_l %>% 
   group_by(SpecType, FinalResult) %>% 
   tally()
 
+#-------------------------------------------------------------------------------
 # KAP page
+#-------------------------------------------------------------------------------
+
 df_kap1 <- tblSection3 %>%
   select(Province, S1HospitalID,
          S3604SickSpread, S3615CareLate:S3620) %>%
@@ -325,7 +362,10 @@ df_kap2 <- tblSection3 %>%
   group_by(Province, S1HospitalID, kap, scale) %>%
   tally()
 
-## Save data frames for dashboard in one data file (CFDashboard.RData) for later use ----------
+#-------------------------------------------------------------------------------
+# Save data frames for dashboard in one data file (CFDashboard.RData) 
+#-------------------------------------------------------------------------------
+
 save(
   list = c(
     "ddate",

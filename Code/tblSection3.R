@@ -3,7 +3,10 @@
 # 3/7/2022
 #-------------------------------------------------------------------------------
 tblSection3 <- tblSection3 %>%
+  # Delete unused columns
   select(-starts_with("_")) %>%
+  # Remove rows without CFID
+  filter(CFID != '__-____-_') %>%
   mutate(Province = ifelse(substr(CFID,1,2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
          S1HospitalID = factor(as.integer(substr(CFID,1,2)),
                                levels = c(9,11,16,21,22,23),
