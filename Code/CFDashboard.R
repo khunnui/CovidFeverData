@@ -133,18 +133,18 @@ df_dx <- tblSection2 %>%
          S2DxFever:S2DxOther, S2DxMeningitis) %>%
   rename_with(~ str_replace(., "S2Dx", ""), starts_with("S2Dx")) %>%
   rename(
-    "Common Cold" = ComCold,
-    "Bacterial Infection" = BacInfect,
-    "Heart Diseases" = HeartDis,
-    "Abdominal Pain" = AbPain,
-    "Cerebrovascular Accident" = CerebAcci,
+    "Common cold" = ComCold,
+    "Bacterial infection" = BacInfect,
+    "Heart diseases" = HeartDis,
+    "Abdominal pain" = AbPain,
+    "Cerebrovascular accident" = CerebAcci,
     "Chikungunya" = Chikun,
-    "Gastrointestinal Tract Infection" = GastroInfect,
-    "Renal Diseases" = Renal,
-    "Viral Infection" = ViralInfect,
-    "Alteration of Conscious" = AlterConscious,
-    "Electrolyte Imbalance" = ElecImbalance,
-    "Scrub Typhus" = ScrubTyphus
+    "Gastrointestinal tract infection" = GastroInfect,
+    "Renal diseases" = Renal,
+    "Viral infection" = ViralInfect,
+    "Alteration of conscious" = AlterConscious,
+    "Electrolyte imbalance" = ElecImbalance,
+    "Scrub typhus" = ScrubTyphus
   ) %>%
   pivot_longer(cols = Fever:Meningitis,
                names_to = "Diagnosis",
@@ -164,13 +164,13 @@ df_un <- tblSection3 %>%
   left_join(LabPCRResult_w %>% select(CFID, FinalResult), by = "CFID") %>%
   rename_with( ~ str_replace(., "S35", ""), starts_with("S35")) %>%
   rename(
-    "Heart Diseases" = HeartDisease,
+    "Heart diseases" = HeartDisease,
     "Immunodeficiency" = Immunodef,
     "History of TB" = HisTB,
     "Active TB" = ActiveTB,
     "Chrolesterol" = Chroles,
-    "Cerebrovascular Diseases" = Cerebro,
-    "Other Chronic Diseases" = OthChronic,
+    "Cerebrovascular diseases" = Cerebro,
+    "Other chronic diseases" = OthChronic,
     "History of smoking" = HisSmoke,
     "Current smoking" = CurSmoke,
     "History of alcohol consumption" = HistAlcohol,
