@@ -355,6 +355,34 @@ df_lab <- LabPCRResult_l %>%
   tally() %>% 
   rename(FinalResult = FinalResult_fac)
 
+df_labpos <- LabPCRResult_l %>%
+  # Select only 4 columns (ID, type, result, and test dates)
+  select(CFID,
+         Province,
+         S1HospitalID,
+         SpecType,
+         FinalResult) %>%
+  # All specimen types in one line
+  pivot_wider(
+    names_from = "SpecType",
+    values_from = "FinalResult"
+  ) %>% 
+  filter(`NP+OP swab` == 1 | `Nasal swab` == 1 | Saliva == 1) %>%
+  mutate(
+    specimens = case_when(
+      `NP+OP swab`   == 1 & `Nasal swab` == 1 &`Saliva` == 1 ~ "NP/OP, nasal, saliva",
+      `NP+OP swab`   == 1 & `Nasal swab` == 1                ~ "NP/OP, nasal",
+      `NP+OP swab`   == 1 & `Saliva`     == 1                ~ "NP/OP, saliva",
+      `Nasal swab`   == 1 & `Saliva`     == 1                ~ "Nasal, saliva",
+      `NP+OP swab`   == 1                                    ~ "NP/OP",
+      `Nasal swab`   == 1                                    ~ "Nasal",
+      `Saliva`       == 1                                    ~ "Saliva",
+      TRUE                                                   ~ "other"
+    )
+  ) %>%
+group_by(Province, S1HospitalID, specimens) %>%
+  tally()
+
 #-------------------------------------------------------------------------------
 # KAP page
 #-------------------------------------------------------------------------------
@@ -410,6 +438,7 @@ save(
     "df_vac",
     "df_atk",
     "df_lab",
+    "df_labpos",
     "df_kap1",
     "df_kap2"
   ),

@@ -71,8 +71,6 @@ LabPCRResult_w <- LabPCRResult_l %>%
     )
   ) %>%
   select(
-    -c(
-      `FinalResult_NP+OP swab`:`FinalResult_Saliva`,
-      `TestDate_P_NP+OP swab`:`TestDate_I2_Saliva`
-    )
+    -c(`FinalResult_NP+OP swab`:`FinalResult_Saliva`,
+      `TestDate_P_NP+OP swab`:`TestDate_I2_Saliva`)
   )
