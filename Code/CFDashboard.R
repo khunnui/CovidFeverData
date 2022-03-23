@@ -336,13 +336,12 @@ df_vac <-tblSection3 %>%
 #-------------------------------------------------------------------------------
 df_atk <-
   filter(tblSection3, S33ATK == 1 ) %>%
-  select(CFID,    Province,  S1HospitalID,S33ATK, S33ATKResult1, S33ATKResult2)%>%
-  mutate(FinalResult = case_when(S33ATKResult1 == 1~'Positive',
-                                 S33ATKResult2 == 1~'Positive',
-                                 S33ATKResult1 == 2~'Negative',
-                                 S33ATKResult1 == 3~'Unknown',
-                                 is.na(S33ATKResult1)~'Missing'
-  )) %>% 
+  select(CFID, Province, S1HospitalID, S33ATK, S33ATKResult1, S33ATKResult2)%>%
+  mutate(FinalResult = factor(case_when(S33ATKResult1 == 1 | S33ATKResult2 == 1 ~'Positive',
+                                 S33ATKResult1 == 2 | S33ATKResult2 == 2 ~'Negative',
+                                 TRUE                                    ~'Unknown'),
+                              levels = c('Positive','Negative','Unknown'))
+  ) %>% 
   group_by(Province, S1HospitalID, FinalResult) %>%
     tally() 
 
