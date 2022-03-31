@@ -62,13 +62,13 @@ df_screnrol <- tblSection1 %>%
 #-------------------------------------------------------------------------------
 
 df_eliw <- tblSection1 %>%
-  filter(S1Eligible == 1) %>% # Eligible only
+  filter(S1Eligible == 'Yes') %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
   group_by(Province, Hospital, scrdate) %>%
   tally()
 
 df_elim <- tblSection1 %>%
-  filter(S1Eligible == 1) %>% # Eligible only
+  filter(S1Eligible == 'Yes') %>% # Eligible only
   mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
   group_by(Province, Hospital, scrdate) %>%
   tally()
@@ -279,7 +279,7 @@ df_sign <- CFMast %>%
     "Blood urine" = BloodUrine
   ) %>%
   pivot_longer(
-    cols = Headache:"Temperature >= 38.0 C",
+    cols = `Temperature >= 38.0 C`:Other,
     names_to = "Signs",
     values_to = "y"
   ) %>%
