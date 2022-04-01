@@ -7,7 +7,7 @@ LabPCRResult_l <- LabPCRResult %>%
   mutate(
     CFID = substr(SpecimenID, 1, 9),
     Province = ifelse(substr(CFID, 1, 2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
-    S1HospitalID = factor(
+    Hospital = factor(
       as.integer(substr(CFID, 1, 2)),
       levels = c(9, 11, 16, 21, 22, 23),
       labels = c(
@@ -32,7 +32,7 @@ LabPCRResult_l <- LabPCRResult %>%
     )
   )
 
-LabPCRResult_w <- LabPCRResult_l %>%
+LabPCRFinal <- LabPCRResult_l %>%
   # Select only 4 columns (ID, type, result, and test dates)
   select(CFID,
          SpecType,
@@ -57,6 +57,9 @@ LabPCRResult_w <- LabPCRResult_l %>%
       levels = c(1, 2, 3),
       labels = c("Positive", "Inconclusive", "Negative")
     ),
+    PCRTests = paste0(ifelse(!is.na(`FinalResult_NP+OP swab`),`FinalResult_NP+OP swab`,'.'),
+                      ifelse(!is.na(`FinalResult_Nasal swab`),`FinalResult_Nasal swab`,'.'),
+                                    ifelse(!is.na(`FinalResult_Saliva`),`FinalResult_Saliva`,'.')),
     TestDate = pmin(
       `TestDate_P_NP+OP swab`,
       `TestDate_P_Nasal swab`,
