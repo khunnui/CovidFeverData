@@ -165,7 +165,7 @@ df_un <- CFMast %>%
                names_to = "Underlying",
                values_to = "y") %>%
   group_by(Underlying, Hospital, Province, FinalResult) %>%
-  tally(wt = y)
+  summarise(n = sum(y[y == 1], na.rm = TRUE))
 
 #-------------------------------------------------------------------------------
 #Risk Factor page
