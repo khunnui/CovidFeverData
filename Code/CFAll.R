@@ -55,5 +55,5 @@ source(paste0(code_folder, "/tblSection5.R"))
 source(paste0(code_folder, "/LabPCRResult.R"))
 #source(paste0(code_folder, "/LabSero.R")) #Nhong has added data
 
+source(paste0(code_folder, "/CFMast.R"))
 source(paste0(code_folder, "/CFDashboard.R"))
-#source(paste0(code_folder, "/CFMast.R"))
