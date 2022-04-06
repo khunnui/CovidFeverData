@@ -406,6 +406,7 @@ save(
     "ddate",
     "df_scrw",
     "df_scrm",
+    "df_scrage",
     "df_scrage0",
     "df_scrage1",
     "df_scrage2",
@@ -431,5 +432,5 @@ save(
     "df_kap1",
     "df_kap2"
   ),
-  file = paste0(data_folder, "/CFDashboard.RData")
+  file = paste0(data_folder, "/CFDashboard.RData") 
 )
