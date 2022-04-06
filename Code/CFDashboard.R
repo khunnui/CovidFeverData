@@ -432,5 +432,5 @@ save(
     "df_kap1",
     "df_kap2"
   ),
-  file = paste0(data_folder, "/CFDashboard.RData")
+  file = paste0(data_folder, "/CFDashboard.RData") 
 )
