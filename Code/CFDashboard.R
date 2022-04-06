@@ -406,6 +406,7 @@ save(
     "ddate",
     "df_scrw",
     "df_scrm",
+    "df_scrage",
     "df_scrage0",
     "df_scrage1",
     "df_scrage2",
