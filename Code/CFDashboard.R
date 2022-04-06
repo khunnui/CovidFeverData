@@ -49,6 +49,10 @@ df_scrage2 <- tblSection1 %>%
     max = max(S1Age_Year, na.rm = TRUE)
   )
 
+df_scrage <- tblSection1 %>%
+  group_by(Province, Hospital, agegroup) %>%
+  tally()
+
 df_scrgender <- tblSection1 %>%
   group_by(Province, Hospital, S1Gender) %>%
   tally()
@@ -402,6 +406,7 @@ save(
     "ddate",
     "df_scrw",
     "df_scrm",
+    "df_scrage",
     "df_scrage0",
     "df_scrage1",
     "df_scrage2",
@@ -427,5 +432,5 @@ save(
     "df_kap1",
     "df_kap2"
   ),
-  file = paste0(data_folder, "/CFDashboard.RData")
+  file = paste0(data_folder, "/CFDashboard.RData") 
 )
