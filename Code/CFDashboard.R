@@ -49,6 +49,10 @@ df_scrage2 <- tblSection1 %>%
     max = max(S1Age_Year, na.rm = TRUE)
   )
 
+df_scrage <- tblSection1 %>%
+  group_by(Province, Hospital, agegroup) %>%
+  tally()
+
 df_scrgender <- tblSection1 %>%
   group_by(Province, Hospital, S1Gender) %>%
   tally()
