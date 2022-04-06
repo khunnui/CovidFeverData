@@ -53,9 +53,9 @@ df_scrgender <- tblSection1 %>%
   group_by(Province, Hospital, S1Gender) %>%
   tally()
 
-df_screnrol <- tblSection1 %>%
-  group_by(Province, Hospital, OLDCF, CF_Enrol) %>%
-  tally()
+# df_screnrol <- tblSection1 %>%
+#   group_by(Province, Hospital, OLDCF, CF_Enrol) %>%
+#   tally()
 
 #-------------------------------------------------------------------------------
 # Enrollment page
