@@ -411,7 +411,6 @@ save(
     "df_scrage1",
     "df_scrage2",
     "df_scrgender",
-    "df_screnrol",
     "df_eliw",
     "df_elim",
     "df_enrw",
