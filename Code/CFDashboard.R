@@ -216,7 +216,7 @@ df_rf <- CFMast %>%
     values_to = "y"
   ) %>%
   group_by(Risk, Province, Hospital, FinalResult) %>%
-  tally(wt = y)
+  summarise(n = sum(y[y == 1], na.rm = TRUE))
 
 #-------------------------------------------------------------------------------
 # Clinical Sign
@@ -288,7 +288,7 @@ df_sign <- CFMast %>%
     values_to = "y"
   ) %>%
   group_by(Signs, Province, Hospital, FinalResult) %>%
-  tally(wt = y)
+  summarise(n = sum(y[y == 1], na.rm = TRUE))
 
 df_signBox <- CFMast %>%
   select(CFID,
