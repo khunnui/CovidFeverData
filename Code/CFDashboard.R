@@ -1,108 +1,104 @@
-ddate <- max(tblSection1$S1ScreenDate, na.rm = TRUE)
+ddate <- max(tblSection1$s1screendate, na.rm = TRUE)
 
 #-------------------------------------------------------------------------------
 # Screening page
 #-------------------------------------------------------------------------------
 
 df_scrw <- tblSection1 %>%
-  mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
-  group_by(Province, Hospital, scrdate) %>%
+  mutate(scrdate = floor_date(s1screendate, "week", week_start = 1)) %>%
+  group_by(province, hospital, scrdate) %>%
   tally()
 
 df_scrm <- tblSection1 %>%
-  mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
-  group_by(Province, Hospital, scrdate) %>%
+  mutate(scrdate = floor_date(s1screendate, "month")) %>%
+  group_by(province, hospital, scrdate) %>%
   tally()
 
 df_scrage0 <- tblSection1 %>%
   summarize(
     n = n(),
-    min = min(S1Age_Year, na.rm = TRUE),
-    q1 = quantile(S1Age_Year, 0.25, na.rm = TRUE),
-    median = median(S1Age_Year, na.rm = TRUE),
-    mean = round(mean(S1Age_Year, na.rm = TRUE), 1),
-    q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
-    max = max(S1Age_Year, na.rm = TRUE)
+    min = min(s1age_year, na.rm = TRUE),
+    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+    median = median(s1age_year, na.rm = TRUE),
+    mean = round(mean(s1age_year, na.rm = TRUE), 1),
+    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+    max = max(s1age_year, na.rm = TRUE)
   )
 
 df_scrage1 <- tblSection1 %>%
-  group_by(Province) %>%
+  group_by(province) %>%
   summarize(
     n = n(),
-    min = min(S1Age_Year, na.rm = TRUE),
-    q1 = quantile(S1Age_Year, 0.25, na.rm = TRUE),
-    median = median(S1Age_Year, na.rm = TRUE),
-    mean = round(mean(S1Age_Year, na.rm = TRUE), 1),
-    q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
-    max = max(S1Age_Year, na.rm = TRUE)
+    min = min(s1age_year, na.rm = TRUE),
+    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+    median = median(s1age_year, na.rm = TRUE),
+    mean = round(mean(s1age_year, na.rm = TRUE), 1),
+    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+    max = max(s1age_year, na.rm = TRUE)
   )
 
 df_scrage2 <- tblSection1 %>%
-  group_by(Hospital) %>%
+  group_by(hospital) %>%
   summarize(
     n = n(),
-    min = min(S1Age_Year, na.rm = TRUE),
-    q1 = quantile(S1Age_Year, 0.25, na.rm = TRUE),
-    median = median(S1Age_Year, na.rm = TRUE),
-    mean = round(mean(S1Age_Year, na.rm = TRUE), 1),
-    q3 = quantile(S1Age_Year, 0.75, na.rm = TRUE),
-    max = max(S1Age_Year, na.rm = TRUE)
+    min = min(s1age_year, na.rm = TRUE),
+    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+    median = median(s1age_year, na.rm = TRUE),
+    mean = round(mean(s1age_year, na.rm = TRUE), 1),
+    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+    max = max(s1age_year, na.rm = TRUE)
   )
 
 df_scrage <- tblSection1 %>%
-  group_by(Province, Hospital, agegroup) %>%
+  group_by(province, hospital, agegroup) %>%
   tally()
 
 df_scrgender <- tblSection1 %>%
-  group_by(Province, Hospital, S1Gender) %>%
+  group_by(province, hospital, s1gender) %>%
   tally()
-
-# df_screnrol <- tblSection1 %>%
-#   group_by(Province, Hospital, OLDCF, CF_Enrol) %>%
-#   tally()
 
 #-------------------------------------------------------------------------------
 # Enrollment page
 #-------------------------------------------------------------------------------
 
 df_eliw <- tblSection1 %>%
-  filter(S1Eligible == 'Yes') %>% # Eligible only
-  mutate(scrdate = floor_date(S1ScreenDate, "week", week_start = 1)) %>%
-  group_by(Province, Hospital, scrdate) %>%
+  filter(s1eligible == TRUE) %>% # Eligible only
+  mutate(scrdate = floor_date(s1screendate, "week", week_start = 1)) %>%
+  group_by(province, hospital, scrdate) %>%
   tally()
 
 df_elim <- tblSection1 %>%
-  filter(S1Eligible == 'Yes') %>% # Eligible only
-  mutate(scrdate = floor_date(S1ScreenDate, "month")) %>%
-  group_by(Province, Hospital, scrdate) %>%
+  filter(s1eligible == TRUE) %>% # Eligible only
+  mutate(scrdate = floor_date(s1screendate, "month")) %>%
+  group_by(province, hospital, scrdate) %>%
   tally()
 
 df_enrw <- CFMast %>%
-  mutate(enrdate = floor_date(S1EnrollDate, "week", week_start = 1)) %>%
-  group_by(Province, Hospital, enrdate, FinalResult) %>%
+  mutate(enrdate = floor_date(s1enrolldate, "week", week_start = 1)) %>%
+  group_by(province, hospital, enrdate, finalresult) %>%
   tally()
 
 df_enrm <- CFMast %>%
-  mutate(enrdate = floor_date(S1EnrollDate, "month")) %>%
-  group_by(Province, Hospital, enrdate, FinalResult) %>%
+  mutate(enrdate = floor_date(s1enrolldate, "month")) %>%
+  group_by(province, hospital, enrdate, finalresult) %>%
   tally()
 
 df_pos3wk <- CFMast %>%
-  filter(TestDate > Sys.Date() - 22) %>%
-  group_by(Province, Hospital, FinalResult) %>%
+  filter(testdate > Sys.Date() - 22) %>%
+  group_by(province, hospital, finalresult) %>%
   tally()
 
 df_enrage <- CFMast %>%
-  group_by(Province, Hospital, agegroup) %>%
+  group_by(province, hospital, agegroup) %>%
   tally()
 
 df_enrgender <- CFMast %>%
-  group_by(Province, Hospital, S1Gender) %>%
+  group_by(province, hospital, s1gender) %>%
   tally()
 
 df_enrocc <- CFMast %>%
-  mutate(S34Occupation = replace(S34Occupation, S34Occupation == "Other farmer", "Farmer")) %>%
-  group_by(Province, Hospital, S34Occupation) %>%
+  mutate(s34occupation = replace(s34occupation, s34occupation == "Other farmer", "Farmer")) %>%
+  group_by(province, hospital, s34occupation) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -110,65 +106,204 @@ df_enrocc <- CFMast %>%
 #-------------------------------------------------------------------------------
 
 df_dx <- CFMast %>%
-  select(CFID,
-         Province,
-         Hospital,
-         FinalResult,
-         S2DxFever:S2DxOther,
-         S2DxMeningitis) %>%
-  rename_with( ~ str_replace(., "S2Dx", ""), starts_with("S2Dx")) %>%
+  select(cfid,
+         province,
+         hospital,
+         finalresult,
+         s2dxfever:s2dxother,
+         s2dxmeningitis) %>%
+  rename_with( ~ str_replace(., "s2dx", ""), starts_with("s2dx")) %>%
   rename(
-    "Common cold" = ComCold,
-    "Bacterial infection" = BacInfect,
-    "Heart diseases" = HeartDis,
-    "Abdominal pain" = AbPain,
-    "Cerebrovascular accident" = CerebAcci,
-    "Chikungunya" = Chikun,
-    "Gastrointestinal tract infection" = GastroInfect,
-    "Renal diseases" = Renal,
-    "Viral infection" = ViralInfect,
-    "Alteration of conscious" = AlterConscious,
-    "Electrolyte imbalance" = ElecImbalance,
-    "Scrub typhus" = ScrubTyphus
+    Fever                      = fever,
+    Abscess                    = abscess,
+    "Common cold"              = comcold,
+    HIV                        = hiv,
+    Dengue                     = dengue,
+    "Bacterial infection"      = bacinfect,
+    Dyspepsia                  = dyspepsia,
+    Shock                      = shock,
+    Cancer                     = cancer,
+    "Heart diseases"           = heartdis,
+    Rash                       = rash,
+    Melioidosis                = melioidosis,
+    Malaria                    = malaria,
+    Diabetes                   = diabetes,
+    Anemia                     = anemia,
+    "Abdominal pain"           = abpain,
+    UTI                        = uti,
+    Thalassemia                = thalassemia,
+    Fatigue                    = fatigue,
+    Arthritis                  = arthritis,
+    Sepsis                     = sepsis,
+    Cellulitis                 = cellulitis,
+    "Cerebrovascular accident" = cerebacci,
+    Hepatitis                  = hepatitis,
+    "Chikungunya"              = chikun,
+    TB                         = tb,
+    Hypertension               = hypertension,
+    URI                        = uri,
+    "Gastrointestinal tract infection" = gastroinfect,
+    "Renal diseases"           = renal,
+    "Viral infection"          = viralinfect,
+    Headache                   = headache,
+    "Alteration of conscious"  = alterconscious,
+    SIRS                       = sirs,
+    COPD                       = copd,
+    "Electrolyte imbalance"    = elecimbalance,
+    Leptospirosis              = leptospirosis,
+    Influenza                  = influenza,
+    "Scrub typhus"             = scrubtyphus,
+    Other                      = other,
+    Meningitis                 = meningitis
   ) %>%
   pivot_longer(cols = Fever:Meningitis,
-               names_to = "Diagnosis",
+               names_to = "diagnosis",
                values_to = "y") %>%
-  group_by(Province, Hospital, FinalResult, Diagnosis) %>%
+  group_by(province, hospital, finalresult, diagnosis) %>%
   tally(wt = y)
+
+#-------------------------------------------------------------------------------
+# Clinical Sign
+#-------------------------------------------------------------------------------
+df_sign <- CFMast %>%
+  select(
+    cfid,
+    province,
+    hospital,
+    s2temp,
+    s32headache,
+    s32neckstiff,
+    s32tiredness,
+    s32malaise,
+    s32chills,
+    s32eyepain,
+    s32redeyes,
+    s32yelloweyes,
+    s32nosebleeding,
+    s32hyposmia,
+    s32dysgeusia,
+    s32musclepain,
+    s32jointpain,
+    s32redjoints,
+    s32bonepain,
+    s32backpain,
+    s32chestpain,
+    s32noappetite,
+    s32nausea,
+    s32vomiting,
+    s32bloodvomit,
+    s32abdominalpain,
+    s32diarrhea,
+    s32bloodstool,
+    s32bloodurine,
+    s32dysuria,
+    s32paleskin,
+    s32rash,
+    s32bruise,
+    s32seizures,
+    s32other,
+    finalresult
+  ) %>%
+  mutate(s2temp = ifelse(s2temp >= 38, 1, 0)) %>%
+  rename_with(~ str_replace(., "s32", ""), starts_with("s32")) %>%
+  rename(
+    "Temperature >= 38.0 C" = s2temp,
+    Headache                = headache,
+    "Stiff neck"            = neckstiff,
+    Tiredness               = tiredness,
+    Malaise                 = malaise,
+    Chills                  = chills,
+    "Eye pain"              = eyepain,
+    "Red eyes"              = redeyes,
+    "Yellow eyes"           = yelloweyes,
+    "Nose bleeding"         = nosebleeding,
+    Hyposmia                = hyposmia,
+    Dysgeusia               = dysgeusia,
+    "Muscle pain"           = musclepain,
+    "Joint pain"            = jointpain,
+    "Red joints"            = redjoints,
+    "Bone pain"             = bonepain,
+    "Back pain"             = backpain,
+    "Chest pain"            = chestpain,
+    "No appetite"           = noappetite,
+    Nausea                  = nausea,
+    Vomiting                = vomiting,
+    "Blood vomitting"       = bloodvomit,
+    "Abdominal pain"        = abdominalpain,
+    Diarrhea                = diarrhea,
+    "Blood stool"           = bloodstool,
+    "Blood urine"           = bloodurine,
+    Dysuria                 = dysuria,
+    "Pale skin"             = paleskin,
+    Rash                    = rash,
+    Bruise                  = bruise,
+    Seizures                = seizures,
+    Other                   = other
+  ) %>%
+  pivot_longer(
+    cols = `Temperature >= 38.0 C`:Other,
+    names_to = "signs",
+    values_to = "y"
+  ) %>%
+  group_by(province, hospital, finalresult, signs) %>%
+  tally(wt = y)
+
+df_signBox <- CFMast %>%
+  select(cfid,
+         province,
+         hospital,
+         s5covidpos,
+         s5intub,
+         s5dishargetype) %>%
+  filter(s5covidpos == 1) %>%
+  group_by(province, hospital, s5intub, s5dishargetype) %>%
+  tally()
 
 #-------------------------------------------------------------------------------
 # Underlying Page
 #-------------------------------------------------------------------------------
 df_un <- CFMast %>%
   select(
-    CFID,
-    Province,
-    Hospital,
-    S35Diabetes,
-    S35Obesity:S35Cancer,
-    S35HIV:S35OthChronic,
-    S35HisSmoke:S35Pregnancy,
-    FinalResult
+    cfid,
+    province,
+    hospital,
+    s35diabetes,
+    s35obesity:s35cancer,
+    s35hiv:s35othchronic,
+    s35hissmoke:s35pregnancy,
+    finalresult
   ) %>%
-  rename_with(~ str_replace(., "S35", ""), starts_with("S35")) %>%
+  rename_with(~ str_replace(., "s35", ""), starts_with("s35")) %>%
   rename(
-    "Heart diseases" = HeartDisease,
-    "Immunodeficiency" = Immunodef,
-    "History of TB" = HisTB,
-    "Active TB" = ActiveTB,
-    "Chrolesterol" = Chroles,
-    "Cerebrovascular diseases" = Cerebro,
-    "Other chronic diseases" = OthChronic,
-    "History of smoking" = HisSmoke,
-    "Current smoking" = CurSmoke,
-    "History of alcohol consumption" = HistAlcohol,
-    "Current of alcohol consumption" = CurAlcohol
+    Diabetes = diabetes,
+    Obesity = obesity,
+    Hypertension = hypertension,
+    "Heart diseases" = heartdisease,
+    Asthma = asthma,
+    COPD = copd,
+    Cancer = cancer,
+    HIV = hiv,
+    "Immunodeficiency" = immunodef,
+    "History of TB" = histb,
+    "Active TB" = activetb,
+    Liver = liver,
+    Thyroid = thyroid,
+    Thalassemia = thalassemia,
+    Anemia = anemia,
+    Renal = renal,
+    "Chrolesterol" = chroles,
+    "Cerebrovascular diseases" = cerebro,
+    "Other chronic diseases" = othchronic,
+    "History of smoking" = hissmoke,
+    "Current smoking" = cursmoke,
+    "History of alcohol consumption" = histalcohol,
+    "Current of alcohol consumption" = curalcohol,
+    Pregnancy = pregnancy
   ) %>%
   pivot_longer(cols = Diabetes:Pregnancy,
-               names_to = "Underlying",
+               names_to = "underlying",
                values_to = "y") %>%
-  group_by(Underlying, Hospital, Province, FinalResult) %>%
+  group_by(underlying, hospital, province, finalresult) %>%
   summarise(n = sum(y[y == 1], na.rm = TRUE))
 
 #-------------------------------------------------------------------------------
@@ -177,160 +312,75 @@ df_un <- CFMast %>%
 
 df_rf <- CFMast %>%
   select(
-    CFID,
-    Province,
-    Hospital,
-    S33SuspectedCOVID19:S33VisitHos,
-    S33VistiCrowded:S33TravelThai,
-    S33TravelInter,
-    FinalResult
+    cfid,
+    province,
+    hospital,
+    s33suspectedcovid19:s33visithos,
+    s33visticrowded:s33travelthai,
+    s33travelinter,
+    finalresult
   ) %>%
   mutate(
-    "Contact COVID-19 cases" = ifelse(S33SuspectedCOVID19 == 1, 1, 0),
+    "Contact COVID-19 cases" = ifelse(s33suspectedcovid19 == 'Yes', TRUE, FALSE),
     "Contact febrile patients" = ifelse(
-      S33FebrileHousehold == 1 |
-        S33FebrileCoWorker == 1 |
-        S33FebrileNeighbor == 1,
-      1,
-      0
+      s33febrilehousehold == 'Yes' |
+        s33febrilecoworker == 'Yes' |
+        s33febrileneighbor == 'Yes',
+      TRUE,
+      FALSE
     ),
-    "Contact persons with respiratory symptoms" = ifelse(S33RPS == 1, 1, 0),
-    "Contact pneumonia patients" = ifelse(S33Pneumonia == 1, 1, 0),
-    "Contact healthcare workers" = ifelse(S33HealthCarePer == 1 |
-                                            S33VisitHos == 1, 1, 0),
-    "Visit crowded places" = ifelse(S33VistiCrowded == 1 |
-                                      S33PartPeople == 1, 1, 0),
-    "History of travel" = ifelse(S33TravelThai == 1 |
-                                   S33TravelInter, 1, 0)
+    "Contact persons with respiratory symptoms" = ifelse(s33rps == 'Yes', TRUE, FALSE),
+    "Contact pneumonia patients" = ifelse(s33pneumonia == 'Yes', TRUE, FALSE),
+    "Contact healthcare workers" = s33healthcareper | s33visithos,
+    "Visit crowded places" = s33visticrowded | s33partpeople,
+    "History of travel" = s33travelthai | s33travelinter
   ) %>%
   select(
     -c(
-      S33SuspectedCOVID19:S33VisitHos,
-      S33VistiCrowded:S33TravelThai,
-      S33TravelInter
+      s33suspectedcovid19:s33visithos,
+      s33visticrowded:s33travelthai,
+      s33travelinter
     )
   ) %>%
   pivot_longer(
     cols = "Contact COVID-19 cases":"History of travel",
-    names_to = "Risk",
+    names_to = "risk",
     values_to = "y"
   ) %>%
-  group_by(Risk, Province, Hospital, FinalResult) %>%
-  summarise(n = sum(y[y == 1], na.rm = TRUE))
-
-#-------------------------------------------------------------------------------
-# Clinical Sign
-#-------------------------------------------------------------------------------
-df_sign <- CFMast %>%
-  select(
-    CFID,
-    Province,
-    Hospital,
-    S2Temp,
-    S32Headache,
-    S32NeckStiff,
-    S32Tiredness,
-    S32Malaise,
-    S32Chills,
-    S32EyePain,
-    S32RedEyes,
-    S32YellowEyes,
-    S32NoseBleeding,
-    S32Hyposmia,
-    S32Dysgeusia,
-    S32MusclePain,
-    S32JointPain,
-    S32RedJoints,
-    S32BonePain,
-    S32BackPain,
-    S32ChestPain,
-    S32NoAppetite,
-    S32Nausea,
-    S32Vomiting,
-    S32BloodVomit,
-    S32AbdominalPain,
-    S32Diarrhea,
-    S32BloodStool,
-    S32BloodUrine,
-    S32Dysuria,
-    S32PaleSkin,
-    S32Rash,
-    S32Bruise,
-    S32Seizures,
-    S32Other,
-    FinalResult
-  ) %>%
-  mutate(S2Temp = ifelse(S2Temp >= 38, 1, 0)) %>%
-  rename_with(~ str_replace(., "S32", ""), starts_with("S32")) %>%
-  rename(
-    "Temperature >= 38.0 C" = S2Temp,
-    "Stiff neck" = NeckStiff,
-    "Eye pain" = EyePain,
-    "Red eyes" = RedEyes,
-    "Yellow eyes" = YellowEyes,
-    "Muscle pain" = MusclePain,
-    "Joint pain" = JointPain,
-    "Red joints" = RedJoints,
-    "Nose bleeding" = NoseBleeding,
-    "Bone pain" = BonePain,
-    "Back pain" = BackPain,
-    "Chest pain" = ChestPain,
-    "Pale skin" = PaleSkin,
-    "No appetite" = NoAppetite,
-    "Blood vomitting" = BloodVomit,
-    "Abdominal pain" = AbdominalPain,
-    "Blood stool" = BloodStool,
-    "Blood urine" = BloodUrine
-  ) %>%
-  pivot_longer(
-    cols = `Temperature >= 38.0 C`:Other,
-    names_to = "Signs",
-    values_to = "y"
-  ) %>%
-  group_by(Signs, Province, Hospital, FinalResult) %>%
-  summarise(n = sum(y[y == 1], na.rm = TRUE))
-
-df_signBox <- CFMast %>%
-  select(CFID,
-         Province,
-         Hospital,
-         S5CovidPos,
-         S5Intub,
-         S5DishargeType) %>%
-  filter(S5CovidPos == 1) %>%
-  group_by(Province, Hospital, S5Intub, S5DishargeType) %>%
-  tally()
+  group_by(province, hospital, finalresult, risk) %>%
+  tally(wt = y)
 
 #-------------------------------------------------------------------------------
 # Vaccination page
 #-------------------------------------------------------------------------------
 
 df_vac <- CFMast %>%
-  group_by(Province, Hospital, S33CovidVaccine, FinalResult) %>%
+  mutate(s33covidvaccine = factor(ifelse(is.na(s33covidvaccine), "Unknown", as.character(s33covidvaccine)),
+                                  levels = c('Vaccinated','Unvaccinated','Unknown')),
+         finalresult = ifelse(!is.na(finalresult), as.character(finalresult), 'Unknown')) %>%
+  group_by(province, hospital, s33covidvaccine, finalresult) %>%
   tally()
 
 #-------------------------------------------------------------------------------
 # Atk page
 #-------------------------------------------------------------------------------
 df_atk <- CFMast %>% 
-  filter(S33ATK == 1) %>%
-  select(CFID,
-         Province,
-         Hospital,
-         S33ATK,
-         S33ATKResult1,
-         S33ATKResult2) %>%
-  mutate(FinalResult = factor(
+  filter(s33atk == 'Yes') %>%
+  select(cfid,
+         province,
+         hospital,
+         s33atk,
+         s33atkresult1,
+         s33atkresult2) %>%
+  mutate(atkresult = factor(
     case_when(
-      S33ATKResult1 == 1 | S33ATKResult2 == 1 ~ 'Positive',
-      S33ATKResult1 == 2 |
-        S33ATKResult2 == 2 ~ 'Negative',
-      TRUE                                    ~
-        'Unknown'
+      s33atkresult1 == 'Positive' | s33atkresult2 == 'Positive' ~ 'Positive',
+      s33atkresult1 == 'Negative' | s33atkresult2 == 'Negative' ~ 'Negative',
+      TRUE                                                      ~ 'Unknown'
     ),
     levels = c('Positive', 'Negative', 'Unknown')
   )) %>%
-  group_by(Province, Hospital, FinalResult) %>%
+  group_by(province, hospital, atkresult) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -338,20 +388,20 @@ df_atk <- CFMast %>%
 #-------------------------------------------------------------------------------
 
 df_lab <- LabPCRResult_l %>%
-  group_by(Province, Hospital, SpecType, FinalResult_fac) %>%
+  group_by(province, hospital, spectype, finalresult_fac) %>%
   tally() %>%
-  rename(FinalResult = FinalResult_fac)
+  rename(finalresult = finalresult_fac)
 
 df_labpos <- LabPCRResult_l %>%
   # Select only 4 columns (ID, type, result, and test dates)
-  select(CFID,
-         Province,
-         Hospital,
-         SpecType,
-         FinalResult) %>%
+  select(cfid,
+         province,
+         hospital,
+         spectype,
+         finalresult) %>%
   # All specimen types in one line
-  pivot_wider(names_from = "SpecType",
-              values_from = "FinalResult") %>%
+  pivot_wider(names_from = "spectype",
+              values_from = "finalresult") %>%
   filter(`NP+OP swab` == 1 | `Nasal swab` == 1 | Saliva == 1) %>%
   mutate(
     specimens = case_when(
@@ -369,7 +419,7 @@ df_labpos <- LabPCRResult_l %>%
       TRUE                                                   ~ "other"
     )
   ) %>%
-  group_by(Province, Hospital, specimens) %>%
+  group_by(province, hospital, specimens) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -377,24 +427,24 @@ df_labpos <- LabPCRResult_l %>%
 #-------------------------------------------------------------------------------
 
 df_kap1 <- CFMast %>%
-  select(Province, Hospital,
-         S3604SickSpread, S3615CareLate:S3620) %>%
-  pivot_longer(cols = S3604SickSpread:S3620,
+  select(province, hospital,
+         s3604sickspread, s3615carelate:s3620) %>%
+  pivot_longer(cols = s3604sickspread:s3620,
                names_to = "kap",
                values_to = "scale") %>%
   #mutate(scale = fct_rev(scale)) %>%
   filter(!is.na(scale)) %>%
-  group_by(Province, Hospital, kap, scale) %>%
+  group_by(province, hospital, kap, scale) %>%
   tally()
 
 df_kap2 <- CFMast %>%
-  select(Province, Hospital,
-         S3610MaskIn, S3613MaskOut, S3621:S3622) %>%
-  pivot_longer(cols = S3610MaskIn:S3622,
+  select(province, hospital,
+         s3610maskin, s3613maskout, s3621:s3622) %>%
+  pivot_longer(cols = s3610maskin:s3622,
                names_to = "kap",
                values_to = "scale") %>%
   filter(!is.na(scale)) %>%
-  group_by(Province, Hospital, kap, scale) %>%
+  group_by(province, hospital, kap, scale) %>%
   tally()
 
 #-------------------------------------------------------------------------------

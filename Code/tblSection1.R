@@ -1,80 +1,126 @@
 #-------------------------------------------------------------------------------
 # tblSection1
 # Created 3/7/2022
-# Modified 3/30/2022
 #-------------------------------------------------------------------------------
 tblSection1 <- tblSection1 %>%
   
+  # Rename all column names to lowercase
+  rename_all(tolower) %>%
+  
   # Delete unused columns
-  select(-c(starts_with("_"), VarifyID)) %>%
+  select(-c(s1rn, starts_with("_"), varifyid)) %>%
   
   # Create/convert columns
   mutate(
     
-    # Set CFID '__-____-_' to missing
-    CFID = ifelse(CFID == '__-____-_', NA, CFID),
-    PreCFID = ifelse(PreCFID == '__-____-_', NA, PreCFID),
-
-    # Create EnrolledPT
-    EnrolledPT = factor(substr(EnrolledPT, 1, 1),
-                        levels = c("1", "2", "3"),
-                        labels = c("Follow up", "Not improve", "Transfered")),
+    # set cfid '__-____-_' to missing
+    cfid = ifelse(cfid == '__-____-_', NA, cfid),
+    precfid = ifelse(precfid == '__-____-_', NA, precfid),
+    
+    # create province for hospitalid
+    province = factor(
+      ifelse(s1hospitalid %in% c(9, 11, 16), 'Nakorn Phanom', 'Tak'),
+      levels = c('Nakorn Phanom', 'Tak')
+    ),
+    
+    # Rename and factor hospitalid
+    hospital = factor(
+      s1hospitalid,
+      levels = c(9, 11, 16, 21, 22, 23),
+      labels = c(
+        "Nakorn Phanom",
+        "Sri Songkhram",
+        "That Phanom",
+        "Mae Sot",
+        "Umphang",
+        "Tha Song Yang"
+      )
+    ),
     
     # Convert datetime to date
-    across(c(matches("Date"), BloodCollectDT), as.Date),
-
-    # Recode 0 in Y/N (1/2) and multiple choices (1,2,3...) to missing
-    across(c(S1IsTransfer,
-             S1Fever,
-             S1FeverHis:S1SputumProd,
-             S1Return30:S1AgreePart,
-             S1IsCommu,
-             S1ReasonNo,
-             S1ConsentBy,
-             NP:Blood), 
-           function(f) {ifelse(f == 0, NA, f)}),
+    across(c(matches("date"), bloodcollectdt), as.Date),
     
-    # Create CF_enrol and OLDCF based on a having a CFID
-    CF_Enrol = ifelse(!is.na(CFID), 1, 2),
-    OLDCF = ifelse(!is.na(PreCFID), 1, 2),
+    # recode 0 in multiple choices (1,2,3...) to missing
+    across(c(s1gender,
+             s1nationality,
+             s1consentby,
+             s1reasonno,
+             saliva),
+           function(f) {
+             ifelse(f == 0, NA, f)
+           }),
     
-    # Create Province for HospitalID
-    Province = factor(ifelse(S1HospitalID %in% c(9, 11, 16), 'Nakorn Phanom', 'Tak'),
-                      levels = c('Nakorn Phanom', 'Tak')),
+    # Recode (1,2) in y/n to (TRUE,FALSE)
+    across(c(
+      s1istransfer,
+      s1metpt,
+      s1fever,
+      s1feverhis:s1sputumprod,
+      s1return30:s1agreepart,
+      s1iscommu,
+      s1consentchild,
+      s1enroll5th,
+      s1issample,
+      np:nasal,
+      blood
+    ),
+    function(f) {
+      f[!f %in% c(1, 2)] <- NA
+      f == 1
+    }),
     
-    # Rename and factor HospitalID
-    Hospital = factor(S1HospitalID,
-                      levels = c(9, 11, 16, 21, 22, 23),
-                      labels = c("Nakorn Phanom","Sri Songkhram","That Phanom","Mae Sot","Umphang","Tha Song Yang")),
+    # Convert enrolledpt
+    enrolledpt = factor(
+      substr(enrolledpt, 1, 1),
+      levels = c("1", "2", "3"),
+      labels = c("Follow up", "Not improve", "Transfered")
+    ),
     
     # Create agegroup
-    #S1Age_Year = ifelse(S1Age_Year < 100, S1Age_Year, NA),
-    agegroup = cut(S1Age_Year,
-                   breaks = c(-Inf, 4, 15, 30, 45, 60, Inf),
-                   labels = c("<5", "5-15", "16-30", "31-45", "46-60", ">60")),
+    #s1age_year = ifelse(s1age_year < 100, s1age_year, NA),
+    agegroup = cut(
+      s1age_year,
+      breaks = c(-Inf, 4, 15, 30, 45, 60, Inf),
+      labels = c("<5", "5-15", "16-30", "31-45", "46-60", ">60")
+    ),
     
     # Factor categorical variables
-    S1Gender = factor(S1Gender,
-                      levels = c(1, 2),
-                      labels = c("Male","Female")),
-    across(c(S1IsTransfer,
-             S1MetPT,
-             S1Fever,
-             S1FeverHis:S1SputumProd,
-             S1Return30:S1AgreePart,
-             S1IsCommu,
-             S1ConsentChild,
-             S1Enroll5th,
-             S1IsSample,
-             NP:Nasal,
-             Blood,
-             CF_Enrol,
-             OLDCF),
-           function(f) {factor(f,
-                              levels = c(1, 2),
-                              labels = c("Yes","No"))})
+    s1gender = factor(
+      s1gender,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    s1nationality = factor(
+      s1nationality,
+      levels = c(1, 2, 3, 4, 5, 6, 7),
+      labels = c('Thai', 'Laos', 'Myanmar', 'Karen', 'Khmer', 'Viet', 'Other')
+    ),
+    s1consentby = factor(
+      s1consentby,
+      levels = c(1, 2, 3),
+      labels = c('Patient', 'Guardian', 'Relative')
+    ),
+    s1reasonno = factor(
+      s1reasonno,
+      levels = c(1, 2, 3, 4, 5, 6, 7, 8),
+      labels = c(
+        'No interest',
+        'No time',
+        'Fear',
+        'No benefit',
+        'Not want to test',
+        'Legal parent not available',
+        'Staff not available',
+        'Other'
+      )
+    ),
+    saliva = factor(
+      saliva,
+      levels = c(1, 2, 3),
+      labels = c('Yes', 'Yes but not enough', 'No')
+    )
     
-  ) %>% 
+  ) %>%
   
-  # Delete unused columns
-  select(-S1HospitalID)
+  # delete unused columns
+  select(-s1hospitalid)
