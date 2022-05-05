@@ -350,17 +350,6 @@ df_rf <- CFMast %>%
   group_by(province, hospital, finalresult, risk) %>%
   tally(wt = y)
 
-df_signBox <- CFMast %>%
-  select(CFID,
-         Province,
-         Hospital,
-         S5CovidPos,
-         S5Intub,
-         S5DishargeType) %>%
-  filter(S5CovidPos == 1) %>%
-  group_by(Province, Hospital, S5Intub, S5DishargeType) %>%
-  tally()
-
 #-------------------------------------------------------------------------------
 # Vaccination page
 #-------------------------------------------------------------------------------
