@@ -351,6 +351,89 @@ df_rf <- CFMast %>%
   tally(wt = y)
 
 #-------------------------------------------------------------------------------
+# Clinical Sign
+#-------------------------------------------------------------------------------
+df_sign <- CFMast %>%
+  select(
+    CFID,
+    Province,
+    Hospital,
+    S2Temp,
+    S32Headache,
+    S32NeckStiff,
+    S32Tiredness,
+    S32Malaise,
+    S32Chills,
+    S32EyePain,
+    S32RedEyes,
+    S32YellowEyes,
+    S32NoseBleeding,
+    S32Hyposmia,
+    S32Dysgeusia,
+    S32MusclePain,
+    S32JointPain,
+    S32RedJoints,
+    S32BonePain,
+    S32BackPain,
+    S32ChestPain,
+    S32NoAppetite,
+    S32Nausea,
+    S32Vomiting,
+    S32BloodVomit,
+    S32AbdominalPain,
+    S32Diarrhea,
+    S32BloodStool,
+    S32BloodUrine,
+    S32Dysuria,
+    S32PaleSkin,
+    S32Rash,
+    S32Bruise,
+    S32Seizures,
+    S32Other,
+    FinalResult
+  ) %>%
+  mutate(S2Temp = ifelse(S2Temp >= 38, 1, 0)) %>%
+  rename_with(~ str_replace(., "S32", ""), starts_with("S32")) %>%
+  rename(
+    "Temperature >= 38.0 C" = S2Temp,
+    "Stiff neck" = NeckStiff,
+    "Eye pain" = EyePain,
+    "Red eyes" = RedEyes,
+    "Yellow eyes" = YellowEyes,
+    "Muscle pain" = MusclePain,
+    "Joint pain" = JointPain,
+    "Red joints" = RedJoints,
+    "Nose bleeding" = NoseBleeding,
+    "Bone pain" = BonePain,
+    "Back pain" = BackPain,
+    "Chest pain" = ChestPain,
+    "Pale skin" = PaleSkin,
+    "No appetite" = NoAppetite,
+    "Blood vomitting" = BloodVomit,
+    "Abdominal pain" = AbdominalPain,
+    "Blood stool" = BloodStool,
+    "Blood urine" = BloodUrine
+  ) %>%
+  pivot_longer(
+    cols = `Temperature >= 38.0 C`:Other,
+    names_to = "Signs",
+    values_to = "y"
+  ) %>%
+  group_by(Signs, Province, Hospital, FinalResult) %>%
+  summarise(n = sum(y[y == 1], na.rm = TRUE))
+
+df_signBox <- CFMast %>%
+  select(CFID,
+         Province,
+         Hospital,
+         S5CovidPos,
+         S5Intub,
+         S5DishargeType) %>%
+  filter(S5CovidPos == 1) %>%
+  group_by(Province, Hospital, S5Intub, S5DishargeType) %>%
+  tally()
+
+#-------------------------------------------------------------------------------
 # Vaccination page
 #-------------------------------------------------------------------------------
 
@@ -360,10 +443,6 @@ df_vac <- CFMast %>%
          finalresult = ifelse(!is.na(finalresult), as.character(finalresult), 'Unknown')) %>%
   group_by(province, hospital, s33covidvaccine, finalresult) %>%
   tally()
-
-# df_vac <- CFMast %>%
-#   group_by(province, hospital, s33covidvaccine, finalresult) %>%
-#   tally()
 
 #-------------------------------------------------------------------------------
 # Atk page
