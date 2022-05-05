@@ -4,20 +4,34 @@
 #-------------------------------------------------------------------------------
 tblSection2 <- tblSection2 %>%
   
+  # Rename all column names to lowercase
+  rename_all(tolower) %>%
+  
   # Delete unused columns
-  select(-starts_with("_")) %>%
+  select(-c(starts_with("_"), remarks)) %>%
   
   # Remove rows without CFID
-  filter(CFID != '__-____-_') %>%
+  filter(cfid != '__-____-_') %>%
   
+  # Create/convert columns
   mutate(
     
     # Recode 999 to missing
-    across(S2Temp:S2Pulse, function(f) {ifelse(f == 999, NA, f)}),
+    across(s2temp:s2pulse, function(f) {
+      ifelse(f == 999, NA, f)
+    }),
     
     # Factor categorical variable
-    S2LevConsciou = factor(S2LevConsciou,
-                           levels = c(1, 2, 3),
-                           labels = c('Conscious', 'Confuse', 'Stupor/Lethargy/Drowsy'))
-
+    s2levconsciou = factor(
+      s2levconsciou,
+      levels = c(1, 2, 3, 4, 5),
+      labels = c(
+        'Conscious',
+        'Confuse',
+        'Stupor/Lethargy/Drowsy',
+        'Semicoma',
+        'Coma'
+      )
+    )
+    
   )

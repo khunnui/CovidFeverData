@@ -4,146 +4,235 @@
 #-------------------------------------------------------------------------------
 tblSection3 <- tblSection3 %>%
   
+  # Rename all column names to lowercase
+  rename_all(tolower) %>%
+  
   # Delete unused columns
-  select(-starts_with("_")) %>%
+  select(-c(starts_with("_"), remarks)) %>%
   
   # Remove rows without CFID
-  filter(CFID != '__-____-_') %>%
+  filter(cfid != '__-____-_') %>%
   
+  # Create/convert columns
   mutate(
     
     # Convert datetime to date
-    across(matches("Date") & !matches("DateRange"), as.Date),
+    across(matches("date") & !matches('daterange'), as.Date),
     
     # Recode 0 to missing
-    across(c(S32Headache,
-             S32NeckStiff,
-             S32Tiredness,
-             S32Malaise,
-             S32Chills,
-             S32EyePain,
-             S32RedEyes,
-             S32YellowEyes,
-             S32NoseBleeding,
-             S32Hyposmia,
-             S32Dysgeusia,
-             S32MusclePain,
-             S32JointPain,
-             S32RedJoints,
-             S32BonePain,
-             S32BackPain,
-             S32ChestPain,
-             S32NoAppetite,
-             S32Nausea,
-             S32Vomiting,
-             S32BloodVomit,
-             S32AbdominalPain,
-             S32Diarrhea,
-             S32BloodStool,
-             S32BloodUrine,
-             S32Dysuria,
-             S32PaleSkin,
-             S32Rash,
-             S32Bruise,
-             S32Seizures,
-             S32Other,
-             S33SuspectedCOVID19:S33VisitHos,
-             S33VistiCrowded:S33TravelThai,
-             S33TravelInter,
-             S33CovidVaccine,
-             S33InfluVaccine,
-             S35Diabetes,
-             S35Obesity:S35Cancer,
-             S35HIV:S35OthChronic,
-             S35HisSmoke:S35Pregnancy,
-             S3604SickSpread,
-             S3606:S3607,
-             S3610MaskIn,
-             S3612Crowd,
-             S3613MaskOut,
-             S3615CareLate:S3622,
-             S3624StopWork,
-             S3625ReIative), 
-           function(f) {ifelse(f == 0, NA, f)}),
+    across(c(
+      s33suspectedcovid19:s33pneumonia,
+      matches('range'),
+      s33cvdoc,
+      s33atk,
+      s33atkresult1,
+      s33atktestby1,
+      s33atkresult2,
+      s33atktestby2,
+      s34occupation,
+      s36education,
+      s36wherelive,
+      s3604sickspread,
+      s3606:s3607,
+      s3610maskin,
+      s3612crowd,
+      s3613maskout,
+      s3615carelate:s3622
+    ),
+    function(f) {
+      ifelse(f == 0, NA, f)
+    }),
+    
+    # Recode 1, 2 to TRUE, FALSE
+    across(c(
+      s32headache,
+      s32neckstiff,
+      s32tiredness,
+      s32malaise,
+      s32chills,
+      s32eyepain,
+      s32redeyes,
+      s32yelloweyes,
+      s32nosebleeding,
+      s32hyposmia,
+      s32dysgeusia,
+      s32musclepain,
+      s32jointpain,
+      s32redjoints,
+      s32bonepain,
+      s32backpain,
+      s32chestpain,
+      s32noappetite,
+      s32nausea,
+      s32vomiting,
+      s32bloodvomit,
+      s32abdominalpain,
+      s32diarrhea,
+      s32bloodstool,
+      s32bloodurine,
+      s32dysuria,
+      s32paleskin,
+      s32rash,
+      s32bruise,
+      s32seizures,
+      s32other,
+      s33healthcareper,
+      s33visithos,
+      s33visticrowded:s33travelthai,
+      s33travelinter,
+      s33hascovid,
+      s33covidvaccine,
+      s33influvaccine,
+      s35diabetes,
+      s35obesity:s35cancer,
+      s35hiv:s35othchronic,
+      s35hissmoke:s35pregnancy,
+      s3624stopwork,
+      s3625reiative,
+      s3630,
+      s3631
+    ),
+    function(f) {
+      f[!f %in% c(1, 2)] <- NA
+      f == 1
+    }),
+    
+    # Convert ATK date range from text to factor
+    across(matches('atkrange'),
+           function(f) {
+             factor(
+               recode(
+                 substr(f, 1, 1),
+                 '<' = 1,
+                 '7' = 2,
+                 '>' = 3
+               ),
+               levels = c(1:3),
+               labels = c('<7 Day', '7-14 Day', '>14 Day')
+             )
+           }),
     
     # Calculate s32anysymptom
-    s32anysymptom = pmin(S32Headache,
-                         S32NeckStiff,
-                         S32Tiredness,
-                         S32Malaise,
-                         S32Chills,
-                         S32EyePain,
-                         S32RedEyes,
-                         S32YellowEyes,
-                         S32NoseBleeding,
-                         S32Hyposmia,
-                         S32Dysgeusia,
-                         S32MusclePain,
-                         S32JointPain,
-                         S32RedJoints,
-                         S32BonePain,
-                         S32BackPain,
-                         S32ChestPain,
-                         S32NoAppetite,
-                         S32Nausea,
-                         S32Vomiting,
-                         S32BloodVomit,
-                         S32AbdominalPain,
-                         S32Diarrhea,
-                         S32BloodStool,
-                         S32BloodUrine,
-                         S32Dysuria,
-                         S32PaleSkin,
-                         S32Rash,
-                         S32Bruise,
-                         S32Seizures,
-                         S32Other,
-                         na.rm = TRUE),
+    s32anysymptom = s32headache |
+      s32neckstiff |
+      s32tiredness |
+      s32malaise |
+      s32chills |
+      s32eyepain |
+      s32redeyes |
+      s32yelloweyes |
+      s32nosebleeding |
+      s32hyposmia |
+      s32dysgeusia |
+      s32musclepain |
+      s32jointpain |
+      s32redjoints |
+      s32bonepain |
+      s32backpain |
+      s32chestpain |
+      s32noappetite |
+      s32nausea |
+      s32vomiting |
+      s32bloodvomit |
+      s32abdominalpain |
+      s32diarrhea |
+      s32bloodstool |
+      s32bloodurine |
+      s32dysuria |
+      s32paleskin |
+      s32rash |
+      s32bruise |
+      s32seizures |
+      s32other,
     
     # Calcualte s33anyrisk
-    s33anyrisk = pmin(S33SuspectedCOVID19,
-                      S33FebrileHousehold,
-                      S33FebrileCoWorker,
-                      S33FebrileNeighbor,
-                      S33RPS,
-                      S33Pneumonia,  
-                      S33HealthCarePer,
-                      S33VisitHos,
-                      S33VistiCrowded,
-                      S33PartPeople,
-                      S33TravelThai,
-                      S33TravelInter,
-                      na.rm = TRUE),
+    s33anyrisk = s33suspectedcovid19 |
+      s33febrilehousehold |
+      s33febrilecoworker |
+      s33febrileneighbor |
+      s33rps |
+      s33pneumonia |
+      s33healthcareper |
+      s33visithos |
+      s33visticrowded |
+      s33partpeople |
+      s33travelthai |
+      s33travelinter,
     
     # Calculate s35anycomorbid
-    s35anycomorbid = pmin(S35Diabetes,
-                          S35Obesity,
-                          S35Hypertension,
-                          S35HeartDisease,
-                          S35Asthma,
-                          S35COPD,
-                          S35Cancer,
-                          S35HIV, 
-                          S35Immunodef,
-                          S35HisTB,
-                          S35ActiveTB,
-                          S35Liver,
-                          S35Thyroid,
-                          S35Thalassemia,
-                          S35Anemia,
-                          S35Renal,
-                          S35Chroles,
-                          S35Cerebro, 
-                          S35OthChronic,
-                          S35HisSmoke,
-                          S35CurSmoke,
-                          S35HistAlcohol, 
-                          S35CurAlcohol,
-                          na.rm = TRUE),
+    s35anycomorbid = s35diabetes |
+      s35obesity |
+      s35hypertension |
+      s35heartdisease |
+      s35asthma |
+      s35copd |
+      s35cancer |
+      s35hiv |
+      s35immunodef |
+      s35histb |
+      s35activetb |
+      s35liver |
+      s35thyroid |
+      s35thalassemia |
+      s35anemia |
+      s35renal |
+      s35chroles |
+      s35cerebro |
+      s35othchronic |
+      s35hissmoke |
+      s35cursmoke |
+      s35histalcohol |
+      s35curalcohol |
+      s35pregnancy,
     
     # Factor categorical variables
-    S34Occupation = factor(
-      S34Occupation,
+    across(c(s33suspectedcovid19:s33pneumonia, s3606, s33atk),
+           function(f) {
+             factor(f,
+                    levels = c(1:3),
+                    labels = c('Yes',
+                               'No',
+                               'Not known'))
+           }),
+    s33hascovidrange =
+      factor(
+        s33hascovidrange,
+        levels = c(1:4),
+        labels = c('1-3 Month', '4-6 Month', '7-12 Month', '> 1 Year')
+      ),
+    s33covidvaccine = factor(
+      s33covidvaccine,
+      levels = c(TRUE, FALSE),
+      labels = c("Vaccinated", "Unvaccinated")
+    ),
+    s33cvdoc =
+      factor(
+        s33cvdoc,
+        levels = c(1:2),
+        labels = c('Verbal', 'Vaccine book')
+      ),
+    across(matches('daterange'),
+           function(f) {
+             factor(
+               f,
+               levels = c(1:4),
+               labels = c('<1 Month', '1-6 Month', '7-12 Month', '> 1 Year')
+             )
+           }),
+    across(matches('atkresult'),
+           function(f) {
+             factor(f,
+                    levels = c(1:3),
+                    labels = c('Positive', 'Negative', 'UnKnown'))
+           }),
+    across(matches('atktestby'),
+           function(f) {
+             factor(f,
+                    levels = c(1:2),
+                    labels = c('Self', 'Medical person'))
+           }),
+    s34occupation = factor(
+      s34occupation,
       levels = c(1:30, 99),
       labels = c(
         'Farmer',
@@ -179,37 +268,70 @@ tblSection3 <- tblSection3 %>%
         'Other'
       )
     ),
-    S33CovidVaccine = factor(
-      S33CovidVaccine,
-      levels = c(1, 2),
-      labels = c("Vaccinated", "Unvaccinated")
+    s36education = factor(
+      s36education,
+      levels = c(1:7),
+      labels = c(
+        '< Primary',
+        'Primary',
+        'Secondary',
+        'High',
+        'Bachelor',
+        '> Bachelor',
+        'Other'
+      )
     ),
-    across(
-      c(S3604SickSpread, S3615CareLate:S3620),
-      function(f) {
-        factor(
-          f,
-          levels = c(5:1),
-          labels = c('Strongly disagree',
-                     'Disagree',
-                     'Neither agree/disagree',
-                     'Agree',
-                     'Strongly agree')
-        )
-      }
+    s36wherelive = factor(
+      s36wherelive,
+      levels = c(1:3),
+      labels = c('Outside municipal', 'Inside municipal', 'Unknown')
     ),
-    across(
-      c(S3610MaskIn, S3613MaskOut, S3621:S3622),
-      function(f) {
-        factor(
-          f,
-          levels = c(5:1),
-          labels = c('Never',
-                     'Rarely',
-                     'Occasionally',
-                     'Most of the time',
-                     'Always')
-        )
-      }
+    across(c(s3604sickspread, s3615carelate:s3620),
+           function(f) {
+             factor(
+               f,
+               levels = c(5:1),
+               labels = c(
+                 'Strongly disagree',
+                 'Disagree',
+                 'Neither agree/disagree',
+                 'Agree',
+                 'Strongly agree'
+               )
+             )
+           }),
+    s3607 = factor(
+      s3607,
+      levels = c(1:6),
+      labels = c(
+        'Indifferent',
+        'Feel scared',
+        'Feel so scared',
+        'Should not be serious',
+        'Scared but not anything serious',
+        'Other'
+      )
+    ),
+    across(c(s3610maskin, s3613maskout, s3621:s3622),
+           function(f) {
+             factor(
+               f,
+               levels = c(5:1),
+               labels = c('Never',
+                          'Rarely',
+                          'Occasionally',
+                          'Most of the time',
+                          'Always')
+             )
+           }),
+    s3612crowd = factor(
+      s3612crowd,
+      levels = c(1:4),
+      labels = c(
+        'Daily/almost daily',
+        '> 7 days/past 2 wks',
+        '<= 7 days/past 2 weeks',
+        'Never'
+      )
     )
   )

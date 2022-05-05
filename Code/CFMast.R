@@ -10,9 +10,9 @@
 library(tidyverse)
 library(dplyr)
 
-CFMast <- filter(tblSection1, CF_Enrol == "Yes") %>%
-  left_join(tblSection2, by='CFID') %>%
-  left_join(tblSection3, by='CFID') %>%
-  left_join(tblSection4, by='CFID') %>%
-  left_join(tblSection5, by='CFID') %>%
-  left_join(LabPCRFinal, by='CFID')
+CFMast <- filter(tblSection1, !is.na(cfid)) %>%
+  left_join(tblSection2, by='cfid') %>%
+  left_join(tblSection3, by='cfid') %>%
+  left_join(tblSection4, by='cfid') %>%
+  left_join(tblSection5, by='cfid') %>%
+  left_join(LabPCRFinal, by='cfid')

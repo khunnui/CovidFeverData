@@ -3,12 +3,13 @@
 # 3/7/2022
 #-------------------------------------------------------------------------------
 LabPCRResult_l <- LabPCRResult %>%
-  # Create CFID from first 9 characters of SpecimenID
+  rename_all(tolower) %>%
+  # Create cfid from first 9 characters of SpecimenID
   mutate(
-    CFID = substr(SpecimenID, 1, 9),
-    Province = ifelse(substr(CFID, 1, 2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
-    Hospital = factor(
-      as.integer(substr(CFID, 1, 2)),
+    cfid = substr(specimenid, 1, 9),
+    province = ifelse(substr(cfid, 1, 2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
+    hospital = factor(
+      as.integer(substr(cfid, 1, 2)),
       levels = c(9, 11, 16, 21, 22, 23),
       labels = c(
         "Nakorn Phanom",
@@ -19,61 +20,61 @@ LabPCRResult_l <- LabPCRResult %>%
         "Tha Song Yang"
       )
     ),
-    across(matches("Date"), as.Date),
-    SpecType = factor(
-      SpecType,
+    across(matches("date"), as.Date),
+    spectype = factor(
+      spectype,
       levels = c(1, 4, 7),
       labels = c("NP+OP swab", "Nasal swab", "Saliva")
     ),
-    FinalResult_fac = factor(
-      FinalResult,
-      levels = c(1, 2, 3),
-      labels = c("Positive", "Inconclusive", "Negative")
+    finalresult_fac = factor(
+      finalresult,
+      levels = c(1, 3, 2),
+      labels = c("Positive", "Negative", "Inconclusive")
     )
   )
 
 LabPCRFinal <- LabPCRResult_l %>%
   # Select only 4 columns (ID, type, result, and test dates)
-  select(CFID,
-         SpecType,
-         FinalResult,
-         TestDate_P,
-         TestDate_I,
-         TestDate_I2) %>%
+  select(cfid,
+         spectype,
+         finalresult,
+         testdate_p,
+         testdate_i,
+         testdate_i2) %>%
   # All specimen types in one line
   pivot_wider(
-    names_from = "SpecType",
-    values_from = c("FinalResult", "TestDate_P", "TestDate_I", "TestDate_I2")
+    names_from = "spectype",
+    values_from = c("finalresult", "testdate_p", "testdate_i", "testdate_i2")
   ) %>%
   # Final PCR result based on all specimen types
   mutate(
-    FinalResult = factor(
+    finalresult = factor(
       pmin(
-        `FinalResult_NP+OP swab`,
-        `FinalResult_Nasal swab`,
-        `FinalResult_Saliva`,
+        `finalresult_NP+OP swab`,
+        `finalresult_Nasal swab`,
+        `finalresult_Saliva`,
         na.rm = TRUE
       ),
-      levels = c(1, 2, 3),
-      labels = c("Positive", "Inconclusive", "Negative")
+      levels = c(1, 3, 2),
+      labels = c("Positive", "Negative", "Inconclusive")
     ),
-    PCRTests = paste0(ifelse(!is.na(`FinalResult_NP+OP swab`),`FinalResult_NP+OP swab`,'.'),
-                      ifelse(!is.na(`FinalResult_Nasal swab`),`FinalResult_Nasal swab`,'.'),
-                                    ifelse(!is.na(`FinalResult_Saliva`),`FinalResult_Saliva`,'.')),
-    TestDate = pmin(
-      `TestDate_P_NP+OP swab`,
-      `TestDate_P_Nasal swab`,
-      `TestDate_P_Saliva`,
-      `TestDate_I_NP+OP swab`,
-      `TestDate_I_Nasal swab`,
-      `TestDate_I_Saliva`,
-      `TestDate_I2_NP+OP swab`,
-      `TestDate_I2_Nasal swab`,
-      `TestDate_I2_Saliva`,
+    pcrtests = paste0(ifelse(!is.na(`finalresult_NP+OP swab`),`finalresult_NP+OP swab`,'.'),
+                      ifelse(!is.na(`finalresult_Nasal swab`),`finalresult_Nasal swab`,'.'),
+                                    ifelse(!is.na(`finalresult_Saliva`),`finalresult_Saliva`,'.')),
+    testdate = pmin(
+      `testdate_p_NP+OP swab`,
+      `testdate_p_Nasal swab`,
+      `testdate_p_Saliva`,
+      `testdate_i_NP+OP swab`,
+      `testdate_i_Nasal swab`,
+      `testdate_i_Saliva`,
+      `testdate_i2_NP+OP swab`,
+      `testdate_i2_Nasal swab`,
+      `testdate_i2_Saliva`,
       na.rm = TRUE
     )
   ) %>%
   select(
-    -c(`FinalResult_NP+OP swab`:`FinalResult_Saliva`,
-      `TestDate_P_NP+OP swab`:`TestDate_I2_Saliva`)
+    -c(`finalresult_NP+OP swab`:`finalresult_Saliva`,
+      `testdate_p_NP+OP swab`:`testdate_i2_Saliva`)
   )
