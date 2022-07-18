@@ -254,7 +254,7 @@ df_signBox <- CFMast %>%
          hospital,
          s5covidpos,
          s5intub,
-         s5dishargetype) %>%
+         s5dischargetype) %>%
   filter(s5covidpos == 1) %>%
   group_by(province, hospital, s5intub, s5dishargetype) %>%
   tally()
