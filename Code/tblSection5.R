@@ -23,7 +23,7 @@ tblSection5 <- tblSection5 %>%
       s5isadmit,
       matches('s5medadmin'),
       s5intub,
-      s5dishargetype,
+      s5dischargetype,
       s5dischargestatus
     ),
     function(f) {
