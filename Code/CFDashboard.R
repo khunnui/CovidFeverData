@@ -292,7 +292,7 @@ df_un <- CFMast %>%
     s35hissmoke:s35pregnancy
   ) %>%
   droplevels() %>% 
-  rename_with(~ str_replace(., "s35", ""), starts_with("s35")) %>%
+  rename_with( ~ str_replace(., "s35", ""), starts_with("s35")) %>%
   rename(
     Diabetes = diabetes,
     Obesity = obesity,
