@@ -1,4 +1,13 @@
+#------------------------------------------------------------------------------#
+# Description: Program for prepare data frames and gt tables for Covid-Fever   #
+#              dashboard https://dghp.shinyapps.io/COVID-Fever/  	  	         #
+# Author:      hpy1                                                            #
+# Created:     January 27, 2022                                                #
+# Modified:    March 9, 2022                                                   #
+#------------------------------------------------------------------------------#
+
 ddate <- max(tblSection1$s1screendate, na.rm = TRUE)
+source(paste0(code_folder, "/Functions.R"))
 
 #-------------------------------------------------------------------------------
 # Screening page
@@ -106,12 +115,12 @@ df_enrocc <- CFMast %>%
 #-------------------------------------------------------------------------------
 
 df_dx <- CFMast %>%
-  select(cfid,
-         province,
+  select(province,
          hospital,
          finalresult,
          s2dxfever:s2dxother,
          s2dxmeningitis) %>%
+  droplevels() %>% 
   rename_with( ~ str_replace(., "s2dx", ""), starts_with("s2dx")) %>%
   rename(
     Fever                      = fever,
@@ -155,21 +164,27 @@ df_dx <- CFMast %>%
     "Scrub typhus"             = scrubtyphus,
     Other                      = other,
     Meningitis                 = meningitis
-  ) %>%
-  pivot_longer(cols = Fever:Meningitis,
-               names_to = "diagnosis",
-               values_to = "y") %>%
-  group_by(province, hospital, finalresult, diagnosis) %>%
-  tally(wt = y)
+  )
+
+gt_dx    <- create_sumtable(df_dx, "Diagnoses")
+gt_dx_n  <- create_sumtable(df_dx %>% filter(province == "Nakorn Phanom"), "Diagnoses")
+gt_dx_t  <- create_sumtable(df_dx %>% filter(province == "Tak"), "Diagnoses")
+gt_dx_n1 <- create_sumtable(df_dx %>% filter(hospital == "Nakorn Phanom"), "Diagnoses")
+gt_dx_n2 <- create_sumtable(df_dx %>% filter(hospital == "Sri Songkhram"), "Diagnoses")
+gt_dx_n3 <- create_sumtable(df_dx %>% filter(hospital == "That Phanom"), "Diagnoses")
+gt_dx_t1 <- create_sumtable(df_dx %>% filter(hospital == "Mae Sot"), "Diagnoses")
+gt_dx_t2 <- create_sumtable(df_dx %>% filter(hospital == "Umphang"), "Diagnoses")
+gt_dx_t3 <- create_sumtable(df_dx %>% filter(hospital == "Tha Song Yang"), "Diagnoses")
 
 #-------------------------------------------------------------------------------
 # Clinical Sign
 #-------------------------------------------------------------------------------
+
 df_sign <- CFMast %>%
   select(
-    cfid,
     province,
     hospital,
+    finalresult,
     s2temp,
     s32headache,
     s32neckstiff,
@@ -201,11 +216,11 @@ df_sign <- CFMast %>%
     s32rash,
     s32bruise,
     s32seizures,
-    s32other,
-    finalresult
+    s32other
   ) %>%
-  mutate(s2temp = ifelse(s2temp >= 38, 1, 0)) %>%
-  rename_with(~ str_replace(., "s32", ""), starts_with("s32")) %>%
+  droplevels() %>%
+  mutate(s2temp = ifelse(s2temp >= 38, TRUE, FALSE)) %>%
+  rename_with( ~ str_replace(., "s32", ""), starts_with("s32")) %>%
   rename(
     "Temperature >= 38.0 C" = s2temp,
     Headache                = headache,
@@ -239,14 +254,17 @@ df_sign <- CFMast %>%
     Bruise                  = bruise,
     Seizures                = seizures,
     Other                   = other
-  ) %>%
-  pivot_longer(
-    cols = `Temperature >= 38.0 C`:Other,
-    names_to = "signs",
-    values_to = "y"
-  ) %>%
-  group_by(province, hospital, finalresult, signs) %>%
-  tally(wt = y)
+  )
+
+gt_sign    <- create_sumtable(df_sign, "Signs & Symptoms")
+gt_sign_n  <- create_sumtable(df_sign %>% filter(province == "Nakorn Phanom"), "Signs & Symptoms")
+gt_sign_t  <- create_sumtable(df_sign %>% filter(province == "Tak"), "Signs & Symptoms")
+gt_sign_n1 <- create_sumtable(df_sign %>% filter(hospital == "Nakorn Phanom"), "Signs & Symptoms")
+gt_sign_n2 <- create_sumtable(df_sign %>% filter(hospital == "Sri Songkhram"), "Signs & Symptoms")
+gt_sign_n3 <- create_sumtable(df_sign %>% filter(hospital == "That Phanom"), "Signs & Symptoms")
+gt_sign_t1 <- create_sumtable(df_sign %>% filter(hospital == "Mae Sot"), "Signs & Symptoms")
+gt_sign_t2 <- create_sumtable(df_sign %>% filter(hospital == "Umphang"), "Signs & Symptoms")
+gt_sign_t3 <- create_sumtable(df_sign %>% filter(hospital == "Tha Song Yang"), "Signs & Symptoms")
 
 df_signBox <- CFMast %>%
   select(cfid,
@@ -262,17 +280,18 @@ df_signBox <- CFMast %>%
 #-------------------------------------------------------------------------------
 # Underlying Page
 #-------------------------------------------------------------------------------
+
 df_un <- CFMast %>%
   select(
-    cfid,
     province,
     hospital,
+    finalresult,
     s35diabetes,
     s35obesity:s35cancer,
     s35hiv:s35othchronic,
-    s35hissmoke:s35pregnancy,
-    finalresult
+    s35hissmoke:s35pregnancy
   ) %>%
+  droplevels() %>% 
   rename_with(~ str_replace(., "s35", ""), starts_with("s35")) %>%
   rename(
     Diabetes = diabetes,
@@ -299,12 +318,17 @@ df_un <- CFMast %>%
     "History of alcohol consumption" = histalcohol,
     "Current of alcohol consumption" = curalcohol,
     Pregnancy = pregnancy
-  ) %>%
-  pivot_longer(cols = Diabetes:Pregnancy,
-               names_to = "underlying",
-               values_to = "y") %>%
-  group_by(underlying, hospital, province, finalresult) %>%
-  summarise(n = sum(y[y == 1], na.rm = TRUE))
+  )
+
+gt_un    <- create_sumtable(df_un, "Underlying Conditions")
+gt_un_n  <- create_sumtable(df_un %>% filter(province == "Nakorn Phanom"), "Underlying Conditions")
+gt_un_t  <- create_sumtable(df_un %>% filter(province == "Tak"), "Underlying Conditions")
+gt_un_n1 <- create_sumtable(df_un %>% filter(hospital == "Nakorn Phanom"), "Underlying Conditions")
+gt_un_n2 <- create_sumtable(df_un %>% filter(hospital == "Sri Songkhram"), "Underlying Conditions")
+gt_un_n3 <- create_sumtable(df_un %>% filter(hospital == "That Phanom"), "Underlying Conditions")
+gt_un_t1 <- create_sumtable(df_un %>% filter(hospital == "Mae Sot"), "Underlying Conditions")
+gt_un_t2 <- create_sumtable(df_un %>% filter(hospital == "Umphang"), "Underlying Conditions")
+gt_un_t3 <- create_sumtable(df_un %>% filter(hospital == "Tha Song Yang"), "Underlying Conditions")
 
 #-------------------------------------------------------------------------------
 #Risk Factor page
@@ -312,14 +336,14 @@ df_un <- CFMast %>%
 
 df_rf <- CFMast %>%
   select(
-    cfid,
     province,
     hospital,
+    finalresult,
     s33suspectedcovid19:s33visithos,
     s33visticrowded:s33travelthai,
-    s33travelinter,
-    finalresult
+    s33travelinter
   ) %>%
+  droplevels() %>% 
   mutate(
     "Contact COVID-19 cases" = ifelse(s33suspectedcovid19 == 'Yes', TRUE, FALSE),
     "Contact febrile patients" = ifelse(
@@ -341,14 +365,17 @@ df_rf <- CFMast %>%
       s33visticrowded:s33travelthai,
       s33travelinter
     )
-  ) %>%
-  pivot_longer(
-    cols = "Contact COVID-19 cases":"History of travel",
-    names_to = "risk",
-    values_to = "y"
-  ) %>%
-  group_by(province, hospital, finalresult, risk) %>%
-  tally(wt = y)
+  )
+
+gt_rf    <- create_sumtable(df_rf, "Risk Factors")
+gt_rf_n  <- create_sumtable(df_rf %>% filter(province == "Nakorn Phanom"), "Risk Factors")
+gt_rf_t  <- create_sumtable(df_rf %>% filter(province == "Tak"), "Risk Factors")
+gt_rf_n1 <- create_sumtable(df_rf %>% filter(hospital == "Nakorn Phanom"), "Risk Factors")
+gt_rf_n2 <- create_sumtable(df_rf %>% filter(hospital == "Sri Songkhram"), "Risk Factors")
+gt_rf_n3 <- create_sumtable(df_rf %>% filter(hospital == "That Phanom"), "Risk Factors")
+gt_rf_t1 <- create_sumtable(df_rf %>% filter(hospital == "Mae Sot"), "Risk Factors")
+gt_rf_t2 <- create_sumtable(df_rf %>% filter(hospital == "Umphang"), "Risk Factors")
+gt_rf_t3 <- create_sumtable(df_rf %>% filter(hospital == "Tha Song Yang"), "Risk Factors")
 
 #-------------------------------------------------------------------------------
 # Vaccination page
@@ -469,11 +496,43 @@ save(
     "df_enrage",
     "df_enrgender",
     "df_enrocc",
-    "df_dx",
-    "df_un",
-    "df_rf",
-    "df_sign",
+    "gt_dx",
+    "gt_dx_n",
+    "gt_dx_n1",
+    "gt_dx_n2",
+    "gt_dx_n3",
+    "gt_dx_t",
+    "gt_dx_t1",
+    "gt_dx_t2",
+    "gt_dx_t3",
+    "gt_sign",
+    "gt_sign_n",
+    "gt_sign_n1",
+    "gt_sign_n2",
+    "gt_sign_n3",
+    "gt_sign_t",
+    "gt_sign_t1",
+    "gt_sign_t2",
+    "gt_sign_t3",
     "df_signBox",
+    "gt_un",
+    "gt_un_n",
+    "gt_un_n1",
+    "gt_un_n2",
+    "gt_un_n3",
+    "gt_un_t",
+    "gt_un_t1",
+    "gt_un_t2",
+    "gt_un_t3",
+    "gt_rf",
+    "gt_rf_n",
+    "gt_rf_n1",
+    "gt_rf_n2",
+    "gt_rf_n3",
+    "gt_rf_t",
+    "gt_rf_t1",
+    "gt_rf_t2",
+    "gt_rf_t3",
     "df_vac",
     "df_atk",
     "df_lab",
@@ -481,5 +540,6 @@ save(
     "df_kap1",
     "df_kap2"
   ),
-  file = paste0(data_folder, "/CFDashboard.RData") 
+  file = paste0(data_folder, "/CFDashboard.RData")
 )
+
