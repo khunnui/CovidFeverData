@@ -19,8 +19,9 @@ tblSection1 <- tblSection1 %>%
     
     # create province for hospitalid
     province = factor(
-      ifelse(s1hospitalid %in% c(9, 11, 16), 'Nakorn Phanom', 'Tak'),
-      levels = c('Nakorn Phanom', 'Tak')
+      ifelse(s1hospitalid %in% c(9, 11, 16), 1, 2),
+      levels = c(1, 2),
+      labels = c('Nakorn Phanom', 'Tak')
     ),
     
     # Rename and factor hospitalid

@@ -7,7 +7,11 @@ LabPCRResult_l <- LabPCRResult %>%
   # Create cfid from first 9 characters of SpecimenID
   mutate(
     cfid = substr(specimenid, 1, 9),
-    province = ifelse(substr(cfid, 1, 2) %in% c('09', '11', '16'), "Nakorn Phanom", "Tak"),
+    province = factor(
+      ifelse(substr(cfid, 1, 2) %in% c('09', '11', '16'), 1, 2),
+      levels = c(1, 2),
+      labels = c('Nakorn Phanom', 'Tak')
+    ),
     hospital = factor(
       as.integer(substr(cfid, 1, 2)),
       levels = c(9, 11, 16, 21, 22, 23),
