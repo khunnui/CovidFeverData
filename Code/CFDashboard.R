@@ -6,86 +6,8 @@
 # Modified:    March 9, 2022                                                   #
 #------------------------------------------------------------------------------#
 
-library(sf)
-
 ddate <- max(tblSection1$s1screendate, na.rm = TRUE)
-shapefile_folder <- paste0(getwd(), "/Maps/")
 source(paste0(code_folder, "/Functions.R"))
-
-#-------------------------------------------------------------------------------
-# Study sites #
-#-------------------------------------------------------------------------------
-
-world        <- st_read(paste0(shapefile_folder, "World_Countries.shp"),
-                        stringsAsFactors = FALSE)
-th_province  <- st_read(paste0(shapefile_folder, "ThailandProvince.shp"),
-                        stringsAsFactors = FALSE)
-th_district  <- st_read(paste0(shapefile_folder, "Amphoe77.shp"), 
-                        stringsAsFactors = FALSE)
-
-world <- world %>%
-  mutate(
-    my_nudge_x = case_when(ISO == 'MM' ~ 1.7,
-                           ISO == 'MY' ~ -0.1,
-                           TRUE ~ 0),
-    my_nudge_y = case_when(ISO == 'MM' ~ 1,
-                           ISO == 'MY' ~ 1.59,
-                           TRUE ~ 0),
-    COUNTRY = ifelse(ISO == 'TH', NA, COUNTRY)
-  )
-tak_district <- th_district %>% filter(ProvID == 63)
-np_district  <- th_district %>% filter(ProvID == 48)
-
-cf_province  <- th_province %>% filter(ProvNum %in% c(48, 63))
-cf_tak       <- tak_district %>% filter(AmphoeID %in% c("05", "06", "08"))
-cf_np        <- np_district %>% filter(AmphoeID %in% c("01", "05", "08"))
-
-map_cf_province <- ggplot() +
-  geom_sf(data = world,
-          fill = "gray95",
-          size = 0.5) +
-  geom_sf(data = th_province,
-          fill = "grey80",
-          size = 0.5) +
-  geom_sf(data = cf_province,
-          fill = "#dd4b39") +
-  geom_sf_text(data = world,
-               aes(label = COUNTRY),
-               nudge_x=world$my_nudge_x,nudge_y=world$my_nudge_y,
-               size = 4) +
-  geom_sf_text(data = cf_province, 
-               aes(label = ProvName),
-               size = 4) +
-  coord_sf(xlim = c(97, 106),
-           ylim = c(6, 20),
-           expand = TRUE) + 
-  theme_void()
-
-map_cf_tak <- ggplot() +
-  geom_sf(data = tak_district, 
-          fill = "grey95") +
-  geom_sf(data = cf_tak, aes(fill = AmphoeE)) +
-  geom_sf_text(data = cf_tak,
-            aes(label = AmphoeE),
-            size = 4) +
-  coord_sf(xlim = c(371000, 544000),
-           ylim = c(1688000, 1965000)) +
-  scale_fill_manual(values = c("#f8de7e", "pink", "#a1caf1")) +
-  theme_void() +
-  theme(legend.position = "none")
-
-map_cf_np <- ggplot() +
-  geom_sf(data = np_district, 
-          fill = "grey95") +
-  geom_sf(data = cf_np, aes(fill = AmphoeE)) +
-  geom_sf_text(data = cf_np,
-            aes(label = AmphoeE),
-            size = 4) +
-  coord_sf(xlim = c(1026500, 1123500),
-           ylim = c(1870000, 1995000)) +
-  scale_fill_manual(values = c('#ffcba4', '#d8bfd8', '#ace1af')) +
-  theme_void() +
-  theme(legend.position = "none")
 
 #-------------------------------------------------------------------------------
 # Screening page
@@ -244,15 +166,17 @@ df_dx <- CFMast %>%
     Meningitis                 = meningitis
   )
 
-gt_dx    <- create_sumtable(df_dx, "Diagnoses")
-gt_dx_n  <- create_sumtable(df_dx %>% filter(province == "Nakorn Phanom"), "Diagnoses")
-gt_dx_t  <- create_sumtable(df_dx %>% filter(province == "Tak"), "Diagnoses")
-gt_dx_n1 <- create_sumtable(df_dx %>% filter(hospital == "Nakorn Phanom"), "Diagnoses")
-gt_dx_n2 <- create_sumtable(df_dx %>% filter(hospital == "Sri Songkhram"), "Diagnoses")
-gt_dx_n3 <- create_sumtable(df_dx %>% filter(hospital == "That Phanom"), "Diagnoses")
-gt_dx_t1 <- create_sumtable(df_dx %>% filter(hospital == "Mae Sot"), "Diagnoses")
-gt_dx_t2 <- create_sumtable(df_dx %>% filter(hospital == "Umphang"), "Diagnoses")
-gt_dx_t3 <- create_sumtable(df_dx %>% filter(hospital == "Tha Song Yang"), "Diagnoses")
+ls_dx    <- get_sum_data(df_dx)
+ls_dx_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom"))
+ls_dx_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom"))
+ls_dx_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram"))
+ls_dx_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom"))
+ls_dx_t  <- get_sum_data(df_dx %>% filter(province == "Tak"))
+ls_dx_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot"))
+ls_dx_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang"))
+ls_dx_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang"))
+
+# gt_dx    <- create_sum_table(ls_dx$df_sum,'','Diagnoses', ls_dx$N0, ls_dx$N1, ls_dx$N2)
 
 #-------------------------------------------------------------------------------
 # Clinical Sign
@@ -334,15 +258,15 @@ df_sign <- CFMast %>%
     Other                   = other
   )
 
-gt_sign    <- create_sumtable(df_sign, "Signs & Symptoms")
-gt_sign_n  <- create_sumtable(df_sign %>% filter(province == "Nakorn Phanom"), "Signs & Symptoms")
-gt_sign_t  <- create_sumtable(df_sign %>% filter(province == "Tak"), "Signs & Symptoms")
-gt_sign_n1 <- create_sumtable(df_sign %>% filter(hospital == "Nakorn Phanom"), "Signs & Symptoms")
-gt_sign_n2 <- create_sumtable(df_sign %>% filter(hospital == "Sri Songkhram"), "Signs & Symptoms")
-gt_sign_n3 <- create_sumtable(df_sign %>% filter(hospital == "That Phanom"), "Signs & Symptoms")
-gt_sign_t1 <- create_sumtable(df_sign %>% filter(hospital == "Mae Sot"), "Signs & Symptoms")
-gt_sign_t2 <- create_sumtable(df_sign %>% filter(hospital == "Umphang"), "Signs & Symptoms")
-gt_sign_t3 <- create_sumtable(df_sign %>% filter(hospital == "Tha Song Yang"), "Signs & Symptoms")
+ls_sign    <- get_sum_data(df_sign)
+ls_sign_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom"))
+ls_sign_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom"))
+ls_sign_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram"))
+ls_sign_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom"))
+ls_sign_t  <- get_sum_data(df_sign %>% filter(province == "Tak"))
+ls_sign_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot"))
+ls_sign_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang"))
+ls_sign_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang"))
 
 df_signBox <- CFMast %>%
   select(cfid,
@@ -398,15 +322,15 @@ df_un <- CFMast %>%
     Pregnancy = pregnancy
   )
 
-gt_un    <- create_sumtable(df_un, "Underlying Conditions")
-gt_un_n  <- create_sumtable(df_un %>% filter(province == "Nakorn Phanom"), "Underlying Conditions")
-gt_un_t  <- create_sumtable(df_un %>% filter(province == "Tak"), "Underlying Conditions")
-gt_un_n1 <- create_sumtable(df_un %>% filter(hospital == "Nakorn Phanom"), "Underlying Conditions")
-gt_un_n2 <- create_sumtable(df_un %>% filter(hospital == "Sri Songkhram"), "Underlying Conditions")
-gt_un_n3 <- create_sumtable(df_un %>% filter(hospital == "That Phanom"), "Underlying Conditions")
-gt_un_t1 <- create_sumtable(df_un %>% filter(hospital == "Mae Sot"), "Underlying Conditions")
-gt_un_t2 <- create_sumtable(df_un %>% filter(hospital == "Umphang"), "Underlying Conditions")
-gt_un_t3 <- create_sumtable(df_un %>% filter(hospital == "Tha Song Yang"), "Underlying Conditions")
+ls_un    <- get_sum_data(df_un)
+ls_un_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom"))
+ls_un_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom"))
+ls_un_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram"))
+ls_un_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom"))
+ls_un_t  <- get_sum_data(df_un %>% filter(province == "Tak"))
+ls_un_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot"))
+ls_un_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang"))
+ls_un_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang"))
 
 #-------------------------------------------------------------------------------
 #Risk Factor page
@@ -445,15 +369,15 @@ df_rf <- CFMast %>%
     )
   )
 
-gt_rf    <- create_sumtable(df_rf, "Risk Factors")
-gt_rf_n  <- create_sumtable(df_rf %>% filter(province == "Nakorn Phanom"), "Risk Factors")
-gt_rf_t  <- create_sumtable(df_rf %>% filter(province == "Tak"), "Risk Factors")
-gt_rf_n1 <- create_sumtable(df_rf %>% filter(hospital == "Nakorn Phanom"), "Risk Factors")
-gt_rf_n2 <- create_sumtable(df_rf %>% filter(hospital == "Sri Songkhram"), "Risk Factors")
-gt_rf_n3 <- create_sumtable(df_rf %>% filter(hospital == "That Phanom"), "Risk Factors")
-gt_rf_t1 <- create_sumtable(df_rf %>% filter(hospital == "Mae Sot"), "Risk Factors")
-gt_rf_t2 <- create_sumtable(df_rf %>% filter(hospital == "Umphang"), "Risk Factors")
-gt_rf_t3 <- create_sumtable(df_rf %>% filter(hospital == "Tha Song Yang"), "Risk Factors")
+ls_rf    <- get_sum_data(df_rf)
+ls_rf_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom"))
+ls_rf_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom"))
+ls_rf_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram"))
+ls_rf_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom"))
+ls_rf_t  <- get_sum_data(df_rf %>% filter(province == "Tak"))
+ls_rf_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot"))
+ls_rf_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang"))
+ls_rf_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang"))
 
 #-------------------------------------------------------------------------------
 # Vaccination page
@@ -513,15 +437,15 @@ df_labpos <- LabPCRResult_l %>%
       `NP+OP swab`   == 1 &
         `Nasal swab` == 1 & `Saliva` == 1 ~ "NP/OP, nasal, saliva",
       `NP+OP swab`   == 1 &
-        `Nasal swab` == 1                ~ "NP/OP, nasal",
+        `Nasal swab` == 1                 ~ "NP/OP, nasal",
       `NP+OP swab`   == 1 &
-        `Saliva`     == 1                ~ "NP/OP, saliva",
+        `Saliva`     == 1                 ~ "NP/OP, saliva",
       `Nasal swab`   == 1 &
-        `Saliva`     == 1                ~ "Nasal, saliva",
-      `NP+OP swab`   == 1                                    ~ "NP/OP",
-      `Nasal swab`   == 1                                    ~ "Nasal",
-      `Saliva`       == 1                                    ~ "Saliva",
-      TRUE                                                   ~ "other"
+        `Saliva`     == 1                 ~ "Nasal, saliva",
+      `NP+OP swab`   == 1                 ~ "NP/OP",
+      `Nasal swab`   == 1                 ~ "Nasal",
+      `Saliva`       == 1                 ~ "Saliva",
+      TRUE                                ~ "other"
     )
   ) %>%
   group_by(province, hospital, specimens) %>%
@@ -563,9 +487,6 @@ df_kap2 <- CFMast %>%
 save(
   list = c(
     "ddate",
-    "map_cf_province",
-    "map_cf_np",
-    "map_cf_tak",
     "df_scrw",
     "df_scrm",
     "df_scrage",
@@ -581,43 +502,43 @@ save(
     "df_enrage",
     "df_enrgender",
     "df_enrocc",
-    "gt_dx",
-    "gt_dx_n",
-    "gt_dx_n1",
-    "gt_dx_n2",
-    "gt_dx_n3",
-    "gt_dx_t",
-    "gt_dx_t1",
-    "gt_dx_t2",
-    "gt_dx_t3",
-    "gt_sign",
-    "gt_sign_n",
-    "gt_sign_n1",
-    "gt_sign_n2",
-    "gt_sign_n3",
-    "gt_sign_t",
-    "gt_sign_t1",
-    "gt_sign_t2",
-    "gt_sign_t3",
+    "ls_dx",
+    "ls_dx_n",
+    "ls_dx_n1",
+    "ls_dx_n2",
+    "ls_dx_n3",
+    "ls_dx_t",
+    "ls_dx_t1",
+    "ls_dx_t2",
+    "ls_dx_t3",
+    "ls_sign",
+    "ls_sign_n",
+    "ls_sign_n1",
+    "ls_sign_n2",
+    "ls_sign_n3",
+    "ls_sign_t",
+    "ls_sign_t1",
+    "ls_sign_t2",
+    "ls_sign_t3",
     "df_signBox",
-    "gt_un",
-    "gt_un_n",
-    "gt_un_n1",
-    "gt_un_n2",
-    "gt_un_n3",
-    "gt_un_t",
-    "gt_un_t1",
-    "gt_un_t2",
-    "gt_un_t3",
-    "gt_rf",
-    "gt_rf_n",
-    "gt_rf_n1",
-    "gt_rf_n2",
-    "gt_rf_n3",
-    "gt_rf_t",
-    "gt_rf_t1",
-    "gt_rf_t2",
-    "gt_rf_t3",
+    "ls_un",
+    "ls_un_n",
+    "ls_un_n1",
+    "ls_un_n2",
+    "ls_un_n3",
+    "ls_un_t",
+    "ls_un_t1",
+    "ls_un_t2",
+    "ls_un_t3",
+    "ls_rf",
+    "ls_rf_n",
+    "ls_rf_n1",
+    "ls_rf_n2",
+    "ls_rf_n3",
+    "ls_rf_t",
+    "ls_rf_t1",
+    "ls_rf_t2",
+    "ls_rf_t3",
     "df_vac",
     "df_atk",
     "df_lab",

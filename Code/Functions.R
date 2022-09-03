@@ -4,27 +4,18 @@ library(rstatix)
 
 # detach("package:gtExtras", unload = TRUE)
 # devtools::install_github("Nartladac/gtExtras")
-
 library(gtExtras)
 
-create_sumtable <- function(df, head) {
+get_sum_data <- function(df) {
+
+  df <- filter(df, finalresult %in% c('Positive','Negative'))
   
-  if (length(unique(df$hospital)) == 1) {
-    tt <- paste0(unique(df$hospital), " Hospital")
-  }
-  else if (length(unique(df$province)) == 1) {
-    tt <- paste0(unique(df$province), " Province")
-  }
-  else {
-    tt <- ""
-  }
-  
-  vars <- df %>% filter(finalresult %in% c('Positive','Negative')) %>% 
+  vars <- df %>%
     select(-c(province, hospital, finalresult)) %>%
     map_dbl(sum, na.rm = TRUE) %>%
     sort(decreasing = TRUE)
   
-  gtsum <- df %>% filter(finalresult %in% c('Positive','Negative')) %>% 
+  gtsum <- df %>%
     select(finalresult, names(which(vars > 0))) %>%
     tbl_summary(by = finalresult,
                 statistic = all_categorical() ~ "{n} ({p})",
@@ -32,15 +23,15 @@ create_sumtable <- function(df, head) {
                 missing = "no") %>%
     add_overall() %>%
     add_p()
-  
-  N0 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_0", pattern = "N = {N_obs}")
-  N1 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_1", pattern = "N = {N_obs}")
-  N2 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_2", pattern = "N = {N_obs}")
 
-  gtsum_data <- gtsum$table_body %>%
+  N0 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_0", pattern = "{N_obs}")
+  N1 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_1", pattern = "{N_obs}")
+  N2 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_2", pattern = "{N_obs}")
+  
+  df_sum <- gtsum$table_body %>%
     select(variable, stat_0:stat_2, p.value) %>%
     mutate(
-      `p value` = p_mark_significant(format.pval(
+      p.value = p_mark_significant(format.pval(
         p.value, eps = .001, digits = 1
       )),
       pos = as.integer(sub(
@@ -50,12 +41,17 @@ create_sumtable <- function(df, head) {
         ",", "", str_extract(stat_2, boundary("word")), fixed = TRUE
       ))
     )
-  gtsum_data$posneg <-
-    lapply(1:nrow(gtsum_data), 
-           function(i) c(gtsum_data$pos[i], gtsum_data$neg[i]))
+  df_sum$posneg <- lapply(1:nrow(df_sum), function(i) c(df_sum$pos[i], df_sum$neg[i]))
+  df_sum <- select(df_sum, -c(pos, neg))
+
+  return(list(df_sum = df_sum, N0 = N0, N1 = N1, N2 = N2))
+
+}
+
+
+create_sum_table <- function(df_sum, tt, head, N0, N1, N2) {
   
-  gt <- gtsum_data %>%
-    select(-c(p.value, pos, neg)) %>%
+  df_sum %>%
     gt() %>%
     gt_plt_bar_stack(
       posneg,
@@ -65,20 +61,26 @@ create_sumtable <- function(df, head) {
       width = 80
     ) %>%
     tab_options(
-      heading.title.font.size = px(14L),
       table.font.size = px(11L),
       data_row.padding = 0,
       table.border.top.style = "hidden"
     ) %>%
     tab_header(
-      title = html(paste0('<p style="font-family: Verdana">',tt,'</p>'))
+      title = tt
     ) %>%
     tab_spanner(label = "PCR Result",
                 columns = stat_1:stat_2) %>%
     tab_style(
-      style = cell_text(weight = "bold"),
-      locations = list(cells_column_spanners(), cells_column_labels())
+      style = list(cell_text(font = "Verdana", size = 14)),
+      locations = list(cells_title(groups = "title"))
     ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = list(cells_column_spanners())
+    ) %>%
+    tab_style(
+      style = "padding-left:11px;padding-right:11px;",
+      locations = cells_column_labels(columns = stat_0:stat_1)) %>%
     tab_style(
       style = cell_borders(
         sides = c("bottom"),
@@ -90,16 +92,18 @@ create_sumtable <- function(df, head) {
                              rows = everything())
     ) %>%
     cols_label(
-      variable = head,
-      stat_0 = html(paste0("Overall (",N0,")<br>n (%)")),
-      stat_1 = html(paste0("Positive (",N1,")<br>n (%)")),
-      stat_2 = html(paste0("Negative (",N2,")<br>n (%)"))
+      variable = md(paste0("**", head, "**")),
+      # stat_0 = html(paste0("Overall (N = ", N0, ")<br>n (%)")),
+      # stat_1 = html(paste0("Positive (N = ", N1, ")<br>n (%)")),
+      # stat_2 = html(paste0("Negative (N = ", N2, ")<br>n (%)"))
+      stat_0 = md(paste0("**Overall** (N = ", N0, ") n (%)")),
+      stat_1 = md(paste0("**Positive** (N = ", N1, ") n (%)")),
+      stat_2 = md(paste0("**Negative** (N = ", N2, ") n (%)")),
+      p.value = md("**p value**")
     ) %>%
     cols_align(align = "center",
-               columns = c(starts_with("stat_"),`p value`)) %>%
+               columns = c(starts_with("stat_"), p.value)) %>%
     cols_width(starts_with("stat_") ~ px(120)) %>%
-    cols_width(`p value` ~ px(100))
-  
-  return(gt)
-  
+    cols_width(p.value ~ px(100))
+
 }
