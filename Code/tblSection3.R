@@ -200,11 +200,11 @@ tblSection3 <- tblSection3 %>%
         levels = c(1:4),
         labels = c('1-3 Month', '4-6 Month', '7-12 Month', '> 1 Year')
       ),
-    s33covidvaccine = factor(
-      s33covidvaccine,
-      levels = c(TRUE, FALSE),
-      labels = c("Vaccinated", "Unvaccinated")
-    ),
+    # s33covidvaccine = factor(
+    #   s33covidvaccine,
+    #   levels = c(TRUE, FALSE),
+    #   labels = c("Vaccinated", "Unvaccinated")
+    # ),
     s33cvdoc =
       factor(
         s33cvdoc,

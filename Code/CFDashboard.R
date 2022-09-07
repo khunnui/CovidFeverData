@@ -384,10 +384,19 @@ ls_rf_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang"))
 #-------------------------------------------------------------------------------
 
 df_vac <- CFMast %>%
-  mutate(s33covidvaccine = factor(ifelse(is.na(s33covidvaccine), "Unknown", as.character(s33covidvaccine)),
-                                  levels = c('Vaccinated','Unvaccinated','Unknown')),
-         finalresult = ifelse(!is.na(finalresult), as.character(finalresult), 'Unknown')) %>%
-  group_by(province, hospital, s33covidvaccine, finalresult) %>%
+  mutate(
+    vac = factor(case_when(
+      s33covidvaccine == TRUE &
+        p_cvdaterange %in% c(2, 3, 4) ~ 1,
+      s33covidvaccine == TRUE         ~ 2,
+      s33covidvaccine == FALSE        ~ 3,
+      TRUE                            ~ 9
+    ),
+    levels = c(1:3, 9),
+    labels = c('Fully vaccinated', 'Partially vaccinated', 'Unvaccinated', 'Unknown')),
+    finalresult = ifelse(!is.na(finalresult), as.character(finalresult), 'Unknown')
+  ) %>%
+  group_by(province, hospital, vac, finalresult) %>%
   tally()
 
 #-------------------------------------------------------------------------------
