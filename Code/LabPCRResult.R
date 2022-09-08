@@ -28,7 +28,7 @@ LabPCRResult_l <- LabPCRResult %>%
     spectype = factor(
       spectype,
       levels = c(1, 4, 7),
-      labels = c("NP+OP swab", "Nasal swab", "Saliva")
+      labels = c("NP/OP swab", "Nasal swab", "Saliva")
     ),
     finalresult_fac = factor(
       finalresult,
@@ -54,7 +54,7 @@ LabPCRFinal <- LabPCRResult_l %>%
   mutate(
     finalresult = factor(
       pmin(
-        `finalresult_NP+OP swab`,
+        `finalresult_NP/OP swab`,
         `finalresult_Nasal swab`,
         `finalresult_Saliva`,
         na.rm = TRUE
@@ -62,23 +62,23 @@ LabPCRFinal <- LabPCRResult_l %>%
       levels = c(1, 3, 2),
       labels = c("Positive", "Negative", "Inconclusive")
     ),
-    pcrtests = paste0(ifelse(!is.na(`finalresult_NP+OP swab`),`finalresult_NP+OP swab`,'.'),
+    pcrtests = paste0(ifelse(!is.na(`finalresult_NP/OP swab`),`finalresult_NP/OP swab`,'.'),
                       ifelse(!is.na(`finalresult_Nasal swab`),`finalresult_Nasal swab`,'.'),
                                     ifelse(!is.na(`finalresult_Saliva`),`finalresult_Saliva`,'.')),
     testdate = pmin(
-      `testdate_p_NP+OP swab`,
+      `testdate_p_NP/OP swab`,
       `testdate_p_Nasal swab`,
       `testdate_p_Saliva`,
-      `testdate_i_NP+OP swab`,
+      `testdate_i_NP/OP swab`,
       `testdate_i_Nasal swab`,
       `testdate_i_Saliva`,
-      `testdate_i2_NP+OP swab`,
+      `testdate_i2_NP/OP swab`,
       `testdate_i2_Nasal swab`,
       `testdate_i2_Saliva`,
       na.rm = TRUE
     )
   ) %>%
   select(
-    -c(`finalresult_NP+OP swab`:`finalresult_Saliva`,
-      `testdate_p_NP+OP swab`:`testdate_i2_Saliva`)
+    -c(`finalresult_NP/OP swab`:`finalresult_Saliva`,
+      `testdate_p_NP/OP swab`:`testdate_i2_Saliva`)
   )

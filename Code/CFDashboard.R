@@ -440,21 +440,22 @@ df_labpos <- LabPCRResult_l %>%
   # All specimen types in one line
   pivot_wider(names_from = "spectype",
               values_from = "finalresult") %>%
-  filter(`NP+OP swab` == 1 | `Nasal swab` == 1 | Saliva == 1) %>%
+  filter(`NP/OP swab` == 1 | `Nasal swab` == 1 | Saliva == 1) %>%
   mutate(
     specimens = case_when(
-      `NP+OP swab`   == 1 &
-        `Nasal swab` == 1 & `Saliva` == 1 ~ "NP/OP, nasal, saliva",
-      `NP+OP swab`   == 1 &
-        `Nasal swab` == 1                 ~ "NP/OP, nasal",
-      `NP+OP swab`   == 1 &
-        `Saliva`     == 1                 ~ "NP/OP, saliva",
+      `NP/OP swab`   == 1 &
+        `Nasal swab` == 1 & 
+        `Saliva`     == 1   ~ "NP/OP, nasal, saliva",
+      `NP/OP swab`   == 1 &
+        `Nasal swab` == 1   ~ "NP/OP, nasal",
+      `NP/OP swab`   == 1 &
+        `Saliva`     == 1   ~ "NP/OP, saliva",
       `Nasal swab`   == 1 &
-        `Saliva`     == 1                 ~ "Nasal, saliva",
-      `NP+OP swab`   == 1                 ~ "NP/OP",
-      `Nasal swab`   == 1                 ~ "Nasal",
-      `Saliva`       == 1                 ~ "Saliva",
-      TRUE                                ~ "other"
+        `Saliva`     == 1   ~ "Nasal, saliva",
+      `NP/OP swab`   == 1   ~ "NP/OP",
+      `Nasal swab`   == 1   ~ "Nasal",
+      `Saliva`       == 1   ~ "Saliva",
+      TRUE                  ~ "other"
     )
   ) %>%
   group_by(province, hospital, specimens) %>%
