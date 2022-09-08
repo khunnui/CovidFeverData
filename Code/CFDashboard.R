@@ -394,7 +394,7 @@ df_vac <- CFMast %>%
     ),
     levels = c(1:3, 9),
     labels = c('Fully vaccinated', 'Partially vaccinated', 'Unvaccinated', 'Unknown')),
-    finalresult = ifelse(!is.na(finalresult), as.character(finalresult), 'Unknown')
+    finalresult = fct_explicit_na(finalresult, na_level = "Unknown")
   ) %>%
   group_by(province, hospital, vac, finalresult) %>%
   tally()
