@@ -6,7 +6,13 @@
 # Modified:    March 9, 2022                                                   #
 #------------------------------------------------------------------------------#
 
-ddate <- max(tblSection1$s1screendate, na.rm = TRUE)
+date1    <- max(tblSection1$last_edit_date, na.rm = TRUE)
+date2    <- max(tblSection2$last_edit_date, na.rm = TRUE)
+date3    <- max(tblSection3$last_edit_date, na.rm = TRUE)
+date4    <- max(tblSection4$last_edit_date, na.rm = TRUE)
+date5    <- max(tblSection5$last_edit_date, na.rm = TRUE)
+datepcr  <- max(LabPCRResult_l$approvedate, na.rm = TRUE)
+ddate    <- max(c(date1,date2,date3,date4,date5,datepcr), na.rm = TRUE)
 source(paste0(code_folder, "/Functions.R"))
 
 #-------------------------------------------------------------------------------

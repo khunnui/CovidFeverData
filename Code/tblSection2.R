@@ -6,6 +6,7 @@ tblSection2 <- tblSection2 %>%
   
   # Rename all column names to lowercase
   rename_all(tolower) %>%
+  rename(last_edit_date = `_lasteditdate`) %>% 
   
   # Delete unused columns
   select(-c(starts_with("_"), remarks)) %>%
@@ -15,6 +16,9 @@ tblSection2 <- tblSection2 %>%
   
   # Create/convert columns
   mutate(
+    
+    # Convert datetime to date
+    across(matches("date"), as.Date),
     
     # Recode 999 to missing
     across(s2temp:s2pulse, function(f) {

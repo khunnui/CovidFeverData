@@ -6,6 +6,7 @@ tblSection5 <- tblSection5 %>%
   
   # Rename all column names to lowercase
   rename_all(tolower) %>%
+  rename(last_edit_date = `_lasteditdate`) %>% 
   
   # Delete unused columns
   select(-c(starts_with("_"), remarks)) %>%

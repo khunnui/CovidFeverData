@@ -3,7 +3,10 @@
 # 3/7/2022
 #-------------------------------------------------------------------------------
 LabPCRResult_l <- LabPCRResult %>%
+  
+  # Rename all column names to lowercase
   rename_all(tolower) %>%
+
   # Create cfid from first 9 characters of SpecimenID
   mutate(
     cfid = substr(specimenid, 1, 9),
