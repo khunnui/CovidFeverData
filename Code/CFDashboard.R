@@ -437,7 +437,7 @@ df_lab <- LabPCRResult_l %>%
   rename(finalresult = finalresult_fac)
 
 df_labenr <- LabPCRResult_l %>%
-  inner_join(CFMast %>% select(cfid),by='cfid') %>%   
+  semi_join(CFMast %>% select(cfid),by='cfid') %>%   
   group_by(province, hospital, spectype, finalresult_fac) %>%
   tally() %>%
   rename(finalresult = finalresult_fac)
@@ -474,7 +474,7 @@ df_labpos <- LabPCRResult_l %>%
   tally()
 
 df_labposenr <- LabPCRResult_l %>%
-  inner_join(CFMast %>% select(cfid),by='cfid') %>%   
+  semi_join(CFMast %>% select(cfid),by='cfid') %>%   
   # Select only 4 columns (ID, type, result, and test dates)
   select(cfid,
          province,
