@@ -11,7 +11,7 @@ get_sum_data <- function(df) {
   df <- filter(df, finalresult %in% c('Positive','Negative'))
   
   vars <- df %>%
-    select(-c(province, hospital, finalresult)) %>%
+    select(-c(province, hospital, finalresult, rps)) %>%
     map_dbl(sum, na.rm = TRUE) %>%
     sort(decreasing = TRUE)
   
