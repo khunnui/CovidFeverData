@@ -121,8 +121,7 @@ tblSection1 <- tblSection1 %>%
       levels = c(1, 2, 3),
       labels = c('Yes', 'Yes but not enough', 'No')
     ),
-    rps=rowSums(across(s1cough:s1sputumprod),na.rm=TRUE)>=1
-    
+    rps = rowSums(across(s1cough:s1sputumprod), na.rm = TRUE) >= 1
   ) %>%
   
   # delete unused columns
