@@ -3,7 +3,7 @@ library(gt)
 library(rstatix)
 
 # detach("package:gtExtras", unload = TRUE)
-# devtools::install_github("Nartladac/gtExtras")
+ #devtools::install_github("Nartladac/gtExtras")
 library(gtExtras)
 
 get_sum_data <- function(df) {
