@@ -437,4 +437,5 @@ tblSection3 <- tblSection3 %>%
     s33cvdaterange8 = set_vax_range(s1enrolldate, s33cvdate8, s33cvdaterange8), 
     s33cvdaterange9 = set_vax_range(s1enrolldate, s33cvdate9, s33cvdaterange9), 
     s33cvdaterange10 = set_vax_range(s1enrolldate, s33cvdate10, s33cvdaterange10)
-  )
+  ) %>% 
+  select(-s1enrolldate)
