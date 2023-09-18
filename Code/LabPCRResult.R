@@ -33,6 +33,7 @@ LabPCRResult_l <- LabPCRResult %>%
       levels = c(1, 4, 7),
       labels = c("NP/OP swab", "Nasal swab", "Saliva")
     ),
+    finalresult = na_if(finalresult, 0),
     finalresult_fac = factor(
       finalresult,
       levels = c(1, 3, 2),

@@ -48,7 +48,6 @@ get_sum_data <- function(df) {
 
 }
 
-
 create_sum_table <- function(df_sum, tt, head, N0, N1, N2) {
   
   df_sum %>%
@@ -100,4 +99,19 @@ create_sum_table <- function(df_sum, tt, head, N0, N1, N2) {
     cols_width(starts_with("stat_") ~ px(120)) %>%
     cols_width(p.value ~ px(100))
 
+}
+
+create_table_sero1a <- function(df) {
+  df %>%
+    # Select only variables to be used
+    select(finalresult,
+           igminterpret,
+           igginterpret,
+           iggquantiinterpret) %>%
+    tbl_summary(by = finalresult,
+                digits = list(all_categorical() ~ c(0, 1))) %>%
+    add_overall() %>%
+    modify_header(update = list(label = "**Serology Testing**",
+                                all_stat_cols() ~ "**{level}**<br>N = {n}")) %>%
+    modify_spanning_header(stat_1:stat_2 ~ "**PCR Result**")
 }

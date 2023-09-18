@@ -427,6 +427,7 @@ tblSection3 <- tblSection3 %>%
       na.rm = TRUE
     ),
     fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
+    fulltime = as.numeric(difftime(s1enrolldate, fulldate, units = 'days')),
     s33cvdaterange1 = set_vax_range(s1enrolldate, s33cvdate1, s33cvdaterange1), 
     s33cvdaterange2 = set_vax_range(s1enrolldate, s33cvdate2, s33cvdaterange2), 
     s33cvdaterange3 = set_vax_range(s1enrolldate, s33cvdate3, s33cvdaterange3), 
@@ -437,4 +438,7 @@ tblSection3 <- tblSection3 %>%
     s33cvdaterange8 = set_vax_range(s1enrolldate, s33cvdate8, s33cvdaterange8), 
     s33cvdaterange9 = set_vax_range(s1enrolldate, s33cvdate9, s33cvdaterange9), 
     s33cvdaterange10 = set_vax_range(s1enrolldate, s33cvdate10, s33cvdaterange10)
-  )
+  ) %>% 
+  
+  # Remove variable from section 1
+  select(-s1enrolldate)

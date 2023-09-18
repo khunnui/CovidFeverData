@@ -6,6 +6,13 @@
 # Modified:    March 9, 2022                                                   #
 #------------------------------------------------------------------------------#
 
+library(labelled)
+library(gtsummary)
+
+# Output theme
+theme_gtsummary_journal(journal = "jama")
+theme_gtsummary_compact()
+
 date1    <- max(tblSection1$last_edit_date, na.rm = TRUE)
 date2    <- max(tblSection2$last_edit_date, na.rm = TRUE)
 date3    <- max(tblSection3$last_edit_date, na.rm = TRUE)
@@ -598,6 +605,118 @@ df_labposenr <- LabPCRResult_l %>%
   tally()
 
 #-------------------------------------------------------------------------------
+# Serology testing page
+#-------------------------------------------------------------------------------
+dfsero1a <- 
+  tblSection1 %>% filter(!is.na(cfid) & s1enroll5th == TRUE) %>%
+  left_join(LabPCRFinal, by = 'cfid') %>%
+  left_join(LabSero %>% filter(spectype == 'A'), by = 'cfid') %>%
+  # Create or modify variables as necessary
+  mutate(
+    finalresult = droplevels(finalresult)  # Drop unused level (Indeterminate)
+  ) %>% 
+  # Select only variables to be used
+  select(
+    province,
+    hospital,
+    finalresult,
+    igminterpret,
+    igginterpret,
+    iggquantiinterpret
+  ) %>%
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    igminterpret = 'IgM',
+    igginterpret = 'IgG-N',
+    iggquantiinterpret = 'IgG-S'
+  )
+
+dfsero1b <-
+  tblSection1 %>% filter(!is.na(cfid) & s1enroll5th == TRUE) %>%
+  left_join(LabPCRFinal, by = 'cfid') %>%
+  inner_join(LabSero %>%
+               filter(spectype == 'A') %>%
+               filter(!is.na(igminterpret) | !is.na(igginterpret) | !is.na(iggquantiinterpret)),
+             by = 'cfid') %>%
+  left_join(tblSection3, by = 'cfid') %>%
+  # Create or modify variables as necessary
+  mutate(
+    agegrp = cut(
+      s1age_year,
+      breaks = c(0, 17, 59, Inf),
+      labels = c('2-17', '18-59', '>=60'),
+      include.lowest = TRUE
+    ),
+    comorbid = rowSums(
+      across(c(s35diabetes:s35pregnancy) & where(is.logical)),
+      na.rm = TRUE) >= 1,
+    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
+    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
+                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
+                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
+    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
+                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
+    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
+                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+    cv = factor(
+      case_when(
+        s33covidvaccine == FALSE ~ 0,
+        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
+        vv == 1 | mr == 1 | iv == 1 ~ 1,
+        ot >= 1 ~ 3,
+        TRUE ~ NA_real_
+      ),
+      levels = 0:3,
+      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
+    ),
+    cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
+    cvtime = as.numeric(difftime(s1enrolldate, cvdate_l, units = 'days'))
+  ) %>%
+  # Select only variables to be used
+  select(
+    province,
+    hospital,
+    finalresult,
+    igminterpret,
+    igginterpret,
+    iggquantiinterpret,
+    agegrp,
+    comorbid,
+    s35obesity,
+    s35histalcohol,
+    s35curalcohol,
+    s35hissmoke,
+    s35hypertension,
+    s35cursmoke,
+    s35diabetes,
+    s35chroles,
+    s35asthma,
+    s35anemia,
+    cv,
+    cvtime,
+    s33hascovid
+  ) %>%
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    agegrp          = 'Age group',
+    comorbid        = 'Comorbidity',
+    s35obesity      = 'Obesity',
+    s35histalcohol  = 'History of alcohol consumption',
+    s35curalcohol   = 'Current alcohol consumption',
+    s35hissmoke     = 'History of smoking',
+    s35hypertension = 'Hypertension',
+    s35cursmoke     = 'Current smoking',
+    s35diabetes     = 'Diabetes',
+    s35chroles      = 'Chrolesterol',
+    s35asthma       = 'Asthma',
+    s35anemia       = 'Anemia',
+    cv              = 'Covid vaccine',
+    cvtime          = 'Time since last vaccine dose',
+    s33hascovid     = 'Previous infected with COVID-19'
+  )
+
+#-------------------------------------------------------------------------------
 # KAP page
 #-------------------------------------------------------------------------------
 
@@ -763,6 +882,8 @@ save(
     "df_labenr",
     "df_labpos",
     "df_labposenr",
+    "dfsero1a",
+    "dfsero1b",
     "df_kap1",
     "df_kap2"
   ),
