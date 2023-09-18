@@ -476,16 +476,17 @@ ls_rf_norps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rp
 
 df_vac <- CFMast %>%
   mutate(
-    vac = factor(case_when(
-      s33covidvaccine == TRUE & 
-        p_cvdaterange %in% c(2, 3, 4) ~ 1,
-      s33covidvaccine == TRUE         ~ 2,
-      s33covidvaccine == FALSE        ~ 3,
-      TRUE                            ~ 9
+    vac = factor(
+      # Patients were considered fully vaccinated if completed at least 1 month prior to enrol
+      if_else(s1enrolldate - fulltime < 30, 1, cv),
+      levels = c(0:3),
+      labels = c(
+        'Unvaccinated',
+        'Partially vaccinated',
+        'Fully vaccinated',
+        'Unknown'
+      )
     ),
-    levels = c(1:3, 9),
-    labels = c('Fully vaccinated', 'Partially vaccinated', 'Unvaccinated', 'Unknown')),
-#    finalresult = fct_explicit_na(finalresult, na_level = "Unknown")  # fct_explicit_na was deprecate #
     finalresult = fct_na_value_to_level(finalresult, level = "Unknown")
   ) %>%
   group_by(province, hospital, rps, vac, finalresult) %>%

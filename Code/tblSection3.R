@@ -2,6 +2,15 @@
 # tblSection3
 # 3/7/2022
 #-------------------------------------------------------------------------------
+
+set_vax_range <- function(edate, vdate, range) {
+
+  ifelse(!is.na(vdate),
+         cut(as.numeric(edate - vdate), breaks = c(-1, 31, 183, 365, Inf)),
+         range)
+  
+}
+
 tblSection3 <- tblSection3 %>%
   
   # Rename all column names to lowercase
@@ -13,6 +22,9 @@ tblSection3 <- tblSection3 %>%
   
   # Remove rows without CFID
   filter(cfid != '__-____-_') %>%
+  
+  # Get enrollment date from section 1
+  left_join(tblSection1 %>% select(cfid, s1enrolldate), by = 'cfid') %>% 
   
   # Create/convert columns
   mutate(
@@ -334,5 +346,95 @@ tblSection3 <- tblSection3 %>%
         '<= 7 days/past 2 weeks',
         'Never'
       )
-    )
+    ),
+    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),  # J&J
+    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
+                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),  # viral vector
+    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
+                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),  # mRNA
+    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
+                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),  # inactivated virus
+    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
+                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+    cv = case_when(
+      s33covidvaccine == FALSE ~ 0,
+      jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
+      vv == 1 | mr == 1 | iv == 1 ~ 1,
+      ot >= 1 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    jjdate1 = pmin(
+      if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 == 2, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 == 2, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 == 2, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 == 2, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 == 2, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    vvdate1 = pmin(
+      if_else(s33cvname1 %in% c(1, 7), s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% c(1, 7), s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% c(1, 7), s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% c(1, 7), s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% c(1, 7), s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% c(1, 7), s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    vvdate2 = pmin(
+      if_else(s33cvname1 %in% c(1, 7) & s33cvdate1 > vvdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% c(1, 7) & s33cvdate2 > vvdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% c(1, 7) & s33cvdate3 > vvdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% c(1, 7) & s33cvdate4 > vvdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% c(1, 7) & s33cvdate5 > vvdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% c(1, 7) & s33cvdate6 > vvdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    mrdate1 = pmin(
+      if_else(s33cvname1 %in% 3:4, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 3:4, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 3:4, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 3:4, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 3:4, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 3:4, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    mrdate2 = pmin(
+      if_else(s33cvname1 %in% 3:4 & s33cvdate1 > mrdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 3:4 & s33cvdate2 > mrdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 3:4 & s33cvdate3 > mrdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 3:4 & s33cvdate4 > mrdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 3:4 & s33cvdate5 > mrdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 3:4 & s33cvdate6 > mrdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    ivdate1 = pmin(
+      if_else(s33cvname1 %in% 5:6, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 5:6, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 5:6, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 5:6, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 5:6, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 5:6, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    ivdate2 = pmin(
+      if_else(s33cvname1 %in% 5:6 & s33cvdate1 > ivdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 5:6 & s33cvdate2 > ivdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 5:6 & s33cvdate3 > ivdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 5:6 & s33cvdate4 > ivdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 5:6 & s33cvdate5 > ivdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 5:6 & s33cvdate6 > ivdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
+    s33cvdaterange1 = set_vax_range(s1enrolldate, s33cvdate1, s33cvdaterange1), 
+    s33cvdaterange2 = set_vax_range(s1enrolldate, s33cvdate2, s33cvdaterange2), 
+    s33cvdaterange3 = set_vax_range(s1enrolldate, s33cvdate3, s33cvdaterange3), 
+    s33cvdaterange4 = set_vax_range(s1enrolldate, s33cvdate4, s33cvdaterange4), 
+    s33cvdaterange5 = set_vax_range(s1enrolldate, s33cvdate5, s33cvdaterange5), 
+    s33cvdaterange6 = set_vax_range(s1enrolldate, s33cvdate6, s33cvdaterange6), 
+    s33cvdaterange7 = set_vax_range(s1enrolldate, s33cvdate7, s33cvdaterange7), 
+    s33cvdaterange8 = set_vax_range(s1enrolldate, s33cvdate8, s33cvdaterange8), 
+    s33cvdaterange9 = set_vax_range(s1enrolldate, s33cvdate9, s33cvdaterange9), 
+    s33cvdaterange10 = set_vax_range(s1enrolldate, s33cvdate10, s33cvdaterange10)
   )
