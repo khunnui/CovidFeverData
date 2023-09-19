@@ -716,6 +716,225 @@ dfsero1b <-
     s33hascovid     = 'Previous infected with COVID-19'
   )
 
+dfsero2a <-
+  tblSection1 %>% filter(!is.na(cfid)) %>%
+  semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
+  left_join(LabSero_l, by = 'cfid') %>%
+  left_join(tblSection3, by = 'cfid') %>%
+  # Create or modify variables as necessary
+  mutate(
+    agegrp = cut(
+      s1age_year,
+      breaks = c(0, 17, 59, Inf),
+      labels = c('2-17', '18-59', '>=60'),
+      include.lowest = TRUE
+    ),
+    comorbid = rowSums(
+      across(c(s35diabetes:s35pregnancy) & where(is.logical)),
+      na.rm = TRUE) >= 1,
+    az = rowSums(across(num_range("s33cvname", 1:10)) == 1, na.rm = TRUE),
+    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
+    md = rowSums(across(num_range("s33cvname", 1:10)) == 3, na.rm = TRUE),
+    pz = rowSums(across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
+    sv = rowSums(across(num_range("s33cvname", 1:10)) == 5, na.rm = TRUE),
+    sp = rowSums(across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
+    sn = rowSums(across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
+                   across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+    cv = factor(
+      case_when(
+        s33covidvaccine == FALSE ~ 0,
+        az + sn >= 2 | jj >= 1 | md + pz >= 2 | sv + sp >= 2 ~ 2,
+        az + sn == 1 | md + pz == 1 | sv + sp == 1 ~ 1,
+        ot >= 1 ~ 3,
+        TRUE ~ NA_real_
+      ),
+      levels = 0:3,
+      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
+    ),
+    numdose = cut(
+      s33cvamount,
+      breaks = c(0, 1, 2, Inf),
+      labels = c('< 2 doses', '2 doses', '> 2 doses'),
+      include.lowest = TRUE
+    ),
+    cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
+    cvtime = as.numeric(difftime(s1enrolldate, cvdate_l, units = 'days')),
+    
+    # JJ
+    jjdate1 = pmin(
+      if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 == 2, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 == 2, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 == 2, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 == 2, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 == 2, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # Viral vector 1
+    vvdate1 = pmin(
+      if_else(s33cvname1 %in% c(1, 7), s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% c(1, 7), s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% c(1, 7), s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% c(1, 7), s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% c(1, 7), s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% c(1, 7), s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # Viral vector 2
+    vvdate2 = pmin(
+      if_else(s33cvname1 %in% c(1, 7) & s33cvdate1 > vvdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% c(1, 7) & s33cvdate2 > vvdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% c(1, 7) & s33cvdate3 > vvdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% c(1, 7) & s33cvdate4 > vvdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% c(1, 7) & s33cvdate5 > vvdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% c(1, 7) & s33cvdate6 > vvdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # mRNA 1
+    mrdate1 = pmin(
+      if_else(s33cvname1 %in% 3:4, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 3:4, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 3:4, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 3:4, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 3:4, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 3:4, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # mRNA 2
+    mrdate2 = pmin(
+      if_else(s33cvname1 %in% 3:4 & s33cvdate1 > mrdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 3:4 & s33cvdate2 > mrdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 3:4 & s33cvdate3 > mrdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 3:4 & s33cvdate4 > mrdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 3:4 & s33cvdate5 > mrdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 3:4 & s33cvdate6 > mrdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # inactivated virus 1
+    ivdate1 = pmin(
+      if_else(s33cvname1 %in% 5:6, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 5:6, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 5:6, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 5:6, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 5:6, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 5:6, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    # inactivated virus 2
+    ivdate2 = pmin(
+      if_else(s33cvname1 %in% 5:6 & s33cvdate1 > ivdate1, s33cvdate1, NA_Date_),
+      if_else(s33cvname2 %in% 5:6 & s33cvdate2 > ivdate1, s33cvdate2, NA_Date_),
+      if_else(s33cvname3 %in% 5:6 & s33cvdate3 > ivdate1, s33cvdate3, NA_Date_),
+      if_else(s33cvname4 %in% 5:6 & s33cvdate4 > ivdate1, s33cvdate4, NA_Date_),
+      if_else(s33cvname5 %in% 5:6 & s33cvdate5 > ivdate1, s33cvdate5, NA_Date_),
+      if_else(s33cvname6 %in% 5:6 & s33cvdate6 > ivdate1, s33cvdate6, NA_Date_),
+      na.rm = TRUE
+    ),
+    fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
+    fulltime = as.numeric(difftime(s1enrolldate, fulldate, units = 'days')),
+    
+    igm_o = if_else(rowSums(across(starts_with('igm_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
+    iggn_o = if_else(rowSums(across(starts_with('iggn_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
+    iggs_o = if_else(rowSums(across(starts_with('iggs_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative')
+  ) %>%
+  # Select only variables to be used
+  select(
+    igm_o,
+    igm_11,
+    igm_91,
+    iggn_o,
+    iggn_11,
+    iggn_91,
+    iggs_o,
+    iggs_11,
+    iggs_91,
+    agegrp,
+    s1gender,
+    comorbid,
+    cv,
+    numdose,
+    fulltime,
+    cvtime,
+    s33hascovid
+  ) %>%
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    agegrp          = 'Age group',
+    s1gender        = 'Gender',
+    comorbid        = 'Comorbidity',
+    cv              = 'Covid vaccine',
+    numdose         = 'Number of vaccine dose',
+    fulltime        = 'Time since fully vaccinated', 
+    cvtime          = 'Time since last vaccine dose',
+    s33hascovid     = 'Previous infected with COVID-19'
+  )
+dfsero2b <-
+  tblSection1 %>% filter(!is.na(cfid)) %>%
+  semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
+  left_join(LabSero_l, by = 'cfid') %>%
+  left_join(tblSection3, by = 'cfid') %>%
+  # Create or modify variables as necessary
+  mutate(
+    agegrp = cut(
+      s1age_year,
+      breaks = c(0, 17, 59, Inf),
+      labels = c('2-17', '18-59', '>=60'),
+      include.lowest = TRUE
+    ),
+    comorbid = rowSums(
+      across(c(s35diabetes:s35pregnancy) & where(is.logical)),
+      na.rm = TRUE) >= 1,
+    az = rowSums(across(num_range("s33cvname", 1:10)) == 1, na.rm = TRUE),
+    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
+    md = rowSums(across(num_range("s33cvname", 1:10)) == 3, na.rm = TRUE),
+    pz = rowSums(across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
+    sv = rowSums(across(num_range("s33cvname", 1:10)) == 5, na.rm = TRUE),
+    sp = rowSums(across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
+    sn = rowSums(across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
+                   across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+    cv = factor(
+      case_when(
+        s33covidvaccine == FALSE ~ 0,
+        az + sn >= 2 | jj >= 1 | md + pz >= 2 | sv + sp >= 2 ~ 2,
+        az + sn == 1 | md + pz == 1 | sv + sp == 1 ~ 1,
+        ot >= 1 ~ 3,
+        TRUE ~ NA_real_
+      ),
+      levels = 0:3,
+      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
+    ),
+    numdose = cut(
+      s33cvamount,
+      breaks = c(0, 1, 2, Inf),
+      labels = c('< 2 doses', '2 doses', '> 2 doses'),
+      include.lowest = TRUE
+    ),
+    tigsfold = iggsq_91/iggsq_11
+    
+  ) %>%
+  # Select only variables to be used
+  select(
+    iggsq_11,
+    iggsq_91,
+    agegrp,
+    s1gender,
+    comorbid,
+    cv,
+    numdose,
+    s33hascovid,
+    tigsfold
+  ) %>%
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    agegrp          = 'Age group',
+    s1gender        = 'Gender',
+    comorbid        = 'Comorbidity',
+    cv              = 'Covid vaccine',
+    numdose         = 'Number of vaccine dose',
+    s33hascovid     = 'Previous infected with COVID-19'
+  )
 #-------------------------------------------------------------------------------
 # KAP page
 #-------------------------------------------------------------------------------
@@ -884,6 +1103,8 @@ save(
     "df_labposenr",
     "dfsero1a",
     "dfsero1b",
+    "dfsero2a",
+    "dfsero2b",
     "df_kap1",
     "df_kap2"
   ),
