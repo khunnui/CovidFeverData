@@ -485,7 +485,10 @@ df_vac <- CFMast %>%
   mutate(
     vac = factor(
       # Patients were considered fully vaccinated if completed at least 1 month prior to enrol
-      if_else(s1enrolldate - fulltime < 30, 1, cv),
+      case_when(
+        cv == 2 & fulltime < 30 ~ 1, 
+        TRUE                    ~ cv
+      ),
       levels = c(0:3),
       labels = c(
         'Unvaccinated',
@@ -840,6 +843,8 @@ dfsero2a <-
   ) %>%
   # Select only variables to be used
   select(
+    province,
+    hospital,
     igm_o,
     igm_11,
     igm_91,
@@ -916,6 +921,8 @@ dfsero2b <-
   ) %>%
   # Select only variables to be used
   select(
+    province,
+    hospital,
     iggsq_11,
     iggsq_91,
     agegrp,
