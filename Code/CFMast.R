@@ -10,7 +10,7 @@
 library(tidyverse)
 library(dplyr)
 
-CFMast <- filter(tblSection1, !is.na(cfid) & cfid != '09-9001-0') %>%
+CFMast <- filter(tblSection1, !is.na(cfid)) %>%
   left_join(tblSection2, by='cfid') %>%
   left_join(tblSection3, by='cfid') %>%
   left_join(tblSection4, by='cfid') %>%

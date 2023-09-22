@@ -8,9 +8,13 @@
 
 library(labelled)
 library(gtsummary)
+library(gt)
+detach("package:gtExtras", unload = TRUE)
+devtools::install_github("Nartladac/gtExtras")
+library(gtExtras)
+library(rstatix)
 
 # Output theme
-theme_gtsummary_journal(journal = "jama")
 theme_gtsummary_compact()
 
 date1    <- max(tblSection1$last_edit_date, na.rm = TRUE)
@@ -178,45 +182,78 @@ df_dx <- CFMast %>%
     "Scrub typhus"             = scrubtyphus,
     Other                      = other,
     Meningitis                 = meningitis
-  )
+  ) %>% 
+  filter(finalresult %in% c('Positive', 'Negative'))
 
-ls_dx    <- get_sum_data(df_dx)
-ls_dx_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom"))
-ls_dx_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom"))
-ls_dx_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram"))
-ls_dx_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom"))
-ls_dx_t  <- get_sum_data(df_dx %>% filter(province == "Tak"))
-ls_dx_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot"))
-ls_dx_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang"))
-ls_dx_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang"))
+# ls_dx    <- get_sum_data(df_dx)
+# ls_dx_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom"))
+# ls_dx_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom"))
+# ls_dx_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram"))
+# ls_dx_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom"))
+# ls_dx_t  <- get_sum_data(df_dx %>% filter(province == "Tak"))
+# ls_dx_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot"))
+# ls_dx_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang"))
+# ls_dx_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang"))
 
-ls_dx_rps    <- get_sum_data(df_dx %>% filter(rps == TRUE))
-ls_dx_rps_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom" & rps == TRUE))
-ls_dx_rps_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
-ls_dx_rps_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
-ls_dx_rps_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom" & rps == TRUE))
-ls_dx_rps_t  <- get_sum_data(df_dx %>% filter(province == "Tak" & rps == TRUE))
-ls_dx_rps_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot" & rps == TRUE))
-ls_dx_rps_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang" & rps == TRUE))
-ls_dx_rps_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
+# ls_dx_rps    <- get_sum_data(df_dx %>% filter(rps == TRUE))
+# ls_dx_rps_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom" & rps == TRUE))
+# ls_dx_rps_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
+# ls_dx_rps_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
+# ls_dx_rps_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom" & rps == TRUE))
+# ls_dx_rps_t  <- get_sum_data(df_dx %>% filter(province == "Tak" & rps == TRUE))
+# ls_dx_rps_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot" & rps == TRUE))
+# ls_dx_rps_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang" & rps == TRUE))
+# ls_dx_rps_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
 
-ls_dx_norps    <- get_sum_data(df_dx %>% filter(rps == FALSE))
-ls_dx_norps_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom" & rps == FALSE))
-ls_dx_norps_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
-ls_dx_norps_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
-ls_dx_norps_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom" & rps == FALSE))
-ls_dx_norps_t  <- get_sum_data(df_dx %>% filter(province == "Tak" & rps == FALSE))
-ls_dx_norps_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot" & rps == FALSE))
-ls_dx_norps_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang" & rps == FALSE))
-ls_dx_norps_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
+# ls_dx_norps    <- get_sum_data(df_dx %>% filter(rps == FALSE))
+# ls_dx_norps_n  <- get_sum_data(df_dx %>% filter(province == "Nakorn Phanom" & rps == FALSE))
+# ls_dx_norps_n1 <- get_sum_data(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
+# ls_dx_norps_n2 <- get_sum_data(df_dx %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
+# ls_dx_norps_n3 <- get_sum_data(df_dx %>% filter(hospital == "That Phanom" & rps == FALSE))
+# ls_dx_norps_t  <- get_sum_data(df_dx %>% filter(province == "Tak" & rps == FALSE))
+# ls_dx_norps_t1 <- get_sum_data(df_dx %>% filter(hospital == "Mae Sot" & rps == FALSE))
+# ls_dx_norps_t2 <- get_sum_data(df_dx %>% filter(hospital == "Umphang" & rps == FALSE))
+# ls_dx_norps_t3 <- get_sum_data(df_dx %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
 
-# gt_dx    <- create_sum_table(ls_dx$df_sum, '', 'Diagnoses', ls_dx$N0, ls_dx$N1, ls_dx$N2)
+head = 'Diagnoses'
+
+gt_dx    <- create_table(df_dx, '', head)
+gt_dx_n  <- create_table(df_dx %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
+gt_dx_n1 <- create_table(df_dx %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
+gt_dx_n2 <- create_table(df_dx %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
+gt_dx_n3 <- create_table(df_dx %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
+gt_dx_t  <- create_table(df_dx %>% filter(province == 'Tak'), 'Tak Province', head)
+gt_dx_t1 <- create_table(df_dx %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
+gt_dx_t2 <- create_table(df_dx %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
+gt_dx_t3 <- create_table(df_dx %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
+
+rpstext = '(RPS Only)'
+gt_dx_rps    <- create_table(df_dx %>% filter(rps == TRUE), rpstext, head)
+gt_dx_rps_n  <- create_table(df_dx %>% filter(province == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Province", rpstext), head)
+gt_dx_rps_n1 <- create_table(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_dx_rps_n2 <- create_table(df_dx %>% filter(hospital == "Sri Songkhram" & rps == TRUE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_dx_rps_n3 <- create_table(df_dx %>% filter(hospital == "That Phanom" & rps == TRUE), paste("That Phanom Hospital", rpstext), head)
+gt_dx_rps_t  <- create_table(df_dx %>% filter(province == "Tak" & rps == TRUE), paste("Tak Province", rpstext), head)
+gt_dx_rps_t1 <- create_table(df_dx %>% filter(hospital == "Mae Sot" & rps == TRUE), paste("Mae Sot Hospital", rpstext), head)
+gt_dx_rps_t2 <- create_table(df_dx %>% filter(hospital == "Umphang" & rps == TRUE), paste("Umphang Hospital", rpstext), head)
+gt_dx_rps_t3 <- create_table(df_dx %>% filter(hospital == "Tha Song Yang" & rps == TRUE), paste("Tha Song Yang Hospital", rpstext), head)
+
+rpstext = '(Non-RPS Only)'
+gt_dx_norps    <- create_table(df_dx %>% filter(rps == FALSE), rpstext, head)
+gt_dx_norps_n  <- create_table(df_dx %>% filter(province == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Province", rpstext), head)
+gt_dx_norps_n1 <- create_table(df_dx %>% filter(hospital == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_dx_norps_n2 <- create_table(df_dx %>% filter(hospital == "Sri Songkhram" & rps == FALSE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_dx_norps_n3 <- create_table(df_dx %>% filter(hospital == "That Phanom" & rps == FALSE), paste("That Phanom Hospital", rpstext), head)
+gt_dx_norps_t  <- create_table(df_dx %>% filter(province == "Tak" & rps == FALSE), paste("Tak Province", rpstext), head)
+gt_dx_norps_t1 <- create_table(df_dx %>% filter(hospital == "Mae Sot" & rps == FALSE), paste("Mae Sot Hospital", rpstext), head)
+gt_dx_norps_t2 <- create_table(df_dx %>% filter(hospital == "Umphang" & rps == FALSE), paste("Umphang Hospital", rpstext), head)
+gt_dx_norps_t3 <- create_table(df_dx %>% filter(hospital == "Tha Song Yang" & rps == FALSE), paste("Tha Song Yang Hospital", rpstext), head)
 
 #-------------------------------------------------------------------------------
 # Clinical Sign
 #-------------------------------------------------------------------------------
 
-df_sign <- CFMast %>%
+df_ss <- CFMast %>%
   select(
     province,
     hospital,
@@ -291,37 +328,38 @@ df_sign <- CFMast %>%
     Bruise                  = bruise,
     Seizures                = seizures,
     Other                   = other
-  )
+  ) %>% 
+  filter(finalresult %in% c('Positive', 'Negative'))
 
-ls_sign    <- get_sum_data(df_sign)
-ls_sign_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom"))
-ls_sign_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom"))
-ls_sign_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram"))
-ls_sign_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom"))
-ls_sign_t  <- get_sum_data(df_sign %>% filter(province == "Tak"))
-ls_sign_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot"))
-ls_sign_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang"))
-ls_sign_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang"))
+# ls_sign    <- get_sum_data(df_sign)
+# ls_sign_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom"))
+# ls_sign_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom"))
+# ls_sign_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram"))
+# ls_sign_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom"))
+# ls_sign_t  <- get_sum_data(df_sign %>% filter(province == "Tak"))
+# ls_sign_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot"))
+# ls_sign_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang"))
+# ls_sign_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang"))
 
-ls_sign_rps    <- get_sum_data(df_sign %>% filter(rps == TRUE))
-ls_sign_rps_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom" & rps == TRUE))
-ls_sign_rps_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
-ls_sign_rps_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
-ls_sign_rps_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom" & rps == TRUE))
-ls_sign_rps_t  <- get_sum_data(df_sign %>% filter(province == "Tak" & rps == TRUE))
-ls_sign_rps_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot" & rps == TRUE))
-ls_sign_rps_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang" & rps == TRUE))
-ls_sign_rps_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
+# ls_sign_rps    <- get_sum_data(df_sign %>% filter(rps == TRUE))
+# ls_sign_rps_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom" & rps == TRUE))
+# ls_sign_rps_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
+# ls_sign_rps_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
+# ls_sign_rps_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom" & rps == TRUE))
+# ls_sign_rps_t  <- get_sum_data(df_sign %>% filter(province == "Tak" & rps == TRUE))
+# ls_sign_rps_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot" & rps == TRUE))
+# ls_sign_rps_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang" & rps == TRUE))
+# ls_sign_rps_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
 
-ls_sign_norps    <- get_sum_data(df_sign %>% filter(rps == FALSE))
-ls_sign_norps_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom" & rps == FALSE))
-ls_sign_norps_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
-ls_sign_norps_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
-ls_sign_norps_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom" & rps == FALSE))
-ls_sign_norps_t  <- get_sum_data(df_sign %>% filter(province == "Tak" & rps == FALSE))
-ls_sign_norps_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot" & rps == FALSE))
-ls_sign_norps_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang" & rps == FALSE))
-ls_sign_norps_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
+# ls_sign_norps    <- get_sum_data(df_sign %>% filter(rps == FALSE))
+# ls_sign_norps_n  <- get_sum_data(df_sign %>% filter(province == "Nakorn Phanom" & rps == FALSE))
+# ls_sign_norps_n1 <- get_sum_data(df_sign %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
+# ls_sign_norps_n2 <- get_sum_data(df_sign %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
+# ls_sign_norps_n3 <- get_sum_data(df_sign %>% filter(hospital == "That Phanom" & rps == FALSE))
+# ls_sign_norps_t  <- get_sum_data(df_sign %>% filter(province == "Tak" & rps == FALSE))
+# ls_sign_norps_t1 <- get_sum_data(df_sign %>% filter(hospital == "Mae Sot" & rps == FALSE))
+# ls_sign_norps_t2 <- get_sum_data(df_sign %>% filter(hospital == "Umphang" & rps == FALSE))
+# ls_sign_norps_t3 <- get_sum_data(df_sign %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
 
 df_signBox <- CFMast %>%
   select(cfid,
@@ -334,6 +372,40 @@ df_signBox <- CFMast %>%
   filter(s5covidpos == 1) %>%
   group_by(province, hospital, rps, s5intub, s5dischargetype) %>%
   tally()
+
+head = 'Signs & Symptoms'
+
+gt_ss    <- create_table(df_ss, '', head)
+gt_ss_n  <- create_table(df_ss %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
+gt_ss_n1 <- create_table(df_ss %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
+gt_ss_n2 <- create_table(df_ss %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
+gt_ss_n3 <- create_table(df_ss %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
+gt_ss_t  <- create_table(df_ss %>% filter(province == 'Tak'), 'Tak Province', head)
+gt_ss_t1 <- create_table(df_ss %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
+gt_ss_t2 <- create_table(df_ss %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
+gt_ss_t3 <- create_table(df_ss %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
+
+rpstext = '(RPS Only)'
+gt_ss_rps    <- create_table(df_ss %>% filter(rps == TRUE), rpstext, head)
+gt_ss_rps_n  <- create_table(df_ss %>% filter(province == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Province", rpstext), head)
+gt_ss_rps_n1 <- create_table(df_ss %>% filter(hospital == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_ss_rps_n2 <- create_table(df_ss %>% filter(hospital == "Sri Songkhram" & rps == TRUE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_ss_rps_n3 <- create_table(df_ss %>% filter(hospital == "That Phanom" & rps == TRUE), paste("That Phanom Hospital", rpstext), head)
+gt_ss_rps_t  <- create_table(df_ss %>% filter(province == "Tak" & rps == TRUE), paste("Tak Province", rpstext), head)
+gt_ss_rps_t1 <- create_table(df_ss %>% filter(hospital == "Mae Sot" & rps == TRUE), paste("Mae Sot Hospital", rpstext), head)
+gt_ss_rps_t2 <- create_table(df_ss %>% filter(hospital == "Umphang" & rps == TRUE), paste("Umphang Hospital", rpstext), head)
+gt_ss_rps_t3 <- create_table(df_ss %>% filter(hospital == "Tha Song Yang" & rps == TRUE), paste("Tha Song Yang Hospital", rpstext), head)
+
+rpstext = '(Non-RPS Only)'
+gt_ss_norps    <- create_table(df_ss %>% filter(rps == FALSE), rpstext, head)
+gt_ss_norps_n  <- create_table(df_ss %>% filter(province == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Province", rpstext), head)
+gt_ss_norps_n1 <- create_table(df_ss %>% filter(hospital == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_ss_norps_n2 <- create_table(df_ss %>% filter(hospital == "Sri Songkhram" & rps == FALSE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_ss_norps_n3 <- create_table(df_ss %>% filter(hospital == "That Phanom" & rps == FALSE), paste("That Phanom Hospital", rpstext), head)
+gt_ss_norps_t  <- create_table(df_ss %>% filter(province == "Tak" & rps == FALSE), paste("Tak Province", rpstext), head)
+gt_ss_norps_t1 <- create_table(df_ss %>% filter(hospital == "Mae Sot" & rps == FALSE), paste("Mae Sot Hospital", rpstext), head)
+gt_ss_norps_t2 <- create_table(df_ss %>% filter(hospital == "Umphang" & rps == FALSE), paste("Umphang Hospital", rpstext), head)
+gt_ss_norps_t3 <- create_table(df_ss %>% filter(hospital == "Tha Song Yang" & rps == FALSE), paste("Tha Song Yang Hospital", rpstext), head)
 
 #-------------------------------------------------------------------------------
 # Underlying Page
@@ -377,37 +449,72 @@ df_un <- CFMast %>%
     "History of alcohol consumption" = histalcohol,
     "Current of alcohol consumption" = curalcohol,
     Pregnancy = pregnancy
-  )
+  ) %>% 
+  filter(finalresult %in% c('Positive', 'Negative'))
 
-ls_un    <- get_sum_data(df_un)
-ls_un_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom"))
-ls_un_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom"))
-ls_un_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram"))
-ls_un_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom"))
-ls_un_t  <- get_sum_data(df_un %>% filter(province == "Tak"))
-ls_un_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot"))
-ls_un_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang"))
-ls_un_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang"))
+# ls_un    <- get_sum_data(df_un)
+# ls_un_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom"))
+# ls_un_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom"))
+# ls_un_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram"))
+# ls_un_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom"))
+# ls_un_t  <- get_sum_data(df_un %>% filter(province == "Tak"))
+# ls_un_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot"))
+# ls_un_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang"))
+# ls_un_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang"))
 
-ls_un_rps    <- get_sum_data(df_un %>% filter(rps == TRUE))
-ls_un_rps_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom" & rps == TRUE))
-ls_un_rps_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
-ls_un_rps_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
-ls_un_rps_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom" & rps == TRUE))
-ls_un_rps_t  <- get_sum_data(df_un %>% filter(province == "Tak" & rps == TRUE))
-ls_un_rps_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot" & rps == TRUE))
-ls_un_rps_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang" & rps == TRUE))
-ls_un_rps_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
+# ls_un_rps    <- get_sum_data(df_un %>% filter(rps == TRUE))
+# ls_un_rps_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom" & rps == TRUE))
+# ls_un_rps_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
+# ls_un_rps_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
+# ls_un_rps_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom" & rps == TRUE))
+# ls_un_rps_t  <- get_sum_data(df_un %>% filter(province == "Tak" & rps == TRUE))
+# ls_un_rps_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot" & rps == TRUE))
+# ls_un_rps_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang" & rps == TRUE))
+# ls_un_rps_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
 
-ls_un_norps    <- get_sum_data(df_un %>% filter(rps == FALSE))
-ls_un_norps_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom" & rps == FALSE))
-ls_un_norps_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
-ls_un_norps_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
-ls_un_norps_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom" & rps == FALSE))
-ls_un_norps_t  <- get_sum_data(df_un %>% filter(province == "Tak" & rps == FALSE))
-ls_un_norps_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot" & rps == FALSE))
-ls_un_norps_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang"))
-ls_un_norps_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang"))
+# ls_un_norps    <- get_sum_data(df_un %>% filter(rps == FALSE))
+# ls_un_norps_n  <- get_sum_data(df_un %>% filter(province == "Nakorn Phanom" & rps == FALSE))
+# ls_un_norps_n1 <- get_sum_data(df_un %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
+# ls_un_norps_n2 <- get_sum_data(df_un %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
+# ls_un_norps_n3 <- get_sum_data(df_un %>% filter(hospital == "That Phanom" & rps == FALSE))
+# ls_un_norps_t  <- get_sum_data(df_un %>% filter(province == "Tak" & rps == FALSE))
+# ls_un_norps_t1 <- get_sum_data(df_un %>% filter(hospital == "Mae Sot" & rps == FALSE))
+# ls_un_norps_t2 <- get_sum_data(df_un %>% filter(hospital == "Umphang"))
+# ls_un_norps_t3 <- get_sum_data(df_un %>% filter(hospital == "Tha Song Yang"))
+
+head = 'Underlying Conditions'
+
+gt_un    <- create_table(df_un, '', head)
+gt_un_n  <- create_table(df_un %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
+gt_un_n1 <- create_table(df_un %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
+gt_un_n2 <- create_table(df_un %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
+gt_un_n3 <- create_table(df_un %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
+gt_un_t  <- create_table(df_un %>% filter(province == 'Tak'), 'Tak Province', head)
+gt_un_t1 <- create_table(df_un %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
+gt_un_t2 <- create_table(df_un %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
+gt_un_t3 <- create_table(df_un %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
+
+rpstext = '(RPS Only)'
+gt_un_rps    <- create_table(df_un %>% filter(rps == TRUE), rpstext, head)
+gt_un_rps_n  <- create_table(df_un %>% filter(province == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Province", rpstext), head)
+gt_un_rps_n1 <- create_table(df_un %>% filter(hospital == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_un_rps_n2 <- create_table(df_un %>% filter(hospital == "Sri Songkhram" & rps == TRUE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_un_rps_n3 <- create_table(df_un %>% filter(hospital == "That Phanom" & rps == TRUE), paste("That Phanom Hospital", rpstext), head)
+gt_un_rps_t  <- create_table(df_un %>% filter(province == "Tak" & rps == TRUE), paste("Tak Province", rpstext), head)
+gt_un_rps_t1 <- create_table(df_un %>% filter(hospital == "Mae Sot" & rps == TRUE), paste("Mae Sot Hospital", rpstext), head)
+gt_un_rps_t2 <- create_table(df_un %>% filter(hospital == "Umphang" & rps == TRUE), paste("Umphang Hospital", rpstext), head)
+gt_un_rps_t3 <- create_table(df_un %>% filter(hospital == "Tha Song Yang" & rps == TRUE), paste("Tha Song Yang Hospital", rpstext), head)
+
+rpstext = '(Non-RPS Only)'
+gt_un_norps    <- create_table(df_un %>% filter(rps == FALSE), rpstext, head)
+gt_un_norps_n  <- create_table(df_un %>% filter(province == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Province", rpstext), head)
+gt_un_norps_n1 <- create_table(df_un %>% filter(hospital == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_un_norps_n2 <- create_table(df_un %>% filter(hospital == "Sri Songkhram" & rps == FALSE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_un_norps_n3 <- create_table(df_un %>% filter(hospital == "That Phanom" & rps == FALSE), paste("That Phanom Hospital", rpstext), head)
+gt_un_norps_t  <- create_table(df_un %>% filter(province == "Tak" & rps == FALSE), paste("Tak Province", rpstext), head)
+gt_un_norps_t1 <- create_table(df_un %>% filter(hospital == "Mae Sot" & rps == FALSE), paste("Mae Sot Hospital", rpstext), head)
+gt_un_norps_t2 <- create_table(df_un %>% filter(hospital == "Umphang" & rps == FALSE), paste("Umphang Hospital", rpstext), head)
+gt_un_norps_t3 <- create_table(df_un %>% filter(hospital == "Tha Song Yang" & rps == FALSE), paste("Tha Song Yang Hospital", rpstext), head)
 
 #-------------------------------------------------------------------------------
 #Risk Factor page
@@ -445,37 +552,72 @@ df_rf <- CFMast %>%
       s33visticrowded:s33travelthai,
       s33travelinter
     )
-  )
+  ) %>% 
+  filter(finalresult %in% c('Positive', 'Negative'))
 
-ls_rf    <- get_sum_data(df_rf)
-ls_rf_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom"))
-ls_rf_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom"))
-ls_rf_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram"))
-ls_rf_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom"))
-ls_rf_t  <- get_sum_data(df_rf %>% filter(province == "Tak"))
-ls_rf_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot"))
-ls_rf_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang"))
-ls_rf_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang"))
+# ls_rf    <- get_sum_data(df_rf)
+# ls_rf_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom"))
+# ls_rf_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom"))
+# ls_rf_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram"))
+# ls_rf_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom"))
+# ls_rf_t  <- get_sum_data(df_rf %>% filter(province == "Tak"))
+# ls_rf_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot"))
+# ls_rf_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang"))
+# ls_rf_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang"))
 
-ls_rf_rps    <- get_sum_data(df_rf %>% filter(rps == TRUE))
-ls_rf_rps_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom" & rps == TRUE))
-ls_rf_rps_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
-ls_rf_rps_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
-ls_rf_rps_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom" & rps == TRUE))
-ls_rf_rps_t  <- get_sum_data(df_rf %>% filter(province == "Tak" & rps == TRUE))
-ls_rf_rps_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot" & rps == TRUE))
-ls_rf_rps_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang" & rps == TRUE))
-ls_rf_rps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
+# ls_rf_rps    <- get_sum_data(df_rf %>% filter(rps == TRUE))
+# ls_rf_rps_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom" & rps == TRUE))
+# ls_rf_rps_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == TRUE))
+# ls_rf_rps_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram" & rps == TRUE))
+# ls_rf_rps_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom" & rps == TRUE))
+# ls_rf_rps_t  <- get_sum_data(df_rf %>% filter(province == "Tak" & rps == TRUE))
+# ls_rf_rps_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot" & rps == TRUE))
+# ls_rf_rps_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang" & rps == TRUE))
+# ls_rf_rps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rps == TRUE))
 
-ls_rf_norps    <- get_sum_data(df_rf %>% filter(rps == FALSE))
-ls_rf_norps_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom" & rps == FALSE))
-ls_rf_norps_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
-ls_rf_norps_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
-ls_rf_norps_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom" & rps == FALSE))
-ls_rf_norps_t  <- get_sum_data(df_rf %>% filter(province == "Tak" & rps == FALSE))
-ls_rf_norps_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot" & rps == FALSE))
-ls_rf_norps_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang" & rps == FALSE))
-ls_rf_norps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
+# ls_rf_norps    <- get_sum_data(df_rf %>% filter(rps == FALSE))
+# ls_rf_norps_n  <- get_sum_data(df_rf %>% filter(province == "Nakorn Phanom" & rps == FALSE))
+# ls_rf_norps_n1 <- get_sum_data(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == FALSE))
+# ls_rf_norps_n2 <- get_sum_data(df_rf %>% filter(hospital == "Sri Songkhram" & rps == FALSE))
+# ls_rf_norps_n3 <- get_sum_data(df_rf %>% filter(hospital == "That Phanom" & rps == FALSE))
+# ls_rf_norps_t  <- get_sum_data(df_rf %>% filter(province == "Tak" & rps == FALSE))
+# ls_rf_norps_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot" & rps == FALSE))
+# ls_rf_norps_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang" & rps == FALSE))
+# ls_rf_norps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
+
+head = 'Risk Factors'
+
+gt_rf    <- create_table(df_rf, '', head)
+gt_rf_n  <- create_table(df_rf %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
+gt_rf_n1 <- create_table(df_rf %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
+gt_rf_n2 <- create_table(df_rf %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
+gt_rf_n3 <- create_table(df_rf %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
+gt_rf_t  <- create_table(df_rf %>% filter(province == 'Tak'), 'Tak Province', head)
+gt_rf_t1 <- create_table(df_rf %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
+gt_rf_t2 <- create_table(df_rf %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
+gt_rf_t3 <- create_table(df_rf %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
+
+rpstext = '(RPS Only)'
+gt_rf_rps    <- create_table(df_rf %>% filter(rps == TRUE), rpstext, head)
+gt_rf_rps_n  <- create_table(df_rf %>% filter(province == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Province", rpstext), head)
+gt_rf_rps_n1 <- create_table(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == TRUE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_rf_rps_n2 <- create_table(df_rf %>% filter(hospital == "Sri Songkhram" & rps == TRUE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_rf_rps_n3 <- create_table(df_rf %>% filter(hospital == "That Phanom" & rps == TRUE), paste("That Phanom Hospital", rpstext), head)
+gt_rf_rps_t  <- create_table(df_rf %>% filter(province == "Tak" & rps == TRUE), paste("Tak Province", rpstext), head)
+gt_rf_rps_t1 <- create_table(df_rf %>% filter(hospital == "Mae Sot" & rps == TRUE), paste("Mae Sot Hospital", rpstext), head)
+gt_rf_rps_t2 <- create_table(df_rf %>% filter(hospital == "Umphang" & rps == TRUE), paste("Umphang Hospital", rpstext), head)
+gt_rf_rps_t3 <- create_table(df_rf %>% filter(hospital == "Tha Song Yang" & rps == TRUE), paste("Tha Song Yang Hospital", rpstext), head)
+
+rpstext = '(Non-RPS Only)'
+gt_rf_norps    <- create_table(df_rf %>% filter(rps == FALSE), rpstext, head)
+gt_rf_norps_n  <- create_table(df_rf %>% filter(province == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Province", rpstext), head)
+gt_rf_norps_n1 <- create_table(df_rf %>% filter(hospital == "Nakorn Phanom" & rps == FALSE), paste("Nakorn Phanom Hospital", rpstext), head)
+gt_rf_norps_n2 <- create_table(df_rf %>% filter(hospital == "Sri Songkhram" & rps == FALSE), paste("Sri Songkhram Hospital", rpstext), head)
+gt_rf_norps_n3 <- create_table(df_rf %>% filter(hospital == "That Phanom" & rps == FALSE), paste("That Phanom Hospital", rpstext), head)
+gt_rf_norps_t  <- create_table(df_rf %>% filter(province == "Tak" & rps == FALSE), paste("Tak Province", rpstext), head)
+gt_rf_norps_t1 <- create_table(df_rf %>% filter(hospital == "Mae Sot" & rps == FALSE), paste("Mae Sot Hospital", rpstext), head)
+gt_rf_norps_t2 <- create_table(df_rf %>% filter(hospital == "Umphang" & rps == FALSE), paste("Umphang Hospital", rpstext), head)
+gt_rf_norps_t3 <- create_table(df_rf %>% filter(hospital == "Tha Song Yang" & rps == FALSE), paste("Tha Song Yang Hospital", rpstext), head)
 
 #-------------------------------------------------------------------------------
 # Vaccination page
@@ -610,7 +752,7 @@ df_labposenr <- LabPCRResult_l %>%
 #-------------------------------------------------------------------------------
 # Serology testing page
 #-------------------------------------------------------------------------------
-dfsero1a <- 
+df_sero1a <- 
   tblSection1 %>% filter(!is.na(cfid) & s1enroll5th == TRUE) %>%
   left_join(LabPCRFinal, by = 'cfid') %>%
   left_join(LabSero %>% filter(spectype == 'A'), by = 'cfid') %>%
@@ -634,7 +776,7 @@ dfsero1a <-
     iggquantiinterpret = 'IgG-S'
   )
 
-dfsero1b <-
+df_sero1b <-
   tblSection1 %>% filter(!is.na(cfid) & s1enroll5th == TRUE) %>%
   left_join(LabPCRFinal, by = 'cfid') %>%
   inner_join(LabSero %>%
@@ -719,7 +861,7 @@ dfsero1b <-
     s33hascovid     = 'Previous infected with COVID-19'
   )
 
-dfsero2a <-
+df_sero2a <-
   tblSection1 %>% filter(!is.na(cfid)) %>%
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
   left_join(LabSero_l, by = 'cfid') %>%
@@ -735,20 +877,20 @@ dfsero2a <-
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
       na.rm = TRUE) >= 1,
-    az = rowSums(across(num_range("s33cvname", 1:10)) == 1, na.rm = TRUE),
     jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
-    md = rowSums(across(num_range("s33cvname", 1:10)) == 3, na.rm = TRUE),
-    pz = rowSums(across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
-    sv = rowSums(across(num_range("s33cvname", 1:10)) == 5, na.rm = TRUE),
-    sp = rowSums(across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
-    sn = rowSums(across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
+                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
+                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
+    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
+                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
     ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
-                   across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
     cv = factor(
       case_when(
         s33covidvaccine == FALSE ~ 0,
-        az + sn >= 2 | jj >= 1 | md + pz >= 2 | sv + sp >= 2 ~ 2,
-        az + sn == 1 | md + pz == 1 | sv + sp == 1 ~ 1,
+        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
+        vv == 1 | mr == 1 | iv == 1 ~ 1,
         ot >= 1 ~ 3,
         TRUE ~ NA_real_
       ),
@@ -763,7 +905,6 @@ dfsero2a <-
     ),
     cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
     cvtime = as.numeric(difftime(s1enrolldate, cvdate_l, units = 'days')),
-    
     # JJ
     jjdate1 = pmin(
       if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
@@ -836,7 +977,6 @@ dfsero2a <-
     ),
     fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
     fulltime = as.numeric(difftime(s1enrolldate, fulldate, units = 'days')),
-    
     igm_o = if_else(rowSums(across(starts_with('igm_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggn_o = if_else(rowSums(across(starts_with('iggn_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggs_o = if_else(rowSums(across(starts_with('iggs_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative')
@@ -874,7 +1014,7 @@ dfsero2a <-
     cvtime          = 'Time since last vaccine dose',
     s33hascovid     = 'Previous infected with COVID-19'
   )
-dfsero2b <-
+df_sero2b <-
   tblSection1 %>% filter(!is.na(cfid)) %>%
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
   left_join(LabSero_l, by = 'cfid') %>%
@@ -890,20 +1030,20 @@ dfsero2b <-
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
       na.rm = TRUE) >= 1,
-    az = rowSums(across(num_range("s33cvname", 1:10)) == 1, na.rm = TRUE),
     jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
-    md = rowSums(across(num_range("s33cvname", 1:10)) == 3, na.rm = TRUE),
-    pz = rowSums(across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
-    sv = rowSums(across(num_range("s33cvname", 1:10)) == 5, na.rm = TRUE),
-    sp = rowSums(across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
-    sn = rowSums(across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
+                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
+    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
+                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
+    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
+                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
     ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
-                   across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
+                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
     cv = factor(
       case_when(
         s33covidvaccine == FALSE ~ 0,
-        az + sn >= 2 | jj >= 1 | md + pz >= 2 | sv + sp >= 2 ~ 2,
-        az + sn == 1 | md + pz == 1 | sv + sp == 1 ~ 1,
+        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
+        vv == 1 | mr == 1 | iv == 1 ~ 1,
         ot >= 1 ~ 3,
         TRUE ~ NA_real_
       ),
@@ -917,7 +1057,6 @@ dfsero2b <-
       include.lowest = TRUE
     ),
     tigsfold = iggsq_91/iggsq_11
-    
   ) %>%
   # Select only variables to be used
   select(
@@ -993,125 +1132,125 @@ save(
     "df_enrage",
     "df_enrgender",
     "df_enrocc",
-    "ls_dx",
-    "ls_dx_n",
-    "ls_dx_n1",
-    "ls_dx_n2",
-    "ls_dx_n3",
-    "ls_dx_t",
-    "ls_dx_t1",
-    "ls_dx_t2",
-    "ls_dx_t3",
-    "ls_dx_rps",
-    "ls_dx_rps_n",
-    "ls_dx_rps_n1",
-    "ls_dx_rps_n2",
-    "ls_dx_rps_n3",
-    "ls_dx_rps_t",
-    "ls_dx_rps_t1",
-    "ls_dx_rps_t2",
-    "ls_dx_rps_t3",
-    "ls_dx_norps",
-    "ls_dx_norps_n",
-    "ls_dx_norps_n1",
-    "ls_dx_norps_n2",
-    "ls_dx_norps_n3",
-    "ls_dx_norps_t",
-    "ls_dx_norps_t1",
-    "ls_dx_norps_t2",
-    "ls_dx_norps_t3",
-    "ls_sign",
-    "ls_sign_n",
-    "ls_sign_n1",
-    "ls_sign_n2",
-    "ls_sign_n3",
-    "ls_sign_t",
-    "ls_sign_t1",
-    "ls_sign_t2",
-    "ls_sign_t3",
-    "ls_sign_rps",
-    "ls_sign_rps_n",
-    "ls_sign_rps_n1",
-    "ls_sign_rps_n2",
-    "ls_sign_rps_n3",
-    "ls_sign_rps_t",
-    "ls_sign_rps_t1",
-    "ls_sign_rps_t2",
-    "ls_sign_rps_t3",
-    "ls_sign_norps",
-    "ls_sign_norps_n",
-    "ls_sign_norps_n1",
-    "ls_sign_norps_n2",
-    "ls_sign_norps_n3",
-    "ls_sign_norps_t",
-    "ls_sign_norps_t1",
-    "ls_sign_norps_t2",
-    "ls_sign_norps_t3",
+    "gt_dx",
+    "gt_dx_n",
+    "gt_dx_n1",
+    "gt_dx_n2",
+    "gt_dx_n3",
+    "gt_dx_t",
+    "gt_dx_t1",
+    "gt_dx_t2",
+    "gt_dx_t3",
+    "gt_dx_rps",
+    "gt_dx_rps_n",
+    "gt_dx_rps_n1",
+    "gt_dx_rps_n2",
+    "gt_dx_rps_n3",
+    "gt_dx_rps_t",
+    "gt_dx_rps_t1",
+    "gt_dx_rps_t2",
+    "gt_dx_rps_t3",
+    "gt_dx_norps",
+    "gt_dx_norps_n",
+    "gt_dx_norps_n1",
+    "gt_dx_norps_n2",
+    "gt_dx_norps_n3",
+    "gt_dx_norps_t",
+    "gt_dx_norps_t1",
+    "gt_dx_norps_t2",
+    "gt_dx_norps_t3",
+    "gt_ss",
+    "gt_ss_n",
+    "gt_ss_n1",
+    "gt_ss_n2",
+    "gt_ss_n3",
+    "gt_ss_t",
+    "gt_ss_t1",
+    "gt_ss_t2",
+    "gt_ss_t3",
+    "gt_ss_rps",
+    "gt_ss_rps_n",
+    "gt_ss_rps_n1",
+    "gt_ss_rps_n2",
+    "gt_ss_rps_n3",
+    "gt_ss_rps_t",
+    "gt_ss_rps_t1",
+    "gt_ss_rps_t2",
+    "gt_ss_rps_t3",
+    "gt_ss_norps",
+    "gt_ss_norps_n",
+    "gt_ss_norps_n1",
+    "gt_ss_norps_n2",
+    "gt_ss_norps_n3",
+    "gt_ss_norps_t",
+    "gt_ss_norps_t1",
+    "gt_ss_norps_t2",
+    "gt_ss_norps_t3",
     "df_signBox",
-    "ls_un",
-    "ls_un_n",
-    "ls_un_n1",
-    "ls_un_n2",
-    "ls_un_n3",
-    "ls_un_t",
-    "ls_un_t1",
-    "ls_un_t2",
-    "ls_un_t3",
-    "ls_un_rps",
-    "ls_un_rps_n",
-    "ls_un_rps_n1",
-    "ls_un_rps_n2",
-    "ls_un_rps_n3",
-    "ls_un_rps_t",
-    "ls_un_rps_t1",
-    "ls_un_rps_t2",
-    "ls_un_rps_t3",
-    "ls_un_norps",
-    "ls_un_norps_n",
-    "ls_un_norps_n1",
-    "ls_un_norps_n2",
-    "ls_un_norps_n3",
-    "ls_un_norps_t",
-    "ls_un_norps_t1",
-    "ls_un_norps_t2",
-    "ls_un_norps_t3",
-    "ls_rf",
-    "ls_rf_n",
-    "ls_rf_n1",
-    "ls_rf_n2",
-    "ls_rf_n3",
-    "ls_rf_t",
-    "ls_rf_t1",
-    "ls_rf_t2",
-    "ls_rf_t3",
-    "ls_rf_rps",
-    "ls_rf_rps_n",
-    "ls_rf_rps_n1",
-    "ls_rf_rps_n2",
-    "ls_rf_rps_n3",
-    "ls_rf_rps_t",
-    "ls_rf_rps_t1",
-    "ls_rf_rps_t2",
-    "ls_rf_rps_t3",
-    "ls_rf_norps",
-    "ls_rf_norps_n",
-    "ls_rf_norps_n1",
-    "ls_rf_norps_n2",
-    "ls_rf_norps_n3",
-    "ls_rf_norps_t",
-    "ls_rf_norps_t1",
-    "ls_rf_norps_t2",
-    "ls_rf_norps_t3",
+    "gt_un",
+    "gt_un_n",
+    "gt_un_n1",
+    "gt_un_n2",
+    "gt_un_n3",
+    "gt_un_t",
+    "gt_un_t1",
+    "gt_un_t2",
+    "gt_un_t3",
+    "gt_un_rps",
+    "gt_un_rps_n",
+    "gt_un_rps_n1",
+    "gt_un_rps_n2",
+    "gt_un_rps_n3",
+    "gt_un_rps_t",
+    "gt_un_rps_t1",
+    "gt_un_rps_t2",
+    "gt_un_rps_t3",
+    "gt_un_norps",
+    "gt_un_norps_n",
+    "gt_un_norps_n1",
+    "gt_un_norps_n2",
+    "gt_un_norps_n3",
+    "gt_un_norps_t",
+    "gt_un_norps_t1",
+    "gt_un_norps_t2",
+    "gt_un_norps_t3",
+    "gt_rf",
+    "gt_rf_n",
+    "gt_rf_n1",
+    "gt_rf_n2",
+    "gt_rf_n3",
+    "gt_rf_t",
+    "gt_rf_t1",
+    "gt_rf_t2",
+    "gt_rf_t3",
+    "gt_rf_rps",
+    "gt_rf_rps_n",
+    "gt_rf_rps_n1",
+    "gt_rf_rps_n2",
+    "gt_rf_rps_n3",
+    "gt_rf_rps_t",
+    "gt_rf_rps_t1",
+    "gt_rf_rps_t2",
+    "gt_rf_rps_t3",
+    "gt_rf_norps",
+    "gt_rf_norps_n",
+    "gt_rf_norps_n1",
+    "gt_rf_norps_n2",
+    "gt_rf_norps_n3",
+    "gt_rf_norps_t",
+    "gt_rf_norps_t1",
+    "gt_rf_norps_t2",
+    "gt_rf_norps_t3",
     "df_vac",
     "df_atk",
     "df_lab",
     "df_labenr",
     "df_labpos",
     "df_labposenr",
-    "dfsero1a",
-    "dfsero1b",
-    "dfsero2a",
-    "dfsero2b",
+    "df_sero1a",
+    "df_sero1b",
+    "df_sero2a",
+    "df_sero2b",
     "df_kap1",
     "df_kap2"
   ),

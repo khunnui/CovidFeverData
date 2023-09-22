@@ -8,8 +8,6 @@ library(gtExtras)
 
 get_sum_data <- function(df) {
 
-  df <- filter(df, finalresult %in% c('Positive','Negative'))
-  
   vars <- df %>%
     select(-c(province, hospital, finalresult, rps)) %>%
     map_dbl(sum, na.rm = TRUE) %>%
@@ -24,9 +22,9 @@ get_sum_data <- function(df) {
     add_overall() %>%
     add_p()
 
-  N0 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_0", pattern = "{N_obs}")
-  N1 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_1", pattern = "{N_obs}")
-  N2 <- inline_text(gtsum, variable = names(vars[1]), column = "stat_2", pattern = "{N_obs}")
+  N0 <- format(nrow(df), big.mark=",")
+  N1 <- format(nrow(filter(df, finalresult == 'Positive')), big.mark = ",")
+  N2 <- format(nrow(filter(df, finalresult == 'Negative')), big.mark = ",")
   
   df_sum <- gtsum$table_body %>%
     select(variable, stat_0:stat_2, p.value) %>%
@@ -48,9 +46,42 @@ get_sum_data <- function(df) {
 
 }
 
-create_sum_table <- function(df_sum, tt, head, N0, N1, N2) {
+create_table <- function(df, tt, head) {
+
+  # Create list of variables sorted by frequency
+  vars <- df %>%
+    select(-c(province, hospital, rps, finalresult)) %>%
+    map_dbl(sum, na.rm = TRUE) %>%
+    sort(decreasing = TRUE)
   
-  df_sum %>%
+  # Create summary table
+  gtsum <- df %>%
+    select(finalresult, names(which(vars > 0))) %>%
+    tbl_summary(by = finalresult,
+                #statistic = all_categorical() ~ "{n} ({p})",
+                digits = all_categorical() ~ c(0, 1),
+                missing = "no") %>%
+    add_overall() %>%
+    add_p()
+
+  # N for overall, PCR positive, and PCR negative
+  N0 <- format(nrow(df), big.mark=",")
+  N1 <- format(nrow(filter(df, finalresult == 'Positive')), big.mark = ",")
+  N2 <- format(nrow(filter(df, finalresult == 'Negative')), big.mark = ",")
+
+  # Add horizontal stacked bar  
+  gtsum$table_body %>%
+    select(variable, stat_0:stat_2, p.value) %>%
+    mutate(
+      p.value = p_mark_significant(
+        format.pval(p.value, eps = .001, digits = 1)
+      ),
+      posneg = map2(
+        as.integer(sub(",", "", str_extract(stat_1, boundary("word")), fixed = TRUE)), 
+        as.integer(sub(",", "", str_extract(stat_2, boundary("word")), fixed = TRUE)), 
+        c
+      )
+    ) %>%
     gt() %>%
     gt_plt_bar_stack(
       posneg,
