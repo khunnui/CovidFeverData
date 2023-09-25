@@ -331,6 +331,59 @@ df_ss <- CFMast %>%
   ) %>% 
   filter(finalresult %in% c('Positive', 'Negative'))
 
+df_ss_b <- 
+  tblSection3  %>%
+  semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
+  select(s32headache:s32other, -c(ends_with("d"))) %>%
+  rename_all(~stringr::str_replace(.,"^s32","")) %>% 
+  mutate(   visit ='Baseline') %>% 
+  replace(is.na(.), FALSE)
+
+df_ss_f <- 
+  tblSection8 %>% filter(s8isfu %in% c(1,3))  %>%
+  semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
+  select(s8headache:s8other)  %>%
+  rename_all(~stringr::str_replace(.,"^s8","")) %>% 
+  mutate(    visit ='F/U') %>% 
+  replace(is.na(.), FALSE)
+
+# Create or modify variables as necessary
+
+df_ss_bf <- rbind( df_ss_b,  df_ss_f) %>% 
+  rename(
+    Headache                = headache,
+    "Stiff neck"            = neckstiff,
+    Tiredness               = tiredness,
+    Malaise                 = malaise,
+    Chills                  = chills,
+    "Eye pain"              = eyepain,
+    "Red eyes"              = redeyes,
+    "Yellow eyes"           = yelloweyes,
+    "Nose bleeding"         = nosebleeding,
+    Hyposmia                = hyposmia,
+    Dysgeusia               = dysgeusia,
+    "Muscle pain"           = musclepain,
+    "Joint pain"            = jointpain,
+    "Red joints"            = redjoints,
+    "Bone pain"             = bonepain,
+    "Back pain"             = backpain,
+    "Chest pain"            = chestpain,
+    "No appetite"           = noappetite,
+    Nausea                  = nausea,
+    Vomiting                = vomiting,
+    "Blood vomitting"       = bloodvomit,
+    "Abdominal pain"        = abdominalpain,
+    Diarrhea                = diarrhea,
+    "Blood stool"           = bloodstool,
+    "Blood urine"           = bloodurine,
+    Dysuria                 = dysuria,
+    "Pale skin"             = paleskin,
+    Rash                    = rash,
+    Bruise                  = bruise,
+    Seizures                = seizures,
+    Other                   = other
+  ) 
+
 df_signBox <- CFMast %>%
   select(cfid,
          province,
@@ -1169,6 +1222,7 @@ save(
     "gt_ss_t1",
     "gt_ss_t2",
     "gt_ss_t3",
+    "df_ss_bf",
     # "gt_ss_rps",
     # "gt_ss_rps_n",
     # "gt_ss_rps_n1",
