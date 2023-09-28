@@ -9,7 +9,7 @@
 library(labelled)
 library(gtsummary)
 library(gt)
-detach("package:gtExtras", unload = TRUE)
+#detach("package:gtExtras", unload = TRUE)
 devtools::install_github("Nartladac/gtExtras")
 library(gtExtras)
 library(rstatix)
@@ -730,11 +730,7 @@ df_lab <- LabPCRResult_l %>%
   tally() %>%
   rename(finalresult = finalresult_fac)
 
-df_labenr <- LabPCRResult_l %>%
-  inner_join(CFMast %>% select(cfid, rps), by='cfid') %>%   
-  group_by(province, hospital, rps, spectype, finalresult_fac) %>%
-  tally() %>%
-  rename(finalresult = finalresult_fac)
+
 
 df_labpos <- LabPCRResult_l %>%
   left_join(tblSection1 %>% select(cfid, rps), by="cfid") %>% 
@@ -769,38 +765,40 @@ df_labpos <- LabPCRResult_l %>%
   group_by(province, hospital, rps, specimens) %>%
   tally()
 
-df_labposenr <- LabPCRResult_l %>%
-  inner_join(CFMast %>% select(cfid, rps), by='cfid') %>%   
-  # Select only 4 columns (ID, type, result, and test dates)
-  select(cfid,
-         province,
-         hospital,
-         rps,
-         spectype,
-         finalresult) %>%
-  # All specimen types in one line
-  pivot_wider(names_from = "spectype",
-              values_from = "finalresult") %>%
-  filter(`NP/OP swab` == 1 | `Nasal swab` == 1 | Saliva == 1) %>%
-  mutate(
-    specimens = case_when(
-      `NP/OP swab`   == 1 & 
-        `Nasal swab` == 1 & 
-        `Saliva`     == 1   ~ "NP/OP, nasal, saliva",
-      `NP/OP swab`   == 1 & 
-        `Nasal swab` == 1   ~ "NP/OP, nasal",
-      `NP/OP swab`   == 1 & 
-        `Saliva`     == 1   ~ "NP/OP, saliva",
-      `Nasal swab`   == 1 & 
-        `Saliva`     == 1   ~ "Nasal, saliva",
-      `NP/OP swab`   == 1   ~ "NP/OP",
-      `Nasal swab`   == 1   ~ "Nasal",
-      `Saliva`       == 1   ~ "Saliva",
-      TRUE                  ~ "other"
-    )
-  ) %>%
-  group_by(province, hospital, rps, specimens) %>%
-  tally()
+
+#-------------------------------------------------------------------------------
+# Laboratory testing page
+#-------------------------------------------------------------------------------
+df_cbcbio <- 
+  LabPCRFinal  %>%
+  left_join(tblSection4) %>% 
+  mutate( 
+    finalresult = droplevels(finalresult))  %>% 
+    select(finalresult,s4hematocrit,s4plateletx10,s4wbccountx10,s4neutrophil,s4lymphocyte,s4monocyte,s4eosinophil,s4basophil,s4bun, s4creatinine,  s4ast, s4alt, s4albumin,s4lactate, s4procal, s4creprotein)
+
+df_cul<-
+  LabPCRFinal  %>%
+  left_join(tblSection4) %>% 
+  mutate( 
+    finalresult = droplevels(finalresult),
+    o1 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '10'),na.rm=TRUE) > 0,
+    o2 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '47'),na.rm=TRUE) > 0,
+    o3 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '84'),na.rm=TRUE) > 0,            
+    o4 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '103'),na.rm=TRUE) > 0,
+    o5 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '108'),na.rm=TRUE) > 0,
+    o6 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '111'),na.rm=TRUE) > 0,
+    o7 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '117'),na.rm=TRUE) > 0,
+    o8 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '147'),na.rm=TRUE) > 0,
+    o9 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '148'),na.rm=TRUE) > 0,
+    o10 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '263'),na.rm=TRUE) > 0,
+    o11 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '353'),na.rm=TRUE) > 0,
+    o12 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '365'),na.rm=TRUE) > 0,
+    o13 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '395'),na.rm=TRUE) > 0,           
+    o14 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '459'),na.rm=TRUE) > 0,           
+    o15 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '998'),na.rm=TRUE) > 0, 
+    o16 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '999'),na.rm=TRUE) > 0
+  ) %>% 
+  select (finalresult,o1:o16)
 
 #-------------------------------------------------------------------------------
 # Serology testing page
@@ -1298,9 +1296,9 @@ save(
     "df_vac",
     "df_atk",
     "df_lab",
-    "df_labenr",
     "df_labpos",
-    "df_labposenr",
+    "df_cbcbio",
+    "df_cul",
     "df_sero1a",
     "df_sero1b",
     "df_sero2a",
