@@ -10,7 +10,7 @@ library(labelled)
 library(gtsummary)
 library(gt)
 #detach("package:gtExtras", unload = TRUE)
-devtools::install_github("Nartladac/gtExtras")
+devtools::install_github("Nartlada/gtExtras")
 library(gtExtras)
 library(rstatix)
 
@@ -332,7 +332,7 @@ df_ss <- CFMast %>%
   filter(finalresult %in% c('Positive', 'Negative'))
 
 df_ss_b <- 
-  tblSection3  %>%
+  tblSection3 %>%
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
   select(s32headache:s32other, -c(ends_with("d"))) %>%
   rename_all(~stringr::str_replace(.,"^s32","")) %>% 
@@ -340,9 +340,9 @@ df_ss_b <-
   replace(is.na(.), FALSE)
 
 df_ss_f <- 
-  tblSection8 %>% filter(s8isfu %in% c(1,3))  %>%
+  tblSection8 %>% filter(s8isfu %in% c(1,3)) %>%
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
-  select(s8headache:s8other)  %>%
+  select(s8headache:s8other) %>%
   rename_all(~stringr::str_replace(.,"^s8","")) %>% 
   mutate(    visit ='F/U') %>% 
   replace(is.na(.), FALSE)
@@ -704,6 +704,7 @@ df_vac2 <- LabPCRFinal %>%
 #-------------------------------------------------------------------------------
 # Atk page
 #-------------------------------------------------------------------------------
+
 df_atk <- CFMast %>% 
   filter(s33atk == 'Yes') %>%
   select(cfid,
@@ -733,8 +734,6 @@ df_lab <- LabPCRResult_l %>%
   group_by(province, hospital, rps, spectype, finalresult_fac) %>%
   tally() %>%
   rename(finalresult = finalresult_fac)
-
-
 
 df_labpos <- LabPCRResult_l %>%
   left_join(tblSection1 %>% select(cfid, rps), by="cfid") %>% 
@@ -769,44 +768,114 @@ df_labpos <- LabPCRResult_l %>%
   group_by(province, hospital, rps, specimens) %>%
   tally()
 
-
 #-------------------------------------------------------------------------------
 # Laboratory testing page
 #-------------------------------------------------------------------------------
-df_cbcbio <- 
-  LabPCRFinal  %>%
-  left_join(tblSection4) %>% 
-  mutate( 
-    finalresult = droplevels(finalresult))  %>% 
-    select(finalresult,s4hematocrit,s4plateletx10,s4wbccountx10,s4neutrophil,s4lymphocyte,s4monocyte,s4eosinophil,s4basophil,s4bun, s4creatinine,  s4ast, s4alt, s4albumin,s4lactate, s4procal, s4creprotein)
 
-df_cul<-
-  LabPCRFinal  %>%
-  left_join(tblSection4) %>% 
-  mutate( 
+df_cbc <-
+  LabPCRFinal %>%
+  left_join(tblSection4) %>%
+  mutate(finalresult = droplevels(finalresult)) %>%
+  select(
+    finalresult,
+    s4hematocrit,
+    s4plateletx10,
+    s4wbccountx10,
+    s4neutrophil,
+    s4lymphocyte,
+    s4monocyte,
+    s4eosinophil,
+    s4basophil,
+    s4bun,
+    s4creatinine,
+    s4ast,
+    s4alt,
+    s4albumin,
+    s4lactate,
+    s4procal,
+    s4creprotein
+  ) %>%
+  set_variable_labels(
+    s4hematocrit  = 'Hematocrit',
+    s4plateletx10 = 'Platelet',
+    s4wbccountx10 = 'WBC',
+    s4neutrophil  = 'Neutrophil',
+    s4lymphocyte  = 'Lymphocyte',
+    s4monocyte    = 'Monocyte',
+    s4eosinophil  = 'Eosinophil',
+    s4basophil    = 'Basophil',
+    s4bun         = 'Blood urea nitrogen (mg/dL)',
+    s4creatinine  = 'Creatinine (mg/dL)',
+    s4ast         = 'Aspartate aminotransferase (iu/L)',
+    s4alt         = 'Alanine aminotransferase (iu/L)',
+    s4albumin     = 'Albumin (g/dL)',
+    s4lactate     = 'Lactate (mmol/L)',
+    s4procal      = 'Procalcitonin (mg/mL)',
+    s4creprotein  = 'C-reactive protein (mg/L)'
+  )
+
+df_cul <-
+  LabPCRFinal %>%
+  left_join(tblSection4) %>%
+  mutate(
     finalresult = droplevels(finalresult),
-    o1 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '10'),na.rm=TRUE) > 0,
-    o2 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '47'),na.rm=TRUE) > 0,
-    o3 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '84'),na.rm=TRUE) > 0,            
-    o4 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '103'),na.rm=TRUE) > 0,
-    o5 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '108'),na.rm=TRUE) > 0,
-    o6 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '111'),na.rm=TRUE) > 0,
-    o7 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '117'),na.rm=TRUE) > 0,
-    o8 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '147'),na.rm=TRUE) > 0,
-    o9 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '148'),na.rm=TRUE) > 0,
-    o10 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '263'),na.rm=TRUE) > 0,
-    o11 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '353'),na.rm=TRUE) > 0,
-    o12 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '365'),na.rm=TRUE) > 0,
-    o13 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '395'),na.rm=TRUE) > 0,           
-    o14 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '459'),na.rm=TRUE) > 0,           
-    o15 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '998'),na.rm=TRUE) > 0, 
-    o16 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),    ~ . == '999'),na.rm=TRUE) > 0
-  ) %>% 
-  select (finalresult,o1:o16)
+    o1 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '10'), na.rm = TRUE) > 0,
+    o2 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '47'), na.rm = TRUE) > 0,
+    o3 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '84'), na.rm = TRUE) > 0,
+    o4 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '103'), na.rm = TRUE) > 0,
+    o5 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '108'), na.rm = TRUE) > 0,
+    o6 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '111'), na.rm = TRUE) > 0,
+    o7 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '117'), na.rm = TRUE) > 0,
+    o8 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '147'), na.rm = TRUE) > 0,
+    o9 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '148'), na.rm = TRUE) > 0,
+    o10 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '263'), na.rm = TRUE) > 0,
+    o11 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '353'), na.rm = TRUE) > 0,
+    o12 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '365'), na.rm = TRUE) > 0,
+    o13 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '395'), na.rm = TRUE) > 0,
+    o14 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '459'), na.rm = TRUE) > 0,
+    o15 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '998'), na.rm = TRUE) > 0,
+    o16 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
+                        ~ . == '999'), na.rm = TRUE) > 0
+  ) %>%
+  select (finalresult, o1:o16) %>% 
+  set_variable_labels(
+    o1  = 'Aerobic Gram Positive Cocci',
+    o2  = 'Burkholderia pseudomallei',
+    o3  = 'Corynebacterium spp.',
+    o4  = 'Enterobacter cloacae',
+    o5  = 'Enterobacter species',
+    o6  = 'Enterococcus faecalis',
+    o7  = 'Escherichia coli',
+    o8  = 'Klebsiella pneumoniae',
+    o9  = 'Klebsiella species',
+    o10 = 'Pseudomonas aeruginosa',
+    o11 = 'Shigella species',
+    o12 = 'Staphylococcus cohnii',
+    o13 = 'Streptococcus agalactiae',
+    o14 = 'Yeast',
+    o15 = 'Mixed Growth',
+    o16 = 'Other'
+  )
 
 #-------------------------------------------------------------------------------
 # Serology testing page
 #-------------------------------------------------------------------------------
+
 df_sero1a <- 
   tblSection1 %>% filter(!is.na(cfid) & s1enroll5th == TRUE) %>%
   left_join(LabPCRFinal, by = 'cfid') %>%
@@ -948,6 +1017,7 @@ df_sero2a <-
     cvtime          = 'Time since last vaccine dose',
     s33hascovid     = 'Previous infected with COVID-19'
   )
+
 df_sero2b <-
   tblSection1 %>% filter(!is.na(cfid)) %>%
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
@@ -996,6 +1066,7 @@ df_sero2b <-
     numdose         = 'Number of vaccine dose',
     s33hascovid     = 'Previous infected with COVID-19'
   )
+
 #-------------------------------------------------------------------------------
 # KAP page
 #-------------------------------------------------------------------------------
@@ -1161,7 +1232,7 @@ save(
     "df_atk",
     "df_lab",
     "df_labpos",
-    "df_cbcbio",
+    "df_cbc",
     "df_cul",
     "df_sero1a",
     "df_sero1b",
