@@ -697,6 +697,10 @@ df_vac <- CFMast %>%
   group_by(province, hospital, rps, vac, finalresult) %>%
   tally()
 
+df_vac2 <- LabPCRFinal %>%
+  left_join(tblSection3 %>% select(cfid,cvtime), by="cfid") %>% 
+   select(finalresult,cvtime)
+
 #-------------------------------------------------------------------------------
 # Atk page
 #-------------------------------------------------------------------------------
@@ -845,29 +849,7 @@ df_sero1b <-
     ),
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
-      na.rm = TRUE) >= 1,
-    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
-    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
-                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
-    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
-                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
-    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
-                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
-    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
-                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
-    cv = factor(
-      case_when(
-        s33covidvaccine == FALSE ~ 0,
-        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
-        vv == 1 | mr == 1 | iv == 1 ~ 1,
-        ot >= 1 ~ 3,
-        TRUE ~ NA_real_
-      ),
-      levels = 0:3,
-      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
-    ),
-    cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
-    cvtime = as.numeric(difftime(s1enrolldate, cvdate_l, units = 'days'))
+      na.rm = TRUE) >= 1
   ) %>%
   # Select only variables to be used
   select(
@@ -928,106 +910,7 @@ df_sero2a <-
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
       na.rm = TRUE) >= 1,
-    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
-    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
-                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
-    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
-                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
-    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
-                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
-    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
-                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
-    cv = factor(
-      case_when(
-        s33covidvaccine == FALSE ~ 0,
-        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
-        vv == 1 | mr == 1 | iv == 1 ~ 1,
-        ot >= 1 ~ 3,
-        TRUE ~ NA_real_
-      ),
-      levels = 0:3,
-      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
-    ),
-    numdose = cut(
-      s33cvamount,
-      breaks = c(0, 1, 2, Inf),
-      labels = c('< 2 doses', '2 doses', '> 2 doses'),
-      include.lowest = TRUE
-    ),
-    cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
-    cvtime = as.numeric(difftime(s1enrolldate, cvdate_l, units = 'days')),
-    # JJ
-    jjdate1 = pmin(
-      if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 == 2, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 == 2, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 == 2, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 == 2, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 == 2, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # Viral vector 1
-    vvdate1 = pmin(
-      if_else(s33cvname1 %in% c(1, 7), s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% c(1, 7), s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% c(1, 7), s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% c(1, 7), s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% c(1, 7), s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% c(1, 7), s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # Viral vector 2
-    vvdate2 = pmin(
-      if_else(s33cvname1 %in% c(1, 7) & s33cvdate1 > vvdate1, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% c(1, 7) & s33cvdate2 > vvdate1, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% c(1, 7) & s33cvdate3 > vvdate1, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% c(1, 7) & s33cvdate4 > vvdate1, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% c(1, 7) & s33cvdate5 > vvdate1, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% c(1, 7) & s33cvdate6 > vvdate1, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # mRNA 1
-    mrdate1 = pmin(
-      if_else(s33cvname1 %in% 3:4, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% 3:4, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% 3:4, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% 3:4, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% 3:4, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% 3:4, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # mRNA 2
-    mrdate2 = pmin(
-      if_else(s33cvname1 %in% 3:4 & s33cvdate1 > mrdate1, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% 3:4 & s33cvdate2 > mrdate1, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% 3:4 & s33cvdate3 > mrdate1, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% 3:4 & s33cvdate4 > mrdate1, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% 3:4 & s33cvdate5 > mrdate1, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% 3:4 & s33cvdate6 > mrdate1, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # inactivated virus 1
-    ivdate1 = pmin(
-      if_else(s33cvname1 %in% 5:6, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% 5:6, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% 5:6, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% 5:6, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% 5:6, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% 5:6, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    # inactivated virus 2
-    ivdate2 = pmin(
-      if_else(s33cvname1 %in% 5:6 & s33cvdate1 > ivdate1, s33cvdate1, NA_Date_),
-      if_else(s33cvname2 %in% 5:6 & s33cvdate2 > ivdate1, s33cvdate2, NA_Date_),
-      if_else(s33cvname3 %in% 5:6 & s33cvdate3 > ivdate1, s33cvdate3, NA_Date_),
-      if_else(s33cvname4 %in% 5:6 & s33cvdate4 > ivdate1, s33cvdate4, NA_Date_),
-      if_else(s33cvname5 %in% 5:6 & s33cvdate5 > ivdate1, s33cvdate5, NA_Date_),
-      if_else(s33cvname6 %in% 5:6 & s33cvdate6 > ivdate1, s33cvdate6, NA_Date_),
-      na.rm = TRUE
-    ),
-    fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
-    fulltime = as.numeric(difftime(s1enrolldate, fulldate, units = 'days')),
+    
     igm_o = if_else(rowSums(across(starts_with('igm_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggn_o = if_else(rowSums(across(starts_with('iggn_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggs_o = if_else(rowSums(across(starts_with('iggs_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative')
@@ -1081,26 +964,7 @@ df_sero2b <-
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
       na.rm = TRUE) >= 1,
-    jj = rowSums(across(num_range("s33cvname", 1:10)) == 2, na.rm = TRUE),
-    vv = rowSums(across(num_range("s33cvname", 1:10)) == 1 |
-                 across(num_range("s33cvname", 1:10)) == 7, na.rm = TRUE),
-    mr = rowSums(across(num_range("s33cvname", 1:10)) == 3 |
-                 across(num_range("s33cvname", 1:10)) == 4, na.rm = TRUE),
-    iv = rowSums(across(num_range("s33cvname", 1:10)) == 5 |
-                 across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),
-    ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
-                 across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
-    cv = factor(
-      case_when(
-        s33covidvaccine == FALSE ~ 0,
-        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
-        vv == 1 | mr == 1 | iv == 1 ~ 1,
-        ot >= 1 ~ 3,
-        TRUE ~ NA_real_
-      ),
-      levels = 0:3,
-      labels = c('None', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
-    ),
+   
     numdose = cut(
       s33cvamount,
       breaks = c(0, 1, 2, Inf),

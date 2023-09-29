@@ -24,7 +24,7 @@ tblSection3 <- tblSection3 %>%
   filter(cfid != '__-____-_') %>%
   
   # Get enrollment date from section 1
-  left_join(tblSection1 %>% select(cfid, s1enrolldate), by = 'cfid') %>% 
+  left_join(tblSection1 %>% select(cfid, s1enrolldate, s1feveronsetdate), by = 'cfid') %>% 
   
   # Create/convert columns
   mutate(
@@ -362,7 +362,10 @@ tblSection3 <- tblSection3 %>%
       vv == 1 | mr == 1 | iv == 1 ~ 1,
       ot >= 1 ~ 3,
       TRUE ~ NA_real_
-    ),
+    ),  
+    cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
+    cvtime = as.numeric(difftime(s1feveronsetdate, cvdate_l, units = 'days')),
+    
     jjdate1 = pmin(
       if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
       if_else(s33cvname2 == 2, s33cvdate2, NA_Date_),
@@ -427,7 +430,8 @@ tblSection3 <- tblSection3 %>%
       na.rm = TRUE
     ),
     fulldate = pmin(jjdate1, vvdate2, mrdate2, ivdate2, na.rm = TRUE),
-    fulltime = as.numeric(difftime(s1enrolldate, fulldate, units = 'days')),
+    fulltime = as.numeric(difftime(s1feveronsetdate, fulldate, units = 'days')),
+    
     s33cvdaterange1 = set_vax_range(s1enrolldate, s33cvdate1, s33cvdaterange1), 
     s33cvdaterange2 = set_vax_range(s1enrolldate, s33cvdate2, s33cvdaterange2), 
     s33cvdaterange3 = set_vax_range(s1enrolldate, s33cvdate3, s33cvdaterange3), 
@@ -441,4 +445,4 @@ tblSection3 <- tblSection3 %>%
   ) %>% 
   
   # Remove variable from section 1
-  select(-s1enrolldate)
+  select(-s1enrolldate,-s1feveronsetdate)
