@@ -698,8 +698,12 @@ df_vac <- CFMast %>%
   tally()
 
 df_vac2 <- LabPCRFinal %>%
-  left_join(tblSection3 %>% select(cfid,cvtime), by="cfid") %>% 
-   select(finalresult,cvtime)
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
+  left_join(tblSection3 %>% select(cfid, cvtime, fulltime),
+            by = "cfid") %>%
+  mutate(finalresult = droplevels(finalresult)) %>%
+  select(finalresult, cvtime, fulltime, province,   hospital,  rps) 
+
 
 #-------------------------------------------------------------------------------
 # Atk page
@@ -774,6 +778,7 @@ df_labpos <- LabPCRResult_l %>%
 
 df_cbc <-
   LabPCRFinal %>%
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
   left_join(tblSection4) %>%
   mutate(finalresult = droplevels(finalresult)) %>%
   select(
@@ -793,7 +798,10 @@ df_cbc <-
     s4albumin,
     s4lactate,
     s4procal,
-    s4creprotein
+    s4creprotein, 
+    province,
+    hospital,
+    rps
   ) %>%
   set_variable_labels(
     s4hematocrit  = 'Hematocrit',
@@ -816,6 +824,7 @@ df_cbc <-
 
 df_cul <-
   LabPCRFinal %>%
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
   left_join(tblSection4) %>%
   mutate(
     finalresult = droplevels(finalresult),
@@ -852,7 +861,7 @@ df_cul <-
     o16 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
                         ~ . == '999'), na.rm = TRUE) > 0
   ) %>%
-  select (finalresult, o1:o16) %>% 
+  select (finalresult, o1:o16, province,  hospital,  rps) %>% 
   set_variable_labels(
     o1  = 'Aerobic Gram Positive Cocci',
     o2  = 'Burkholderia pseudomallei',
@@ -979,7 +988,12 @@ df_sero2a <-
     comorbid = rowSums(
       across(c(s35diabetes:s35pregnancy) & where(is.logical)),
       na.rm = TRUE) >= 1,
-    
+    numdose = cut(
+      s33cvamount,
+      breaks = c(0, 1, 2, Inf),
+      labels = c('< 2 doses', '2 doses', '> 2 doses'),
+      include.lowest = TRUE
+    ),
     igm_o = if_else(rowSums(across(starts_with('igm_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggn_o = if_else(rowSums(across(starts_with('iggn_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative'),
     iggs_o = if_else(rowSums(across(starts_with('iggs_')) == 'Positive', na.rm = TRUE) > 0, 'Positive', 'Negative')
@@ -1228,7 +1242,8 @@ save(
     # "gt_rf_norps_t1",
     # "gt_rf_norps_t2",
     # "gt_rf_norps_t3",
-    "df_vac",
+    "df_vac", 
+    "df_vac2",
     "df_atk",
     "df_lab",
     "df_labpos",

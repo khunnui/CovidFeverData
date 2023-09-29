@@ -444,5 +444,9 @@ tblSection3 <- tblSection3 %>%
     s33cvdaterange10 = set_vax_range(s1enrolldate, s33cvdate10, s33cvdaterange10)
   ) %>% 
   
+  set_variable_labels(
+    cvtime  = 'Time since last dose (days)',
+    fulltime = "Time since fully vaccinated (days)"
+  ) %>% 
   # Remove variable from section 1
   select(-s1enrolldate,-s1feveronsetdate)
