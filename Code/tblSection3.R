@@ -2,7 +2,7 @@
 # tblSection3
 # 3/7/2022
 #-------------------------------------------------------------------------------
-
+library(labelled)
 set_vax_range <- function(edate, vdate, range) {
 
   ifelse(!is.na(vdate),
@@ -443,7 +443,6 @@ tblSection3 <- tblSection3 %>%
     s33cvdaterange9 = set_vax_range(s1enrolldate, s33cvdate9, s33cvdaterange9), 
     s33cvdaterange10 = set_vax_range(s1enrolldate, s33cvdate10, s33cvdaterange10)
   ) %>% 
-  
   set_variable_labels(
     cvtime  = 'Time since last dose (days)',
     fulltime = "Time since fully vaccinated (days)"
