@@ -1086,7 +1086,9 @@ df_sero2b <-
 #-------------------------------------------------------------------------------
 
 df_kap1 <- CFMast %>%
-  select(province, hospital, rps,
+  mutate(
+    variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
+  select(province, hospital, rps, variant,
          s3604sickspread, s3615carelate:s3620) %>%
   rename(s3604 = s3604sickspread,
          s3615 = s3615carelate) %>% 
@@ -1095,11 +1097,13 @@ df_kap1 <- CFMast %>%
                values_to = "scale") %>%
   #mutate(scale = fct_rev(scale)) %>%
   filter(!is.na(scale)) %>%
-  group_by(province, hospital, rps, kap, scale) %>%
+  group_by(province, hospital, rps, variant, kap, scale) %>%
   tally()
 
 df_kap2 <- CFMast %>%
-  select(province, hospital, rps,
+  mutate(
+    variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
+  select(province, hospital, rps,variant,
          s3610maskin, s3613maskout, s3621:s3622) %>%
   rename(s3610 = s3610maskin,
          s3613 = s3613maskout) %>% 
@@ -1107,9 +1111,53 @@ df_kap2 <- CFMast %>%
                names_to = "kap",
                values_to = "scale") %>%
   filter(!is.na(scale)) %>%
-  group_by(province, hospital, rps, kap, scale) %>%
+  group_by(province, hospital, rps, variant, kap, scale) %>%
   tally()
 
+
+df_kap3 <-
+  tblSection1 %>% filter(!is.na(cfid)) %>%
+  left_join(tblSection3, by = 'cfid') %>%
+  # Select only variables to be used
+  select(province, hospital, rps, s1enrolldate,
+         s3604sickspread, s3615carelate:s3620) %>%
+  rename(s3604 = s3604sickspread,
+         s3615 = s3615carelate) %>%
+  mutate(
+    variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    's3604' = 'Only sick people with symptoms can spread the disease',
+    's3615' = 'Sought care later than usual because of COVID-19',
+    's3616' = 'Afraid of being quarantined after close contact with COVID-19 patient',
+    's3617' = 'Afraid to seek care out of fear of being tested/isolated',
+    's3618' = 'Always wearing mask in public is a good thing to do',
+    's3619' = 'Always practicing social distancing is a good thing to do',
+    's3620' = 'Patients should disclose their exposure to COVID-19 and their symptoms'
+      )
+
+df_kap4 <-
+  tblSection1 %>% filter(!is.na(cfid)) %>%
+  left_join(tblSection3, by = 'cfid') %>%
+  # Select only variables to be used
+  select(province, hospital, rps, s1enrolldate,
+          s3610maskin, s3613maskout, s3621:s3622) %>%
+  rename(
+         s3610 = s3610maskin,
+         s3613 = s3613maskout) %>%
+  mutate(
+    variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
+  # Set variable labels to be displayed in output
+  set_variable_labels(
+    's3610' = 'During the past 2 weeks, did you wear a mask at home?',
+    's3613' = 'Did you wear a mask when you went outside in crowded areas?',
+    's3621' = 'Do you practice social distancing in your household?',
+    's3622' = 'Do you practice social distancing outside of your residence?'
+    
+  )
+
+   
+  
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
@@ -1254,7 +1302,9 @@ save(
     "df_sero2a",
     "df_sero2b",
     "df_kap1",
-    "df_kap2"
+    "df_kap2",
+    "df_kap3",
+    "df_kap4"
   ),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
