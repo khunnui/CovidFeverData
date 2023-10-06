@@ -356,16 +356,18 @@ tblSection3 <- tblSection3 %>%
                  across(num_range("s33cvname", 1:10)) == 6, na.rm = TRUE),  # inactivated virus
     ot = rowSums(across(num_range("s33cvname", 1:10)) == 9 |
                  across(num_range("s33cvname", 1:10)) == 10, na.rm = TRUE),
-    cv = case_when(
-      s33covidvaccine == FALSE ~ 0,
-      jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
-      vv == 1 | mr == 1 | iv == 1 ~ 1,
-      ot >= 1 ~ 3,
-      TRUE ~ NA_real_
-    ),  
+    cv = factor(
+      case_when(
+        s33covidvaccine == FALSE ~ 0,
+        jj >= 1 | vv >= 2 | mr >= 2 | iv >= 2 ~ 2,
+        vv == 1 | mr == 1 | iv == 1 ~ 1,
+        ot >= 1 ~ 3,
+        TRUE ~ NA_real_
+      ),
+      labels = c('Not vaccinated', 'Not fully vaccinated', 'Fully vaccinated', 'Vaccinated but no information')
+    ),
     cvdate_l = pmax(s33cvdate1, s33cvdate2, s33cvdate3, s33cvdate4, s33cvdate5, s33cvdate6, na.rm = TRUE),
     cvtime = as.numeric(difftime(s1feveronsetdate, cvdate_l, units = 'days')),
-    
     jjdate1 = pmin(
       if_else(s33cvname1 == 2, s33cvdate1, NA_Date_),
       if_else(s33cvname2 == 2, s33cvdate2, NA_Date_),

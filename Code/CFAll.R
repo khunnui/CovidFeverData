@@ -42,6 +42,8 @@ LabSero      <- dbGetQuery(dbConn,'select * from "LabSero"')
 #tblSection6 <- dbGetQuery(dbConn,'select * from "tblSection6"')
 #tblSection7 <- dbGetQuery(dbConn,'select * from "tblSection7"')
 tblSection8 <- dbGetQuery(dbConn,'select * from "tblSection8"')
+lcsec1  <- dbGetQuery(dbConn,'select * from "LCSec1"')
+lcsec2  <- dbGetQuery(dbConn,'select * from "LCSec2"')
 
 ## Data wrangling for each data frame ------------------------------------------
 source(paste0(code_folder, "/tblSection1.R"))
@@ -56,6 +58,8 @@ source(paste0(code_folder, "/LabSero.R"))
 # source(paste0(code_folder, "/tblSection6.R"))
 # source(paste0(code_folder, "/tblSection7.R"))
 source(paste0(code_folder, "/tblSection8.R"))
+source(paste0(code_folder, "/lcsec1.R"))
+source(paste0(code_folder, "/lcsec2.R"))
 
 source(paste0(code_folder, "/CFMast.R"))
 source(paste0(code_folder, "/CFDashboard.R"))
