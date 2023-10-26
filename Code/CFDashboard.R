@@ -13,7 +13,7 @@ library(gt)
 devtools::install_github("Nartlada/gtExtras")
 library(gtExtras)
 library(rstatix)
-
+library(dplyr)
 # Output theme
 theme_gtsummary_compact()
 
@@ -1294,9 +1294,16 @@ df_lc5 <- lcsec1 %>%
     
   )
 
-# df_lc6 <- lcsec1 %>% 
-#   mutate(totaldep = rowsum(l19_1interest:l19_9dead, na.rm = TRUE)) %>% 
-#   select (l19_1interest:l19_9dead, totaldep)
+df_lc6 <- lcsec1 %>%
+  drop_na(l19_1interest:l19_9dead) %>% 
+  mutate(totaldpr = rowSums(select(.,l19_1interest:l19_9dead), na.rm = TRUE),
+         severe = cut(totaldpr,breaks = c(1,4,9,14,19,Inf),labels = c("Minimal","Mild","Moderate","Moderately Severe","Severe")) ) %>%
+  select (l19_1interest:l19_9dead, totaldpr, severe, province) %>% 
+  group_by(province, severe) %>%
+  tally()
+
+
+
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
