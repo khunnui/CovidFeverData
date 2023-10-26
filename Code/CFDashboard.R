@@ -1261,6 +1261,42 @@ df_lc4 <- lcsec1 %>%
     l1mucormycosis ='Mucormycosis'
  
   )
+# medicine treatment
+df_lc5 <- lcsec1 %>%
+  select(l1antiviral:l1avmol,-c(ends_with("day")) ,l1tbloodderive, l1tchloro, l1exherb,l1strd,l1antibiotic,l1antifungal,l1antithrom, province) %>% 
+  mutate(
+    across(c(l1antiviral :l1antithrom),
+           function(f) {
+             ifelse(f == 0 | is.na(f),2,f)
+           }),
+    across(c(l1antiviral :l1antithrom),
+           function(f) {
+             factor(f,levels = 1:2,labels = c('Yes','No'))
+           })
+  ) %>% 
+  set_variable_labels(
+    l1antiviral = 'Antiviral',
+    l1avlop = 'Lopinavir/Ritonavir',
+    l1avdar = 'Darunavir +/- cobicistat',
+    l1avrem = 'Remdesivir',
+    l1avfav = 'Favipiravir',
+    l1avacy = 'Acyclovir/Ganciclovir',
+    l1avose = 'Oseltamivir',
+    l1avpax = 'Paxlovid (Nirmatrelvir/ritonavir)',
+    l1avmol = 'Molnupiravir',          
+    l1tbloodderive='Blood-derived products',
+    l1tchloro='Chloroquine/hydroxychloroquine', 
+    l1exherb='Herb',
+    l1strd='Steroids',
+    l1antibiotic='Antibiotic',
+    l1antifungal='Antifungal',
+    l1antithrom ='Antithrombotic/anticoagulation'
+    
+  )
+
+# df_lc6 <- lcsec1 %>% 
+#   mutate(totaldep = rowsum(l19_1interest:l19_9dead, na.rm = TRUE)) %>% 
+#   select (l19_1interest:l19_9dead, totaldep)
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
@@ -1412,7 +1448,8 @@ save(
     "df_lc1",
     "df_lc2",
     "df_lc3",
-    "df_lc4"),
+    "df_lc4",
+    "df_lc5"),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
 
