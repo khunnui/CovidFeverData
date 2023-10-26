@@ -24,6 +24,12 @@ date4    <- max(tblSection4$last_edit_date, na.rm = TRUE)
 date5    <- max(tblSection5$last_edit_date, na.rm = TRUE)
 datepcr  <- max(LabPCRResult_l$approvedate, na.rm = TRUE)
 ddate    <- max(c(date1, date2, date3, date4, date5, datepcr), na.rm = TRUE)
+
+lcdate1    <- max(lcsec1$last_edit_date, na.rm = TRUE)
+lcdate2    <- max(lcsec2$last_edit_date, na.rm = TRUE)
+#lcdate3    <- max(tblSection3$last_edit_date, na.rm = TRUE)
+
+lcddate    <- max(c(lcdate1, lcdate2), na.rm = TRUE)
 source(paste0(code_folder, "/Functions.R"))
 
 #-------------------------------------------------------------------------------
@@ -1156,8 +1162,108 @@ df_kap4 <-
     
   )
 
-   
-  
+
+
+#-------------------------------------------------------------------------------
+#Long COVID data
+#-------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------
+#Long COVID section1 no. patient
+#-------------------------------------------------------------------------------
+
+df_lc1 <- lcsec1 %>%
+  select(cfid, province, period) %>%
+  left_join(lcsec2 %>% filter(l2period == 1) %>% select(cfid, fu1 = l2period), by = 'cfid') %>%
+  mutate(fu1 = !is.na(fu1)) %>%
+  left_join(lcsec2 %>% filter(l2period == 2) %>% select(cfid, fu2 = l2period), by = 'cfid') %>%
+  mutate(fu2 = !is.na(fu2)) %>%
+  left_join(lcsec2 %>% filter(l2period == 3) %>% select(cfid, fu3 = l2period), by = 'cfid') %>%
+  mutate(fu3 = !is.na(fu3)) %>%
+  left_join(lcsec2 %>% filter(l2period == 4) %>% select(cfid, fu4 = l2period), by = 'cfid') %>% 
+  mutate(fu4 = !is.na(fu4)) %>% 
+  select(-cfid) %>% 
+  set_variable_labels(
+    fu1 = 'Follow up # 1',
+    fu2 = 'Follow up # 2',
+    fu3 = 'Follow up # 3',
+    fu4 = 'Follow up # 4'
+  )
+
+
+
+df_lc2 <- lcsec1 %>%
+  select(l1severegrade, province) %>%
+  mutate(
+    l1severegrade = factor(l1severegrade,levels=c(1:4),labels = c('Mild','Moderate', 'Severe','Critical'))
+  ) %>% 
+  set_variable_labels(
+    l1severegrade = 'Severeity'
+  )
+
+
+df_lc3 <- lcsec1 %>%
+  select(l1cshock:l1csid, province) %>%
+  mutate(
+    across(c(l1cshock:l1csid),
+           function(f) {
+             ifelse(f == 0 | is.na(f),2,f)
+           }),
+    across(c(l1cshock:l1csid),
+           function(f) {
+             factor(f,levels = 1:2,labels = c('Yes','No'))
+           }),
+  ) %>% 
+  set_variable_labels(
+    l1cshock = 'Shock',
+    l1cseizure =   'Seizure'   ,
+    l1cmeningitis = 'Meningitis',
+    l1ctransfusion = 'Transfusion',
+    l1ccararrhy =   'Cardiac arrhythmia',
+    l1ccararrest = 'Cardiac arrest',
+    l1cards = 'Acute respiratory distress syndrome (ARDS)',
+    l1cisstroke = 'Stroke ischemic stroke',
+    l1cinstroke = 'Stroke intracerebral haemorrhage',
+    l1cstroke = 'Stroke (unspecified type)',
+    l1cmentaldis   = 'Mental health disorders',
+    l1cbacteremia   = 'Bacteremia',
+    l1cendocarditis = 'endocarditis',
+    l1cmyocarditis   = 'Myocarditis/pericarditis',
+    l1cari        = 'Acute renal injury',
+    l1cpancreatitis = 'Pancreatitis',
+    l1ccardiomyopathy = 'Cardiomyopathy',
+    l1cpulemb        = 'Pulmonary embolism',
+    l1cdvt      = 'Deep vein thrombosis',
+    l1csid = 'Steroid induced diabetes'
+  )
+
+df_lc4 <- lcsec1 %>%
+  select(l1inuri :l1mucormycosis, province) %>%
+  mutate(
+    across(c(l1inuri :l1mucormycosis),
+           function(f) {
+             ifelse(f == 0 | is.na(f),2,f)
+           }),
+    across(c(l1inuri :l1mucormycosis),
+           function(f) {
+             factor(f,levels = 1:2,labels = c('Yes','No'))
+           }),
+  ) %>% 
+  set_variable_labels(
+    l1inuri  ='URI',
+    l1inuti   ='Urinary Tract Infection',
+    l1inbone     ='Bone and Joint Infections'   ,  
+    l1incns     ='Central nervous system Infections',
+    l1ingastro      ='Gastrointestinal Infections' ,
+    l1inlri   ='LRI'  ,
+    l1inskin    ='Skin and Soft Tissue Infection',
+    l1incardio     ='Cardiovascular Infections',
+    l1inblood     ='Bloodstream Infections'   , 
+    l1instds     ='Sexual transmitted disease',
+    l1mucormycosis ='Mucormycosis'
+ 
+  )
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
@@ -1304,7 +1410,14 @@ save(
     "df_kap1",
     "df_kap2",
     "df_kap3",
-    "df_kap4"
-  ),
+    "df_kap4",
+    "lcddate",
+    "df_lc1",
+    "df_lc2",
+    "df_lc3",
+    "df_lc4"),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
+
+
+
