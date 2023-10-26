@@ -684,13 +684,10 @@ gt_rf_t3 <- create_table(df_rf %>% filter(hospital == 'Tha Song Yang'), 'Tha Son
 
 df_vac <- CFMast %>%
   mutate(
+    # Patients were considered fully vaccinated if completed at least 1 month prior to enrol
     vac = factor(
-      # Patients were considered fully vaccinated if completed at least 1 month prior to enrol
-      case_when(
-        cv == 2 & fulltime < 30 ~ 1, 
-        TRUE                    ~ cv
-      ),
-      levels = c(0:3),
+      ifelse(cv == 'Fully vaccinated' & (!is.na(fulltime) & fulltime < 30), 2, cv),
+      levels = c(1:4),
       labels = c(
         'Unvaccinated',
         'Partially vaccinated',
