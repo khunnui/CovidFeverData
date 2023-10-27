@@ -8,6 +8,9 @@ lcsec2 <- lcsec2 %>%
   rename_all(tolower) %>%
   rename(last_edit_date = `_lasteditdate`) %>% 
 
+  # Get enrollment date and province from tblSection1
+  left_join(tblSection1 %>% select (cfid, s1enrolldate, province), by = 'cfid') %>%
+  
   # Delete unused columns
   select(-c(starts_with("_"))) %>%
   
