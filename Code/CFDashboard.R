@@ -1294,12 +1294,20 @@ df_lc5 <- lcsec1 %>%
     
   )
 
-df_lc6_d0 <- lcsec1 %>%
+df_lc6 <- lcsec1 %>%
   drop_na(l19_1interest:l19_9dead) %>%
+  rename_with( ~ str_replace(., "l19_", "l_")) %>%
+  mutate(period = 0) %>%
+  select(province, period, l_1interest:l_9dead) %>%
+  rbind(
+    lcsec2 %>%
+      drop_na(l25_1interest:l25_9dead) %>%
+      rename_with( ~ str_replace(., "l25_", "l_")) %>% 
+      select(province, period = l2period, l_1interest:l_9dead)
+  ) %>% 
   mutate(
-    totaldpr = rowSums(select(., l19_1interest:l19_9dead), na.rm = TRUE),
     severe = cut(
-      totaldpr,
+      rowSums(select(., l_1interest:l_9dead), na.rm = TRUE),
       breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
       labels = c(
         "No Depression",
@@ -1308,111 +1316,11 @@ df_lc6_d0 <- lcsec1 %>%
         "Moderate",
         "Moderately Severe",
         "Severe"
-      ),
-      include.lowest = TRUE
+      )
     )
   ) %>%
-  select (l19_1interest:l19_9dead, totaldpr, severe, province) %>%
-  group_by(province, severe) %>%
-  tally() %>% 
-  mutate(period = 0)
-
-df_lc6_d1 <- lcsec2 %>%
-  drop_na(l25_1interest:l25_9dead) %>%
-  filter(l2period==1) %>%
-  mutate(
-    totaldpr = rowSums(select(.,l25_1interest:l25_9dead), na.rm = TRUE),
-    severe = cut(
-      totaldpr,
-      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
-      labels = c(
-        "No Depression",
-        "Minimal",
-        "Mild",
-        "Moderate",
-        "Moderately Severe",
-        "Severe"
-      ),
-      include.lowest = TRUE
-    )
-  ) %>%
-  select (l25_1interest:l25_9dead, totaldpr, severe, province) %>%
-  group_by(province, severe) %>%
-  tally() %>% 
-  mutate(period = 1)
-
-df_lc6_d2 <- lcsec2 %>%
-  drop_na(l25_1interest:l25_9dead) %>%
-  filter(l2period==2) %>%
-  mutate(
-    totaldpr = rowSums(select(.,l25_1interest:l25_9dead), na.rm = TRUE),
-    severe = cut(
-      totaldpr,
-      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
-      labels = c(
-        "No Depression",
-        "Minimal",
-        "Mild",
-        "Moderate",
-        "Moderately Severe",
-        "Severe"
-      ),
-      include.lowest = TRUE
-    )
-  ) %>%
-  select (l25_1interest:l25_9dead, totaldpr, severe, province) %>%
-  group_by(province, severe) %>%
-  tally() %>% 
-  mutate(period = 2)
-
-df_lc6_d3 <- lcsec2 %>%
-  drop_na(l25_1interest:l25_9dead) %>%
-  filter(l2period==3) %>%
-  mutate(
-    totaldpr = rowSums(select(.,l25_1interest:l25_9dead), na.rm = TRUE),
-    severe = cut(
-      totaldpr,
-      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
-      labels = c(
-        "No Depression",
-        "Minimal",
-        "Mild",
-        "Moderate",
-        "Moderately Severe",
-        "Severe"
-      ),
-      include.lowest = TRUE
-    )
-  ) %>%
-  select (l25_1interest:l25_9dead, totaldpr, severe, province) %>%
-  group_by(province, severe) %>%
-  tally() %>% 
-  mutate(period = 3)
-
-df_lc6_d4 <- lcsec2 %>%
-  drop_na(l25_1interest:l25_9dead) %>%
-  filter(l2period==4) %>%
-  mutate(
-    totaldpr = rowSums(select(.,l25_1interest:l25_9dead), na.rm = TRUE),
-    severe = cut(
-      totaldpr,
-      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
-      labels = c(
-        "No Depression",
-        "Minimal",
-        "Mild",
-        "Moderate",
-        "Moderately Severe",
-        "Severe"
-      ),
-      include.lowest = TRUE
-    )
-  ) %>%
-  select (l25_1interest:l25_9dead, totaldpr, severe, province) %>%
-  group_by(province, severe) %>%
-  tally() %>% 
-  mutate(period = 4)
-
+  group_by(province, period, severe) %>%
+  tally()
 
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
