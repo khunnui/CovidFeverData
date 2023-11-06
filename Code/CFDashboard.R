@@ -1322,6 +1322,61 @@ df_lc6 <- lcsec1 %>%
   group_by(province, period, severe) %>%
   tally()
 
+df_lc21 <- lcsec21 %>%
+  mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
+  group_by(province, cfid, period) %>%
+  summarise(opd = sum(opd_ipd == 1, na.rm = TRUE),
+            ipd = sum(opd_ipd == 2, na.rm = TRUE)) %>%
+  mutate(oipd = factor(
+    case_when(opd > 0 & ipd > 0  ~ 3,
+              opd > 0 & ipd == 0  ~ 1,
+              opd == 0 & ipd > 0  ~ 2),
+    levels = 1:3,
+    labels = c('OPD', 'IPD', 'OPD+IPD')
+  )) %>% 
+  group_by(province, period, oipd) %>%
+  tally()
+
+df_lc22 <- lcsec2 %>%
+  mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
+  #group_by(province, cfid, period) %>%
+  mutate(reinfect = factor(ifelse(l22pcr==1|l22atk==1,1,2 ),levels=1:2, labels =c('Yes','No'))
+   ) %>% 
+  group_by(province, period, reinfect) %>%
+  tally()
+
+
+df_lc3dx <- lcsec3 %>%
+  select(
+    l3ipd_opd,
+    l35isdiaxcardio,
+    l35isdiaxendo,
+    l35infect,
+    l35gas,
+    l35pulmonary,
+    l35renal,
+    l35isdiaxderma,
+    l35muscle,
+    l35mental,
+    l35neuro,
+    l35cancer
+  ) %>%
+  droplevels() %>%
+  rename_with(~ str_replace(., "s2dx", ""), starts_with("s2dx")) %>%
+  rename(
+    l35isdiaxcardio = 'Cardiovascular' ,
+    l35isdiaxendo = 'Endocrine',
+    l35infect = 'Infections',
+    l35gas = 'Gastro-intestinal' ,
+    l35pulmonary = 'Pulmonary' ,
+    l35renal = 'Renal' ,
+    l35isdiaxderma = 'Dermatological' ,
+    l35muscle = 'Musculoskeletal',
+    l35mental = 'Mental health abnormality' ,
+    l35neuro = 'Neurological' ,
+    l35cancer = 'Cancer'
+  ) %>% 
+  filter(finalresult %in% c('Positive', 'Negative'))
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
@@ -1474,9 +1529,16 @@ save(
     "df_lc2",
     "df_lc3",
     "df_lc4",
-    "df_lc5"),
+    "df_lc5",
+    "df_lc6",
+    "df_lc21",
+    "df_lc22"),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
 
-
+save(
+  list = c(
+    "df_lc21",
+    "df_lc22"),
+  file = paste0(data_folder, "/CFDashboardTest.RData"))
 
