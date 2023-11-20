@@ -1182,10 +1182,10 @@ df_lc1 <- lcsec1 %>%
   mutate(fu4 = !is.na(fu4)) %>% 
   select(-cfid) %>% 
   set_variable_labels(
-    fu1 = 'Follow up # 1',
-    fu2 = 'Follow up # 2',
-    fu3 = 'Follow up # 3',
-    fu4 = 'Follow up # 4'
+    fu1 = '1st follow-up period',
+    fu2 = '2nd follow-up period',
+    fu3 = '3th follow-up period',
+    fu4 = '4th follow-up period'
   )
 
 
@@ -1322,7 +1322,7 @@ df_lc6 <- lcsec1 %>%
   group_by(province, period, severe) %>%
   tally()
 
-<<<<<<< HEAD
+
 df_lc21 <- lcsec21 %>%
   mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
   group_by(province, cfid, period) %>%
