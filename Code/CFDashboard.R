@@ -1346,37 +1346,37 @@ df_lc22 <- lcsec2 %>%
   tally()
 
 
-df_lc3dx <- lcsec3 %>%
-  select(
-    l3ipd_opd,
-    l35isdiaxcardio,
-    l35isdiaxendo,
-    l35infect,
-    l35gas,
-    l35pulmonary,
-    l35renal,
-    l35isdiaxderma,
-    l35muscle,
-    l35mental,
-    l35neuro,
-    l35cancer
-  ) %>%
-  droplevels() %>%
-  rename_with(~ str_replace(., "s2dx", ""), starts_with("s2dx")) %>%
-  rename(
-    l35isdiaxcardio = 'Cardiovascular' ,
-    l35isdiaxendo = 'Endocrine',
-    l35infect = 'Infections',
-    l35gas = 'Gastro-intestinal' ,
-    l35pulmonary = 'Pulmonary' ,
-    l35renal = 'Renal' ,
-    l35isdiaxderma = 'Dermatological' ,
-    l35muscle = 'Musculoskeletal',
-    l35mental = 'Mental health abnormality' ,
-    l35neuro = 'Neurological' ,
-    l35cancer = 'Cancer'
-  ) %>% 
-  filter(finalresult %in% c('Positive', 'Negative'))
+# df_lc3dx <- lcsec3 %>%
+#   select(
+#     l3ipd_opd,
+#     l35isdiaxcardio,
+#     l35isdiaxendo,
+#     l35infect,
+#     l35gas,
+#     l35pulmonary,
+#     l35renal,
+#     l35isdiaxderma,
+#     l35muscle,
+#     l35mental,
+#     l35neuro,
+#     l35cancer
+#   ) %>%
+#   droplevels() %>%
+#   rename_with(~ str_replace(., "l35", ""), starts_with("l35")) %>%
+#   rename(
+#     l35isdiaxcardio = 'Cardiovascular' ,
+#     l35isdiaxendo = 'Endocrine',
+#     l35infect = 'Infections',
+#     l35gas = 'Gastro-intestinal' ,
+#     l35pulmonary = 'Pulmonary' ,
+#     l35renal = 'Renal' ,
+#     l35isdiaxderma = 'Dermatological' ,
+#     l35muscle = 'Musculoskeletal',
+#     l35mental = 'Mental health abnormality' ,
+#     l35neuro = 'Neurological' ,
+#     l35cancer = 'Cancer'
+#   ) %>% 
+#   filter(finalresult %in% c('Positive', 'Negative'))
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
