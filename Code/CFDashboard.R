@@ -1322,7 +1322,6 @@ df_lc6 <- lcsec1 %>%
   group_by(province, period, severe) %>%
   tally()
 
-
 df_lc21 <- lcsec21 %>%
   mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
   group_by(province, cfid, period) %>%
@@ -1378,8 +1377,6 @@ df_lc22 <- lcsec2 %>%
 #     l35cancer = 'Cancer'
 #   ) %>% 
 #   filter(finalresult %in% c('Positive', 'Negative'))
-=======
->>>>>>> 5132a6b74766900223df15fac75e4c7c9a716783
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
@@ -1532,9 +1529,16 @@ save(
     "df_lc2",
     "df_lc3",
     "df_lc4",
-    "df_lc5"),
+    "df_lc5",
+    "df_lc6",
+    "df_lc21",
+    "df_lc22"),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
 
-
+save(
+  list = c(
+    "df_lc21",
+    "df_lc22"),
+  file = paste0(data_folder, "/CFDashboardTest.RData"))
 
