@@ -1293,12 +1293,13 @@ df_lc5 <- lcsec1 %>%
     l1antithrom ='Antithrombotic/anticoagulation'
     
   )
-
+# depress
 df_lc6 <- lcsec1 %>%
   drop_na(l19_1interest:l19_9dead) %>%
   rename_with( ~ str_replace(., "l19_", "l_")) %>%
-  mutate(period = 0) %>%
+  mutate(period = 'Baseline') %>%
   select(province, period, l_1interest:l_9dead) %>%
+  mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
   rbind(
     lcsec2 %>%
       drop_na(l25_1interest:l25_9dead) %>%
@@ -1323,7 +1324,7 @@ df_lc6 <- lcsec1 %>%
   tally()
 
 df_lc21 <- lcsec21 %>%
-  mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
+  mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
   group_by(province, cfid, period) %>%
   summarise(opd = sum(opd_ipd == 1, na.rm = TRUE),
             ipd = sum(opd_ipd == 2, na.rm = TRUE)) %>%
@@ -1338,7 +1339,7 @@ df_lc21 <- lcsec21 %>%
   tally()
 
 df_lc22 <- lcsec2 %>%
-  mutate(period =factor(l2period,labels = c('FU 1','FU 2','FU 3','FU 4'))) %>% 
+  mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
   #group_by(province, cfid, period) %>%
   mutate(reinfect = factor(ifelse(l22pcr==1|l22atk==1,1,2 ),levels=1:2, labels =c('Yes','No'))
    ) %>% 
