@@ -1297,9 +1297,8 @@ df_lc5 <- lcsec1 %>%
 df_lc6 <- lcsec1 %>%
   drop_na(l19_1interest:l19_9dead) %>%
   rename_with( ~ str_replace(., "l19_", "l_")) %>%
-  mutate(period = 'Baseline') %>%
+  mutate(period = 0) %>%
   select(province, period, l_1interest:l_9dead) %>%
-  mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
   rbind(
     lcsec2 %>%
       drop_na(l25_1interest:l25_9dead) %>%
@@ -1318,7 +1317,7 @@ df_lc6 <- lcsec1 %>%
         "Moderately Severe",
         "Severe"
       )
-    )
+    ), period =factor(period,labels = c('Baseline','Period 1','Period 2','Period 3','Period 4'))
   ) %>%
   group_by(province, period, severe) %>%
   tally()
