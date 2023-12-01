@@ -1317,10 +1317,25 @@ df_lc6 <- lcsec1 %>%
         "Moderately Severe",
         "Severe"
       )
-    ), period =factor(period,labels = c('Baseline','Period 1','Period 2','Period 3','Period 4'))
+   )
+   # ), period =factor(period,labels = c('Baseline','Period 1','Period 2','Period 3','Period 4'))
   ) %>%
   group_by(province, period, severe) %>%
   tally()
+n0 <- sum(filter(df_lc6,period == 0)$n,na.rm=TRUE)
+n1 <- sum(filter(df_lc6,period == 1)$n,na.rm=TRUE)
+n2 <- sum(filter(df_lc6,period == 2)$n,na.rm=TRUE)
+n3 <- sum(filter(df_lc6,period == 3)$n,na.rm=TRUE)
+n4 <- sum(filter(df_lc6,period == 4)$n,na.rm=TRUE)
+
+df_lc6 <- df_lc6 %>%
+  mutate(period = factor(period, levels = 0:4 ,labels = c(
+     paste0('Baseline (n=', n0, ')'),
+     paste0('Period 1 (n=', n1, ')'),
+     paste0('Period 2 (n=', n2, ')'),
+     paste0('Period 3 (n=', n3, ')'),
+     paste0('Period 4 (n=', n4, ')')
+  )))
 
 df_lc21 <- lcsec21 %>%
   mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
@@ -1338,45 +1353,75 @@ df_lc21 <- lcsec21 %>%
   tally()
 
 df_lc22 <- lcsec2 %>%
-  mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
-  #group_by(province, cfid, period) %>%
-  mutate(reinfect = factor(ifelse(l22pcr==1|l22atk==1,1,2 ),levels=1:2, labels =c('Yes','No'))
-   ) %>% 
+  mutate(period =l2period ,
+         reinfect = factor(
+           case_when(
+             l22pcr == 1|l22atk == 1 ~ 1,
+             TRUE  ~ 2 
+            ),
+           levels = 1:2,
+           labels = c('Yes', 'No')
+         )
+  ) %>% 
   group_by(province, period, reinfect) %>%
   tally()
 
 
-# df_lc3dx <- lcsec3 %>%
-#   select(
-#     l3ipd_opd,
-#     l35isdiaxcardio,
-#     l35isdiaxendo,
-#     l35infect,
-#     l35gas,
-#     l35pulmonary,
-#     l35renal,
-#     l35isdiaxderma,
-#     l35muscle,
-#     l35mental,
-#     l35neuro,
-#     l35cancer
-#   ) %>%
-#   droplevels() %>%
-#   rename_with(~ str_replace(., "l35", ""), starts_with("l35")) %>%
-#   rename(
-#     l35isdiaxcardio = 'Cardiovascular' ,
-#     l35isdiaxendo = 'Endocrine',
-#     l35infect = 'Infections',
-#     l35gas = 'Gastro-intestinal' ,
-#     l35pulmonary = 'Pulmonary' ,
-#     l35renal = 'Renal' ,
-#     l35isdiaxderma = 'Dermatological' ,
-#     l35muscle = 'Musculoskeletal',
-#     l35mental = 'Mental health abnormality' ,
-#     l35neuro = 'Neurological' ,
-#     l35cancer = 'Cancer'
-#   ) %>% 
-#   filter(finalresult %in% c('Positive', 'Negative'))
+df_lc3dx <- lcsec3 %>%
+  select(
+    cfid,
+    l3period,
+    province,
+    l35isdiaxcardio,
+    l35isdiaxendo,
+    l35infect,
+    l35gas,
+    l35pulmonary,
+    l35renal,
+    l35isdiaxderma,
+    l35muscle,
+    l35mental,
+    l35neuro,
+    l35cancer
+  ) %>%
+  #  droplevels() %>%
+  rename_with( ~ str_replace(., "l35", ""), starts_with("l35")) %>%
+  mutate(period = factor(l3period, labels = c(
+    'Period 1', 'Period 2', 'Period 3', 'Period 4'
+  ))) %>%
+  group_by(cfid, period, province) %>%
+  summarise(
+    isdiaxcardio = min(isdiaxcardio, na.rm = TRUE),
+    isdiaxendo = min(isdiaxendo, na.rm = TRUE),
+    infect = min(infect, na.rm = TRUE),
+    gas = min(gas, na.rm = TRUE),
+    pulmonary = min(pulmonary, na.rm = TRUE),
+    renal = min(renal, na.rm = TRUE),
+    isdiaxderma = min(isdiaxderma, na.rm = TRUE),
+    muscle = min(muscle, na.rm = TRUE),
+    mental = min(mental, na.rm = TRUE),
+    neuro = min(neuro, na.rm = TRUE) ,
+    cancer = min(cancer, na.rm = TRUE)
+  )        %>%
+  ungroup() %>%
+  mutate(across(c(isdiaxcardio:cancer),
+                ~ na_if(., Inf))) %>% 
+  group_by(period,province) %>% 
+  summarise()
+  set_variable_labels(
+    isdiaxcardio = 'Cardiovascular' ,
+    isdiaxendo = 'Endocrine',
+    infect = 'Infections',
+    gas = 'Gastro-intestinal' ,
+    pulmonary = 'Pulmonary' ,
+    renal = 'Renal' ,
+    isdiaxderma = 'Dermatological' ,
+    muscle = 'Musculoskeletal',
+    mental = 'Mental health abnormality' ,
+    neuro = 'Neurological' ,
+    cancer = 'Cancer'
+   )
+
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
 #-------------------------------------------------------------------------------
