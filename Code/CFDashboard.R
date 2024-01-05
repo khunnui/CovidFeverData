@@ -1402,12 +1402,11 @@ df_lc3dx <- lcsec3 %>%
     mental = min(mental, na.rm = TRUE),
     neuro = min(neuro, na.rm = TRUE) ,
     cancer = min(cancer, na.rm = TRUE)
-  )        %>%
-  ungroup() %>%
-  mutate(across(c(isdiaxcardio:cancer),
-                ~ na_if(., Inf))) %>% 
+  ) %>%
+  ungroup(.) %>%
+  mutate(across(c(isdiaxcardio:cancer), ~ na_if(., Inf))) %>% 
   group_by(period,province) %>% 
-  summarise()
+  summarise(across(isdiaxcardio:cancer,~sum(.==1,na.rm = TRUE))) %>% 
   set_variable_labels(
     isdiaxcardio = 'Cardiovascular' ,
     isdiaxendo = 'Endocrine',
@@ -1577,7 +1576,8 @@ save(
     "df_lc5",
     "df_lc6",
     "df_lc21",
-    "df_lc22"),
+    "df_lc22",
+    "df_lc3dx"),
   file = paste0(data_folder, "/CFDashboard.RData")
 )
 
