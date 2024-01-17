@@ -1407,19 +1407,22 @@ df_lc3dx <- lcsec3 %>%
   mutate(across(c(isdiaxcardio:cancer), ~ na_if(., Inf))) %>% 
   group_by(period,province) %>% 
   summarise(across(isdiaxcardio:cancer,~sum(.==1,na.rm = TRUE))) %>% 
-  set_variable_labels(
-    isdiaxcardio = 'Cardiovascular' ,
-    isdiaxendo = 'Endocrine',
-    infect = 'Infections',
-    gas = 'Gastro-intestinal' ,
-    pulmonary = 'Pulmonary' ,
-    renal = 'Renal' ,
-    isdiaxderma = 'Dermatological' ,
-    muscle = 'Musculoskeletal',
-    mental = 'Mental health abnormality' ,
-    neuro = 'Neurological' ,
-    cancer = 'Cancer'
-   )
+  rename(
+    'Cardiovascular' = isdiaxcardio,
+    'Endocrine' = isdiaxendo,
+    'Infections' = infect,
+    'Gastro-intestinal' = gas,
+    'Pulmonary' = pulmonary,
+    'Renal' = renal,
+    'Dermatological' = isdiaxderma,
+    'Musculoskeletal' = muscle,
+    'Mental health abnormality' = mental,
+    'Neurological' = neuro,
+    'Cancer' = cancer
+   ) %>% 
+  pivot_longer(cols = Cardiovascular:Cancer,
+               names_to = "Diagnosis",
+               values_to = "y")
 
 #-------------------------------------------------------------------------------
 # Save data frames for dashboard in one data file (CFDashboard.RData)
