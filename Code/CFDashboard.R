@@ -1163,12 +1163,24 @@ df_kap4 <-
 
 #-------------------------------------------------------------------------------
 #Long COVID data
+
 #-------------------------------------------------------------------------------
 
 
 #-------------------------------------------------------------------------------
+
+
 #Long COVID section1 no. patient
+
+
 #-------------------------------------------------------------------------------
+lcsec2allfu <- lcsec2 %>% 
+  select(cfid, province, l2period) %>%
+  filter(l2period == 4)
+lcsec2allfu <- lcsec2 %>% 
+  inner_join(lcsec2allfu , by = 'cfid')  
+
+
 
 df_lc1 <- lcsec1 %>%
   select(cfid, province, period) %>%
@@ -1293,14 +1305,16 @@ df_lc5 <- lcsec1 %>%
     l1antithrom ='Antithrombotic/anticoagulation'
     
   )
-# depress
+# depress 1
 df_lc6 <- lcsec1 %>%
+  filter(l19contactstatus==1) %>% 
   drop_na(l19_1interest:l19_9dead) %>%
   rename_with( ~ str_replace(., "l19_", "l_")) %>%
   mutate(period = 0) %>%
   select(province, period, l_1interest:l_9dead) %>%
   rbind(
     lcsec2 %>%
+      filter(l2contactstatus==1) %>% 
       drop_na(l25_1interest:l25_9dead) %>%
       rename_with( ~ str_replace(., "l25_", "l_")) %>% 
       select(province, period = l2period, l_1interest:l_9dead)
@@ -1322,12 +1336,12 @@ df_lc6 <- lcsec1 %>%
   ) %>%
   group_by(province, period, severe) %>%
   tally()
-n0 <- sum(filter(df_lc6,period == 0)$n,na.rm=TRUE)
-n1 <- sum(filter(df_lc6,period == 1)$n,na.rm=TRUE)
-n2 <- sum(filter(df_lc6,period == 2)$n,na.rm=TRUE)
-n3 <- sum(filter(df_lc6,period == 3)$n,na.rm=TRUE)
-n4 <- sum(filter(df_lc6,period == 4)$n,na.rm=TRUE)
-
+n0 <- nrow(subset(lcsec1,l19contactstatus == 1))
+n1 <- nrow(subset(lcsec2,l2period == 1 & l2contactstatus == 1 ))
+n2 <- nrow(subset(lcsec2,l2period == 2 & l2contactstatus == 1))
+n3 <- nrow(subset(lcsec2,l2period == 3 & l2contactstatus == 1))
+n4 <- nrow(subset(lcsec2,l2period == 4 & l2contactstatus == 1))
+#sum(filter(df_lc6,period == 2)$n,na.rm=TRUE)
 df_lc6 <- df_lc6 %>%
   mutate(period = factor(period, levels = 0:4 ,labels = c(
      paste0('Baseline (n=', n0, ')'),
@@ -1337,9 +1351,92 @@ df_lc6 <- df_lc6 %>%
      paste0('Period 4 (n=', n4, ')')
   )))
 
+# Count Section1 in Section2 for mental health interview
+df_lc61 <-lcsec1 %>%
+  select(cfid,l19contactstatus) %>% 
+  filter(l19contactstatus==1) %>% 
+  left_join(lcsec2 %>% filter(l2contactstatus==1), by = 'cfid') %>% 
+  drop_na(l25_1interest:l25_9dead) %>%
+  rename_with( ~ str_replace(., "l25_", "l_")) %>% 
+  select(province, period = l2period, l_1interest:l_9dead
+  ) %>% 
+  mutate(
+    severe = cut(
+      rowSums(select(., l_1interest:l_9dead), na.rm = TRUE),
+      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
+      labels = c(
+        "No Depression",
+        "Minimal",
+        "Mild",
+        "Moderate",
+        "Moderately Severe",
+        "Severe"
+      )
+    )
+    # ), period =factor(period,labels = c('Baseline','Period 1','Period 2','Period 3','Period 4'))
+  ) %>%
+  group_by(province, period, severe) 
+ 
+
+# depress 2 - only who has baseline
+df_lc62 <-
+  lcsec1 %>%
+  filter(l19contactstatus==1) %>% 
+  drop_na(l19_1interest:l19_9dead) %>%
+  rename_with( ~ str_replace(., "l19_", "l_")) %>%
+  mutate(period = 0) %>%
+  select(province, period, l_1interest:l_9dead) %>%
+  rbind(
+        lcsec1 %>%
+        select(cfid,l19contactstatus) %>% 
+        filter(l19contactstatus==1) %>% 
+        left_join(lcsec2 %>% filter(l2contactstatus==1), by = 'cfid') %>% 
+        drop_na(l25_1interest:l25_9dead) %>%
+        rename_with( ~ str_replace(., "l25_", "l_")) %>% 
+        select(province, period = l2period, l_1interest:l_9dead)
+        ) %>% 
+  mutate(
+    severe = cut(
+      rowSums(select(., l_1interest:l_9dead), na.rm = TRUE),
+      breaks = c(-Inf, 0, 4, 9, 14, 19, Inf),
+      labels = c(
+        "No Depression",
+        "Minimal",
+        "Mild",
+        "Moderate",
+        "Moderately Severe",
+        "Severe"
+      )
+    )
+    # ), period =factor(period,labels = c('Baseline','Period 1','Period 2','Period 3','Period 4'))
+  ) %>%
+  group_by(province, period, severe) %>%
+  tally()
+n0 <- nrow(subset(lcsec1,l19contactstatus ==1))
+n1 <- nrow(subset(df_lc61,period ==1 ))
+n2 <- nrow(subset(df_lc61,period ==2))
+n3 <- nrow(subset(df_lc61,period ==3))
+n4 <- nrow(subset(df_lc61,period ==4))
+#sum(filter(df_lc6,period == 2)$n,na.rm=TRUE)
+df_lc62 <- df_lc62 %>%
+  mutate(period = factor(period, levels = 0:4 ,labels = c(
+    paste0('Baseline (n=', n0, ')'),
+    paste0('Period 1 (n=', n1, ')'),
+    paste0('Period 2 (n=', n2, ')'),
+    paste0('Period 3 (n=', n3, ')'),
+    paste0('Period 4 (n=', n4, ')')
+  )))
+
+#------------------------------------- 
+# Revisit follow up
+#-------------------------------------
+
 df_lc21 <- lcsec21 %>%
+  left_join(lcsec2 %>% group_by(cfid) %>% 
+              summarise(completefu = ifelse(max(l2period,na.rm = TRUE)==4,1,0)) %>% 
+              ungroup(),by="cfid") %>%
   mutate(period =factor(l2period,labels = c('Period 1','Period 2','Period 3','Period 4'))) %>% 
-  group_by(province, cfid, period) %>%
+  group_by(province, cfid, period, completefu) %>%
   summarise(opd = sum(opd_ipd == 1, na.rm = TRUE),
             ipd = sum(opd_ipd == 2, na.rm = TRUE)) %>%
   mutate(oipd = factor(
@@ -1349,10 +1446,17 @@ df_lc21 <- lcsec21 %>%
     levels = 1:3,
     labels = c('OPD', 'IPD', 'OPD+IPD')
   )) %>% 
-  group_by(province, period, oipd) %>%
+  group_by(province, period, oipd, completefu) %>%
   tally()
 
+#------------------------------------- 
+# Reinfections
+#-------------------------------------
+
 df_lc22 <- lcsec2 %>%
+  left_join(lcsec2 %>% group_by(cfid) %>% 
+  summarise(completefu = ifelse(max(l2period,na.rm = TRUE)==4,1,0)) %>% 
+  ungroup(),by="cfid") %>%
   mutate(period =l2period ,
          reinfect = factor(
            case_when(
@@ -1363,8 +1467,9 @@ df_lc22 <- lcsec2 %>%
            labels = c('Yes', 'No')
          )
   ) %>% 
-  group_by(province, period, reinfect) %>%
+  group_by(province, period, reinfect, completefu) %>%
   tally()
+
 
 
 df_lc3dx <- lcsec3 %>%
@@ -1389,7 +1494,10 @@ df_lc3dx <- lcsec3 %>%
   mutate(period = factor(l3period, labels = c(
     'Period 1', 'Period 2', 'Period 3', 'Period 4'
   ))) %>%
-  group_by(cfid, period, province) %>%
+  left_join(lcsec2 %>% group_by(cfid) %>% 
+              summarise(completefu = ifelse(max(l2period,na.rm = TRUE)==4,1,0)) %>% 
+              ungroup(),by="cfid") %>%
+  group_by(cfid, period, province,completefu) %>%
   summarise(
     isdiaxcardio = min(isdiaxcardio, na.rm = TRUE),
     isdiaxendo = min(isdiaxendo, na.rm = TRUE),
@@ -1405,7 +1513,7 @@ df_lc3dx <- lcsec3 %>%
   ) %>%
   ungroup(.) %>%
   mutate(across(c(isdiaxcardio:cancer), ~ na_if(., Inf))) %>% 
-  group_by(period,province) %>% 
+  group_by(period,province,completefu) %>% 
   summarise(across(isdiaxcardio:cancer,~sum(.==1,na.rm = TRUE))) %>% 
   rename(
     'Cardiovascular' = isdiaxcardio,
@@ -1572,12 +1680,14 @@ save(
     "df_kap3",
     "df_kap4",
     "lcddate",
+    "lcsec2allfu",
     "df_lc1",
     "df_lc2",
     "df_lc3",
     "df_lc4",
     "df_lc5",
     "df_lc6",
+    "df_lc62",
     "df_lc21",
     "df_lc22",
     "df_lc3dx"),
