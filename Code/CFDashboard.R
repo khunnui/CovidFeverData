@@ -1305,7 +1305,7 @@ df_lc5 <- lcsec1 %>%
     l1antithrom ='Antithrombotic/anticoagulation'
     
   )
-# depress 1
+# depress 1 (all patients with interview at all period)
 df_lc6 <- lcsec1 %>%
   filter(l19contactstatus==1) %>% 
   drop_na(l19_1interest:l19_9dead) %>%
