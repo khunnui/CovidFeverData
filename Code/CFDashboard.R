@@ -1217,7 +1217,7 @@ df_lc2 <- lcsec1 %>%
     l1severegrade = factor(l1severegrade,levels=c(1:4),labels = c('Mild','Moderate', 'Severe','Critical'))
   ) %>% 
   set_variable_labels(
-    l1severegrade = 'Severeity'
+    l1severegrade = 'Severity'
   )
 
 
