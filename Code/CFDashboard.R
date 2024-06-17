@@ -1215,11 +1215,10 @@ df_lc2 <- lcsec1 %>%
   select(l1severegrade, province) %>%
   mutate(
     l1severegrade = factor(l1severegrade,levels=c(1:4),labels = c('Mild','Moderate', 'Severe','Critical'))
+  ) %>% 
+  set_variable_labels(
+    l1severegrade = 'Severity'
   )
-# %>% 
-#  set_variable_labels(
-#    l1severegrade = 'Severity'
-#  )
 
 
 df_lc3 <- lcsec1 %>%
