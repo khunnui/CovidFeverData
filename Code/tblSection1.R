@@ -92,6 +92,12 @@ tblSection1 <- tblSection1 %>%
       levels = c(1, 2),
       labels = c("Male", "Female")
     ),
+    
+    nationality = factor(
+      s1nationality,
+      levels = c(1, 2, 3, 4, 5, 6, 7),
+      labels = c('Thai', 'Non-Thai', 'Non-Thai', 'Non-Thai', 'Non-Thai', 'Non-Thai', 'Non-Thai')),
+    
     s1nationality = factor(
       s1nationality,
       levels = c(1, 2, 3, 4, 5, 6, 7),
@@ -121,7 +127,7 @@ tblSection1 <- tblSection1 %>%
       levels = c(1, 2, 3),
       labels = c('Yes', 'Yes but not enough', 'No')
     ),
-    rps = rowSums(across(s1cough:s1sputumprod), na.rm = TRUE) >= 1
+    rps = rowSums(across(s1cough:s1sputumprod), na.rm = TRUE) >= 1 
   ) %>%
   
   # delete unused columns

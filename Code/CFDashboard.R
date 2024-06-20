@@ -38,12 +38,12 @@ source(paste0(code_folder, "/Functions.R"))
 
 df_scrw <- tblSection1 %>%
   mutate(scrdate = floor_date(s1screendate, "week", week_start = 1)) %>%
-  group_by(province, hospital, scrdate) %>%
+  group_by(province, hospital, rps, scrdate) %>%
   tally()
 
 df_scrm <- tblSection1 %>%
   mutate(scrdate = floor_date(s1screendate, "month")) %>%
-  group_by(province, hospital, scrdate) %>%
+  group_by(province, hospital,rps, scrdate) %>%
   tally()
 
 df_scrage0 <- tblSection1 %>%
@@ -81,12 +81,16 @@ df_scrage2 <- tblSection1 %>%
     max = max(s1age_year, na.rm = TRUE)
   )
 
+df_scragestat <- tblSection1 %>%
+  select (province, hospital,rps, nationality, s1age_year)  
+   
+
 df_scrage <- tblSection1 %>%
-  group_by(province, hospital, agegroup) %>%
+  group_by(province, hospital,rps, agegroup) %>%
   tally()
 
 df_scrgender <- tblSection1 %>%
-  group_by(province, hospital, s1gender) %>%
+  group_by(province, hospital,rps, s1gender) %>%
   tally()
 
 #-------------------------------------------------------------------------------
