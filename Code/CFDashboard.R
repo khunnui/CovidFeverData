@@ -1558,6 +1558,7 @@ save(
     "df_scrage0",
     "df_scrage1",
     "df_scrage2",
+    "df_scragestat",
     "df_scrgender",
     "df_eliw",
     "df_elim",
