@@ -3,7 +3,7 @@
 # Created 3/7/2022
 #-------------------------------------------------------------------------------
 tblSection1 <- tblSection1 %>%
-  
+ 
   # Rename all column names to lowercase
   rename_all(tolower) %>%
   rename(last_edit_date = `_lasteditdate`) %>% 
@@ -131,5 +131,4 @@ tblSection1 <- tblSection1 %>%
   ) %>%
   
   # delete unused columns
-  select(-s1hospitalid)
-
+  select(-s1hospitalid) 

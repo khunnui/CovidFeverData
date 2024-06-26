@@ -38,59 +38,59 @@ source(paste0(code_folder, "/Functions.R"))
 
 df_scrw <- tblSection1 %>%
   mutate(scrdate = floor_date(s1screendate, "week", week_start = 1)) %>%
-  group_by(province, hospital, rps, scrdate) %>%
+  group_by(province, hospital, rps, nationality, scrdate) %>%
   tally()
 
 df_scrm <- tblSection1 %>%
   mutate(scrdate = floor_date(s1screendate, "month")) %>%
-  group_by(province, hospital,rps, scrdate) %>%
+  group_by(province, hospital,rps,nationality,  scrdate) %>%
   tally()
 
-df_scrage0 <- tblSection1 %>%
-  summarize(
-    n = n(),
-    min = min(s1age_year, na.rm = TRUE),
-    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
-    median = median(s1age_year, na.rm = TRUE),
-    mean = round(mean(s1age_year, na.rm = TRUE), 1),
-    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
-    max = max(s1age_year, na.rm = TRUE)
-  )
-
-df_scrage1 <- tblSection1 %>%
-  group_by(province) %>%
-  summarize(
-    n = n(),
-    min = min(s1age_year, na.rm = TRUE),
-    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
-    median = median(s1age_year, na.rm = TRUE),
-    mean = round(mean(s1age_year, na.rm = TRUE), 1),
-    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
-    max = max(s1age_year, na.rm = TRUE)
-  )
-
-df_scrage2 <- tblSection1 %>%
-  group_by(hospital) %>%
-  summarize(
-    n = n(),
-    min = min(s1age_year, na.rm = TRUE),
-    q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
-    median = median(s1age_year, na.rm = TRUE),
-    mean = round(mean(s1age_year, na.rm = TRUE), 1),
-    q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
-    max = max(s1age_year, na.rm = TRUE)
-  )
+# df_scrage0 <- tblSection1 %>%
+#   summarize(
+#     n = n(),
+#     min = min(s1age_year, na.rm = TRUE),
+#     q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+#     median = median(s1age_year, na.rm = TRUE),
+#     mean = round(mean(s1age_year, na.rm = TRUE), 1),
+#     q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+#     max = max(s1age_year, na.rm = TRUE)
+#   )
+# 
+# df_scrage1 <- tblSection1 %>%
+#   group_by(province) %>%
+#   summarize(
+#     n = n(),
+#     min = min(s1age_year, na.rm = TRUE),
+#     q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+#     median = median(s1age_year, na.rm = TRUE),
+#     mean = round(mean(s1age_year, na.rm = TRUE), 1),
+#     q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+#     max = max(s1age_year, na.rm = TRUE)
+#   )
+# 
+# df_scrage2 <- tblSection1 %>%
+#   group_by(hospital) %>%
+#   summarize(
+#     n = n(),
+#     min = min(s1age_year, na.rm = TRUE),
+#     q1 = quantile(s1age_year, 0.25, na.rm = TRUE),
+#     median = median(s1age_year, na.rm = TRUE),
+#     mean = round(mean(s1age_year, na.rm = TRUE), 1),
+#     q3 = quantile(s1age_year, 0.75, na.rm = TRUE),
+#     max = max(s1age_year, na.rm = TRUE)
+#   )
 
 df_scragestat <- tblSection1 %>%
   select (province, hospital,rps, nationality, s1age_year)  
    
 
 df_scrage <- tblSection1 %>%
-  group_by(province, hospital,rps, agegroup) %>%
+  group_by(province, hospital,rps,nationality,  agegroup) %>%
   tally()
 
 df_scrgender <- tblSection1 %>%
-  group_by(province, hospital,rps, s1gender) %>%
+  group_by(province, hospital,rps,nationality,  s1gender) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -100,41 +100,41 @@ df_scrgender <- tblSection1 %>%
 df_eliw <- tblSection1 %>%
   filter(s1eligible == TRUE) %>% # Eligible only
   mutate(scrdate = floor_date(s1screendate, "week", week_start = 1)) %>%
-  group_by(province, hospital, rps, scrdate) %>%
+  group_by(province, hospital, rps, nationality, scrdate) %>%
   tally()
 
 df_elim <- tblSection1 %>%
   filter(s1eligible == TRUE) %>% # Eligible only
   mutate(scrdate = floor_date(s1screendate, "month")) %>%
-  group_by(province, hospital, rps, scrdate) %>%
+  group_by(province, hospital, rps, nationality, scrdate) %>%
   tally()
 
 df_enrw <- CFMast %>%
   mutate(enrdate = floor_date(s1enrolldate, "week", week_start = 1)) %>%
-  group_by(province, hospital, rps, enrdate, finalresult) %>%
+  group_by(province, hospital, rps, nationality, enrdate, finalresult) %>%
   tally()
 
 df_enrm <- CFMast %>%
   mutate(enrdate = floor_date(s1enrolldate, "month")) %>%
-  group_by(province, hospital, rps, enrdate, finalresult) %>%
+  group_by(province, hospital, rps, nationality, enrdate, finalresult) %>%
   tally()
 
 df_pos3wk <- CFMast %>%
   filter(testdate > Sys.Date() - 22) %>%
-  group_by(province, hospital, rps, finalresult) %>%
+  group_by(province, hospital, rps,nationality, finalresult) %>%
   tally()
 
 df_enrage <- CFMast %>%
-  group_by(province, hospital, rps, agegroup) %>%
+  group_by(province, hospital, rps,nationality, agegroup) %>%
   tally()
 
 df_enrgender <- CFMast %>%
-  group_by(province, hospital, rps, s1gender) %>%
+  group_by(province, hospital, rps, nationality,s1gender) %>%
   tally()
 
 df_enrocc <- CFMast %>%
   mutate(s34occupation = replace(s34occupation, s34occupation == "Other farmer", "Farmer")) %>%
-  group_by(province, hospital, rps, s34occupation) %>%
+  group_by(province, hospital, rps, nationality, s34occupation) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -145,6 +145,7 @@ df_dx <- CFMast %>%
   select(province,
          hospital,
          rps,
+         nationality,
          finalresult,
          s2dxfever:s2dxother,
          s2dxmeningitis) %>%
@@ -268,6 +269,7 @@ df_ss <- CFMast %>%
     province,
     hospital,
     rps,
+    nationality,
     finalresult,
     s2temp,
     s32headache,
@@ -343,9 +345,9 @@ df_ss <- CFMast %>%
 
 df_ss_b <- 
   tblSection3 %>%
-  left_join(tblSection1 %>% select(cfid,rps), by = 'cfid') %>% 
+  left_join(tblSection1 %>% select(cfid,rps,nationality), by = 'cfid') %>% 
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
-  select(s32headache:s32other, rps, -c(ends_with("d"))) %>%
+  select(s32headache:s32other, rps, -c(ends_with("d")), nationality) %>%
   rename_all(~stringr::str_replace(.,"^s32","")) %>% 
   mutate(   visit ='Baseline') %>% 
   replace(is.na(.), FALSE)
@@ -353,9 +355,9 @@ df_ss_b <-
 
 df_ss_f <- 
   tblSection8 %>% filter(s8isfu %in% c(1,3)) %>%
-  left_join(tblSection1 %>% select(cfid,rps), by = 'cfid') %>% 
+  left_join(tblSection1 %>% select(cfid,rps,nationality), by = 'cfid') %>% 
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
-  select(s8headache:s8other, rps) %>%
+  select(s8headache:s8other, rps,nationality) %>%
   rename_all(~stringr::str_replace(.,"^s8","")) %>% 
   mutate(    visit ='F/U') %>% 
   replace(is.na(.), FALSE)
@@ -402,11 +404,12 @@ df_signBox <- CFMast %>%
          province,
          hospital,
          rps,
+         nationality,
          s5covidpos,
          s5intub,
          s5dischargetype) %>%
   filter(s5covidpos == 1) %>%
-  group_by(province, hospital, rps, s5intub, s5dischargetype) %>%
+  group_by(province, hospital, rps, nationality, s5intub, s5dischargetype) %>%
   tally()
 
 # ls_sign    <- get_sum_data(df_sign)
@@ -481,6 +484,7 @@ df_un <- CFMast %>%
     province,
     hospital,
     rps,
+    nationality,
     finalresult,
     s35diabetes,
     s35obesity:s35cancer,
@@ -590,6 +594,7 @@ df_rf <- CFMast %>%
     province,
     hospital,
     rps,
+    nationality,
     finalresult,
     s33suspectedcovid19:s33visithos,
     s33visticrowded:s33travelthai,
@@ -649,18 +654,18 @@ df_rf <- CFMast %>%
 # ls_rf_norps_t1 <- get_sum_data(df_rf %>% filter(hospital == "Mae Sot" & rps == FALSE))
 # ls_rf_norps_t2 <- get_sum_data(df_rf %>% filter(hospital == "Umphang" & rps == FALSE))
 # ls_rf_norps_t3 <- get_sum_data(df_rf %>% filter(hospital == "Tha Song Yang" & rps == FALSE))
-
-head = 'Risk Factors'
-
-gt_rf    <- create_table(df_rf, '', head)
-gt_rf_n  <- create_table(df_rf %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
-gt_rf_n1 <- create_table(df_rf %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
-gt_rf_n2 <- create_table(df_rf %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
-gt_rf_n3 <- create_table(df_rf %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
-gt_rf_t  <- create_table(df_rf %>% filter(province == 'Tak'), 'Tak Province', head)
-gt_rf_t1 <- create_table(df_rf %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
-gt_rf_t2 <- create_table(df_rf %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
-gt_rf_t3 <- create_table(df_rf %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
+# 
+# head = 'Risk Factors'
+# 
+# gt_rf    <- create_table(df_rf, '', head)
+# gt_rf_n  <- create_table(df_rf %>% filter(province == 'Nakorn Phanom'), 'Nakorn Phanom Province', head)
+# gt_rf_n1 <- create_table(df_rf %>% filter(hospital == 'Nakorn Phanom'), 'Nakorn Phanom Hospital', head)
+# gt_rf_n2 <- create_table(df_rf %>% filter(hospital == 'Sri Songkhram'), 'Sri Songkhram Hospital', head)
+# gt_rf_n3 <- create_table(df_rf %>% filter(hospital == 'That Phanom'), 'That Phanom Hospital', head)
+# gt_rf_t  <- create_table(df_rf %>% filter(province == 'Tak'), 'Tak Province', head)
+# gt_rf_t1 <- create_table(df_rf %>% filter(hospital == 'Mae Sot'), 'Mae Sot Hospital', head)
+# gt_rf_t2 <- create_table(df_rf %>% filter(hospital == 'Umphang'), 'Umphang Hospital', head)
+# gt_rf_t3 <- create_table(df_rf %>% filter(hospital == 'Tha Song Yang'), 'Tha Song Yang Hospital', head)
 
 # rpstext = '(RPS Only)'
 # gt_rf_rps    <- create_table(df_rf %>% filter(rps == TRUE), rpstext, head)
@@ -703,15 +708,15 @@ df_vac <- CFMast %>%
     ),
     finalresult = fct_na_value_to_level(finalresult, level = "Unknown")
   ) %>%
-  group_by(province, hospital, rps, vac, finalresult) %>%
+  group_by(province, hospital, rps, nationality,vac, finalresult) %>%
   tally()
 
 df_vac2 <- LabPCRFinal %>%
-  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps,nationality), by='cfid') %>% 
   left_join(tblSection3 %>% select(cfid, cvtime, fulltime),
             by = "cfid") %>%
   mutate(finalresult = droplevels(finalresult)) %>%
-  select(finalresult, cvtime, fulltime, province,   hospital,  rps) 
+  select(finalresult, cvtime, fulltime, province,   hospital,  rps, nationality) 
 
 
 #-------------------------------------------------------------------------------
@@ -724,6 +729,7 @@ df_atk <- CFMast %>%
          province,
          hospital,
          rps,
+         nationality,
          s33atk,
          s33atkresult1,
          s33atkresult2) %>%
@@ -735,7 +741,7 @@ df_atk <- CFMast %>%
     ),
     levels = c('Positive', 'Negative', 'Unknown')
   )) %>%
-  group_by(province, hospital, rps, atkresult) %>%
+  group_by(province, hospital, rps,nationality, atkresult) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -743,18 +749,19 @@ df_atk <- CFMast %>%
 #-------------------------------------------------------------------------------
 
 df_lab <- LabPCRResult_l %>%
-  left_join(tblSection1 %>% select(cfid, rps), by="cfid") %>% 
-  group_by(province, hospital, rps, spectype, finalresult_fac) %>%
+  left_join(tblSection1 %>% select(cfid, rps,nationality), by="cfid") %>% 
+  group_by(province, hospital, rps, nationality, spectype, finalresult_fac) %>%
   tally() %>%
   rename(finalresult = finalresult_fac)
 
 df_labpos <- LabPCRResult_l %>%
-  left_join(tblSection1 %>% select(cfid, rps), by="cfid") %>% 
+  left_join(tblSection1 %>% select(cfid, rps,nationality), by="cfid") %>% 
   # Select only 4 columns (ID, type, result, and test dates)
   select(cfid,
          province,
          hospital,
          rps,
+         nationality,
          spectype,
          finalresult) %>%
   # All specimen types in one line
@@ -778,7 +785,7 @@ df_labpos <- LabPCRResult_l %>%
       TRUE                  ~ "other"
     )
   ) %>%
-  group_by(province, hospital, rps, specimens) %>%
+  group_by(province, hospital, rps, nationality, specimens) %>%
   tally()
 
 #-------------------------------------------------------------------------------
@@ -787,7 +794,7 @@ df_labpos <- LabPCRResult_l %>%
 
 df_cbc <-
   LabPCRFinal %>%
-  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps,nationality), by='cfid') %>% 
   left_join(tblSection4) %>%
   mutate(finalresult = droplevels(finalresult)) %>%
   select(
@@ -810,7 +817,8 @@ df_cbc <-
     s4creprotein, 
     province,
     hospital,
-    rps
+    rps,
+    nationality
   ) %>%
   set_variable_labels(
     s4hematocrit  = 'Hematocrit',
@@ -833,7 +841,7 @@ df_cbc <-
 
 df_cul <-
   LabPCRFinal %>%
-  left_join(tblSection1 %>%  select(cfid, province, hospital, rps), by='cfid') %>% 
+  left_join(tblSection1 %>%  select(cfid, province, hospital, rps,nationality), by='cfid') %>% 
   left_join(tblSection4) %>%
   mutate(
     finalresult = droplevels(finalresult),
@@ -870,7 +878,7 @@ df_cul <-
     o16 = rowSums(across(ends_with("org1") | ends_with("org2") | ends_with("org3"),
                         ~ . == '999'), na.rm = TRUE) > 0
   ) %>%
-  select (finalresult, o1:o16, province,  hospital,  rps) %>% 
+  select (finalresult, o1:o16, province,  hospital,  rps,nationality) %>% 
   set_variable_labels(
     o1  = 'Aerobic Gram Positive Cocci',
     o2  = 'Burkholderia pseudomallei',
@@ -907,6 +915,7 @@ df_sero1a <-
     province,
     hospital,
     rps,
+    nationality,
     finalresult,
     igminterpret,
     igginterpret,
@@ -944,6 +953,7 @@ df_sero1b <-
     province,
     hospital,
     rps,
+    nationality,
     finalresult,
     igminterpret,
     igginterpret,
@@ -1014,6 +1024,7 @@ df_sero2a <-
     province,
     hospital,
     rps,
+    nationality,
     igm_o,
     igm_11,
     igm_91,
@@ -1074,6 +1085,7 @@ df_sero2b <-
     province,
     hospital,
     rps,
+    nationality,
     iggsq_11,
     iggsq_91,
     agegrp,
@@ -1101,7 +1113,7 @@ df_sero2b <-
 df_kap1 <- CFMast %>%
   mutate(
     variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
-  select(province, hospital, rps, variant, s1age_year,
+  select(province, hospital, rps,nationality, variant, s1age_year,
          s3604sickspread, s3615carelate:s3620) %>%
   rename(s3604 = s3604sickspread,
          s3615 = s3615carelate) %>% 
@@ -1111,13 +1123,13 @@ df_kap1 <- CFMast %>%
   #mutate(scale = fct_rev(scale)) %>%
   filter(!is.na(scale)) %>%
   filter(s1age_year >=10) %>%
-  group_by(province, hospital, rps, variant, kap, scale) %>%
+  group_by(province, hospital, rps, nationality, variant, kap, scale) %>%
   tally()
 
 df_kap2 <- CFMast %>%
   mutate(
     variant = factor(ifelse(s1enrolldate < '2022-1-1', 1, 2), labels = c('Jun-Dec 2021', 'Jan 2022 - May 2023'))) %>% 
-  select(province, hospital, rps,variant,s1age_year,
+  select(province, hospital, rps, nationality, variant,s1age_year,
          s3610maskin, s3613maskout, s3621:s3622) %>%
   rename(s3610 = s3610maskin,
          s3613 = s3613maskout) %>% 
@@ -1126,7 +1138,7 @@ df_kap2 <- CFMast %>%
                values_to = "scale") %>%
   filter(!is.na(scale)) %>%
   filter(s1age_year >=10) %>%
-  group_by(province, hospital, rps, variant, kap, scale) %>%
+  group_by(province, hospital, rps, nationality, variant, kap, scale) %>%
   tally()
 
 
@@ -1134,7 +1146,7 @@ df_kap3 <-
   tblSection1 %>% filter(!is.na(cfid)) %>%
   left_join(tblSection3, by = 'cfid') %>%
   # Select only variables to be used
-  select(province, hospital, rps, s1enrolldate, s1age_year,
+  select(province, hospital, rps, nationality, s1enrolldate, s1age_year,
          s3604sickspread, s3615carelate:s3620) %>%
   rename(s3604 = s3604sickspread,
          s3615 = s3615carelate) %>%
@@ -1156,7 +1168,7 @@ df_kap4 <-
   tblSection1 %>% filter(!is.na(cfid)) %>%
   left_join(tblSection3, by = 'cfid') %>%
   # Select only variables to be used
-  select(province, hospital, rps, s1enrolldate, s1age_year,
+  select(province, hospital, rps, nationality, s1enrolldate, s1age_year,
           s3610maskin, s3613maskout, s3621:s3622) %>%
   rename(
          s3610 = s3610maskin,
@@ -1599,17 +1611,17 @@ save(
     # "gt_un_norps_t",
     # "gt_un_norps_t1",
     # "gt_un_norps_t2",
-    # "gt_un_norps_t3",
+    # "gt_un_norps_t3",  
    "df_rf",
-     "gt_rf",
-    "gt_rf_n",
-    "gt_rf_n1",
-    "gt_rf_n2",
-    "gt_rf_n3",
-    "gt_rf_t",
-    "gt_rf_t1",
-    "gt_rf_t2",
-    "gt_rf_t3",
+    #  "gt_rf",
+    # "gt_rf_n",
+    # "gt_rf_n1",
+    # "gt_rf_n2",
+    # "gt_rf_n3",
+    # "gt_rf_t",
+    # "gt_rf_t1",
+    # "gt_rf_t2",
+    # "gt_rf_t3",
     # "gt_rf_rps",
     # "gt_rf_rps_n",
     # "gt_rf_rps_n1",
