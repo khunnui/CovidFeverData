@@ -1262,7 +1262,7 @@ df_lc3 <- lcsec1 %>%
     l1cstroke = 'Stroke (unspecified type)',
     l1cmentaldis   = 'Mental health disorders',
     l1cbacteremia   = 'Bacteremia',
-    l1cendocarditis = 'endocarditis',
+    l1cendocarditis = 'Endocarditis',
     l1cmyocarditis   = 'Myocarditis/pericarditis',
     l1cari        = 'Acute renal injury',
     l1cpancreatitis = 'Pancreatitis',
