@@ -345,9 +345,9 @@ df_ss <- CFMast %>%
 
 df_ss_b <- 
   tblSection3 %>%
-  left_join(tblSection1 %>% select(cfid,rps,nationality), by = 'cfid') %>% 
+  left_join(tblSection1 %>% select(cfid,province,hospital,rps,nationality), by = 'cfid') %>% 
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
-  select(s32headache:s32other, rps, -c(ends_with("d")), nationality) %>%
+  select(s32headache:s32other, province,hospital,rps, -c(ends_with("d")), nationality) %>%
   rename_all(~stringr::str_replace(.,"^s32","")) %>% 
   mutate(   visit ='Baseline') %>% 
   replace(is.na(.), FALSE)
@@ -355,9 +355,9 @@ df_ss_b <-
 
 df_ss_f <- 
   tblSection8 %>% filter(s8isfu %in% c(1,3)) %>%
-  left_join(tblSection1 %>% select(cfid,rps,nationality), by = 'cfid') %>% 
+  left_join(tblSection1 %>% select(cfid,province,hospital,rps,nationality), by = 'cfid') %>% 
   semi_join(LabPCRFinal %>% filter(finalresult == 'Positive'), by = 'cfid') %>%
-  select(s8headache:s8other, rps,nationality) %>%
+  select(s8headache:s8other,province,hospital, rps,nationality) %>%
   rename_all(~stringr::str_replace(.,"^s8","")) %>% 
   mutate(    visit ='F/U') %>% 
   replace(is.na(.), FALSE)
@@ -407,9 +407,10 @@ df_signBox <- CFMast %>%
          nationality,
          s5covidpos,
          s5intub,
-         s5dischargetype) %>%
+         s5dischargetype,
+         s5isadmit) %>%
   filter(s5covidpos == 1) %>%
-  group_by(province, hospital, rps, nationality, s5intub, s5dischargetype) %>%
+  group_by(province, hospital, rps, nationality, s5intub, s5dischargetype,s5isadmit) %>%
   tally()
 
 # ls_sign    <- get_sum_data(df_sign)

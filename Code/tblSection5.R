@@ -47,13 +47,20 @@ tblSection5 <- tblSection5 %>%
       s5isadmit,
       levels = c(1:7),
       labels = c(
-        'Yes',
-        'Yes - refer from other hosp',
-        'No - but admit in project hosp',
-        'No home quarantine',
-        'No State Quarantine',
-        'No admit in other hospital',
-        'No Other'
+         'Yes',
+         'Yes',
+         'Yes',
+         'No home quarantine',
+         'No State Quarantine',
+         'Yes',
+         'No Other'
+        # 'Yes',
+        # 'Yes - refer from other hosp',
+        # 'No - but admit in project hosp',
+        # 'No home quarantine',
+        # 'No State Quarantine',
+        # 'No admit in other hospital',
+        # 'No Other'
       )
     ),
     across(matches('medadmin'),
